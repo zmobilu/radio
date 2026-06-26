@@ -283,7 +283,7 @@
         }
         body.full-night-mode #nightBottomInfo {
             display: block !important; position: absolute !important; bottom: 8vh !important;
-            font-size: 4.5vw !important; font-weight: 500; letter-spacing: 0.5px; text-align: center; width: 100vw; transform: scaleY(1.1);
+            font-size: 6vw !important; font-weight: 500; letter-spacing: 0.5px; text-align: center; width: 100vw; transform: scaleY(1.1);
         }
 
         /* --- EXKLUZÍVNE UKOTVENIE PRE VEĽKÉ OBRAZOVKY (Notebook / PC) --- */
@@ -451,6 +451,7 @@
         let cfgFarbaNoci = localStorage.getItem('cfg_night_color') || "#ffff00";
         let nocnyRezimSnoozeDo = 0;
 
+        // --- PREMENNÉ PRE GEOLOKÁCIU POČASIA (Opravené načítanie uloženého mesta) ---
         window.customLat = parseFloat(localStorage.getItem('kiosk_current_lat')) || 48.1421;
         window.customLon = parseFloat(localStorage.getItem('kiosk_current_lon')) || 17.1964;
         window.customCityName = localStorage.getItem('kiosk_current_name') || "Bratislava";
@@ -653,78 +654,74 @@
         }
 
         function vykresliGraf(targetDayIndex) {
-            const chartContainer = document.getElementById('hourlyChartContainer');
-            if (!chartContainer || !weatherDataBackup) return;
-            chartContainer.innerHTML = ''; 
+    const chartContainer = document.getElementById('hourlyChartContainer');
+    if (!chartContainer || !weatherDataBackup) return;
+    chartContainer.innerHTML = ''; 
 
-            const dayIdx = (targetDayIndex === null) ? 0 : targetDayIndex;
-            if (weatherDataBackup.daily && weatherDataBackup.daily.sunrise && weatherDataBackup.daily.sunset) {
-                document.getElementById('sunRiseVal').textContent = weatherDataBackup.daily.sunrise[dayIdx].split('T')[1]; 
-                document.getElementById('sunSetVal').textContent = weatherDataBackup.daily.sunset[dayIdx].split('T')[1];   
-            }
+    // DEFINITÍVNE ODSTRÁNENÉ: Pokusy o zápis do sunRiseVal a sunSetVal
 
-            let temps = [], rain = [], cloud = [], wind = [], labels = [], codes = [];
+    let temps = [], rain = [], cloud = [], wind = [], labels = [], codes = [];
 
-            if (targetDayIndex === null) {
-                const currentHourIndex = new Date().getHours();
-                temps = weatherDataBackup.hourly.temperature_2m.slice(currentHourIndex, currentHourIndex + 12);
-                rain = (weatherDataBackup.hourly.precipitation || []).slice(currentHourIndex, currentHourIndex + 12);
-                cloud = (weatherDataBackup.hourly.cloud_cover || []).slice(currentHourIndex, currentHourIndex + 12);
-                wind = (weatherDataBackup.hourly.wind_speed_10m || []).slice(currentHourIndex, currentHourIndex + 12);
-                codes = (weatherDataBackup.hourly.weather_code || []).slice(currentHourIndex, currentHourIndex + 12);
-                
-                for (let idx = 0; idx < 12; idx++) {
-                    labels.push(idx === 0 ? 'Teraz' : String((currentHourIndex + idx) % 24));
-                }
-            } else {
-                const startHourOfTargetDay = targetDayIndex * 24;
-                for (let step = 0; step < 12; step++) {
-                    const hourOffset = startHourOfTargetDay + (step * 2); 
-                    temps.push(weatherDataBackup.hourly.temperature_2m[hourOffset]);
-                    rain.push((weatherDataBackup.hourly.precipitation || [])[hourOffset]);
-                    cloud.push((weatherDataBackup.hourly.cloud_cover || [])[hourOffset]);
-                    wind.push((weatherDataBackup.hourly.wind_speed_10m || [])[hourOffset]);
-                    codes.push((weatherDataBackup.hourly.weather_code || [])[hourOffset]);
-                    
-                    labels.push(String(step * 2));
-                }
-            }
-
-            const maxGraphTemp = Math.max(...temps);
-            const minGraphTemp = Math.min(...temps);
-            const tempRange = (maxGraphTemp - minGraphTemp) || 1;
-
-            temps.forEach((temp, idx) => {
-                if (temp === undefined) return;
-                const roundedTemp = Math.round(temp);
-                const pct = ((temp - minGraphTemp) / tempRange) * 52 + 12;
-                
-                const rainVal = rain[idx] ? parseFloat(rain[idx]) : 0;
-                const rainHtml = rainVal > 0 ? `<span class="chart-rain-info">💧${rainVal.toFixed(1)}</span>` : `<span class="chart-rain-info"></span>`;
-                
-                const cCode = codes[idx] !== undefined ? codes[idx] : 0;
-                const weatherIconHtml = `<i class="fas ${WEATHER_CODES[cCode] || 'fa-cloud'} chart-icon-info" style="color: ${WEATHER_COLORS[cCode] || '#aaa'};"></i>`;
-
-                const cloudVal = cloud[idx] ? Math.round(cloud[idx]) : 0;
-                const bgOpacity = 0.05 + (cloudVal / 100) * 0.15; 
-                const colBackground = `linear-gradient(to top, rgba(255,255,255, ${bgOpacity}), ${getTempColor(temp)})`;
-                
-                const windVal = wind[idx] ? Math.round(wind[idx]) : 0;
-                const windHtml = windVal > 0 ? `<span class="chart-wind-info"><i class="fas fa-wind" style="font-size:0.8em;"></i> ${windVal}</span>` : `<span style="height: 1.8vw;"></span>`;
-
-                const column = document.createElement('div');
-                column.className = 'chart-column';
-                column.innerHTML = `
-                    ${rainHtml}
-                    ${weatherIconHtml}
-                    <span class="chart-temp-info" style="color: ${getTempColor(temp)};">${roundedTemp}°</span>
-                    <div class="chart-bar-fill" style="height: ${pct}%; background: ${colBackground};"></div>
-                    <span class="chart-label-hour">${labels[idx]}</span>
-                    ${windHtml}
-                `;
-                chartContainer.appendChild(column);
-            });
+    if (targetDayIndex === null) {
+        const currentHourIndex = new Date().getHours();
+        temps = weatherDataBackup.hourly.temperature_2m.slice(currentHourIndex, currentHourIndex + 12);
+        rain = (weatherDataBackup.hourly.precipitation || []).slice(currentHourIndex, currentHourIndex + 12);
+        cloud = (weatherDataBackup.hourly.cloud_cover || []).slice(currentHourIndex, currentHourIndex + 12);
+        wind = (weatherDataBackup.hourly.wind_speed_10m || []).slice(currentHourIndex, currentHourIndex + 12);
+        codes = (weatherDataBackup.hourly.weather_code || []).slice(currentHourIndex, currentHourIndex + 12);
+        
+        for (let idx = 0; idx < 12; idx++) {
+            labels.push(idx === 0 ? 'Teraz' : String((currentHourIndex + idx) % 24));
         }
+    } else {
+        const startHourOfTargetDay = targetDayIndex * 24;
+        for (let step = 0; step < 12; step++) {
+            const hourOffset = startHourOfTargetDay + (step * 2); 
+            temps.push(weatherDataBackup.hourly.temperature_2m[hourOffset]);
+            rain.push((weatherDataBackup.hourly.precipitation || [])[hourOffset]);
+            cloud.push((weatherDataBackup.hourly.cloud_cover || [])[hourOffset]);
+            wind.push((weatherDataBackup.hourly.wind_speed_10m || [])[hourOffset]);
+            codes.push((weatherDataBackup.hourly.weather_code || [])[hourOffset]);
+            
+            labels.push(String(step * 2));
+        }
+    }
+
+    const maxGraphTemp = Math.max(...temps);
+    const minGraphTemp = Math.min(...temps);
+    const tempRange = (maxGraphTemp - minGraphTemp) || 1;
+
+    temps.forEach((temp, idx) => {
+        if (temp === undefined) return;
+        const roundedTemp = Math.round(temp);
+        const pct = ((temp - minGraphTemp) / tempRange) * 52 + 12;
+        
+        const rainVal = rain[idx] ? parseFloat(rain[idx]) : 0;
+        const rainHtml = rainVal > 0 ? `<span class="chart-rain-info">💧${rainVal.toFixed(1)}</span>` : `<span class="chart-rain-info"></span>`;
+        
+        const cCode = codes[idx] !== undefined ? codes[idx] : 0;
+        const weatherIconHtml = `<i class="fas ${WEATHER_CODES[cCode] || 'fa-cloud'} chart-icon-info" style="color: ${WEATHER_COLORS[cCode] || '#aaa'};"></i>`;
+
+        const cloudVal = cloud[idx] ? Math.round(cloud[idx]) : 0;
+        const bgOpacity = 0.05 + (cloudVal / 100) * 0.15; 
+                const colBackground = `linear-gradient(to top, rgba(255,255,255, ${bgOpacity}), ${getTempColor(temp)})`;
+        
+        const windVal = wind[idx] ? Math.round(wind[idx]) : 0;
+        const windHtml = windVal > 0 ? `<span class="chart-wind-info"><i class="fas fa-wind" style="font-size:0.8em;"></i> ${windVal}</span>` : `<span style="height: 1.8vw;"></span>`;
+
+        const column = document.createElement('div');
+        column.className = 'chart-column';
+        column.innerHTML = `
+            ${rainHtml}
+            ${weatherIconHtml}
+            <span class="chart-temp-info" style="color: ${getTempColor(temp)};">${roundedTemp}°</span>
+            <div class="chart-bar-fill" style="height: ${pct}%; background: ${colBackground};"></div>
+            <span class="chart-label-hour">${labels[idx]}</span>
+            ${windHtml}
+        `;
+        chartContainer.appendChild(column);
+    });
+}
 
         function prepniDenGrafu(e, dayIndex) {
             if (e) e.stopPropagation();
