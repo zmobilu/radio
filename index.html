@@ -3,217 +3,519 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kiosk OS v2</title>
+    <title>Univerzálny Kiosk Rádio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
     <style>
-        /* --- NÁPAD S OHRANIČENÍM DO FullHD --- */
-        html, body {
+        /* --- RESET A UNIVERZÁLNY MOD --- */
+        body {
             margin: 0;
             padding: 0;
-            background-color: #000; /* Okolitý čierny blok na 4K monitoroch */
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            box-sizing: border-box;
             -webkit-user-select: none;
             user-select: none;
         }
 
-        /* Hlavný kontajner aplikácie */
-        .app-container {
-            width: 100vw;
-            height: 100vh;
-            max-width: 1920px;  /* Stop na FullHD šírke */
-            max-height: 1080px; /* Stop na FullHD výške */
-            background-color: #000;
+        /* --- HORNÁ LIŠTA (HEADER) --- */
+        .top-header {
             display: flex;
-            box-shadow: 0 0 100px rgba(0,0,0,0.8); /* Jemný tieň do okolitého 4K priestoru */
-        }
-
-        /* --- ROZDELENIE 30% / 70% --- */
-        
-        /* Ľavý panel pre dynamické tlačidlá (30%) */
-        .left-panel {
-            width: 30%;
-            height: 100%;
-            background-color: #050505;
-            border-right: 1px solid #111;
-            box-sizing: border-box;
-            padding: 15px;
-            
-            /* Tlačidlá budeme riadiť cez Flexbox/Grid pomocou JS */
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Pravý panel pre hodiny a dátum (70%) */
-        .right-panel {
-            width: 70%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            background-color: #000;
-        }
-
-        /* --- PRAVÁ STRANA: KLASICKÝ ČAS A DÁTUM --- */
-        #time-display {
-            font-size: 16vw; /* Používame relatívne jednotky, ktoré sa prispôsobia FullHD kontajneru */
-            font-weight: 600;
-            line-height: 0.9;
-            letter-spacing: -2px;
-        }
-        
-        #date-display {
-            font-size: 3.5vw;
-            font-weight: 300;
-            color: #888;
-            margin-top: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* --- ĽAVÁ STRANA: DYNAMICKÁ MRIEŽKA RÁDIÍ --- */
-        .grid-container {
-            width: 100%;
-            height: 100%;
-            display: grid;
-            gap: 12px; /* Medzera medzi tlačidlami */
+            padding: 10px 20px;
+            background: #050505;
+            border-bottom: 1px solid #111;
+            height: 65px;
             box-sizing: border-box;
         }
+        .header-clock {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -1px;
+        }
+        .header-info {
+            font-size: 14px;
+            color: #aaa;
+            text-align: right;
+            line-height: 1.3;
+        }
+        #header-nameday {
+            font-weight: 500;
+        }
 
-        /* Univerzálny štýl pre vygenerované tlačidlo */
-        .radio-btn {
-            background-color: #151515;
+        /* --- HLAVNÁ PLOCHA OD HORA DOLE (MAIN GRID) --- */
+        .radio-grid-container {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: grid;
+            /* Responzívna mriežka: dlaždice sa automaticky vyskladajú podľa šírky okna */
+            grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+            gap: 12px;
+            align-content: start;
+            background: #000;
+        }
+
+        /* Vzhľad karty / tlačidla rádia */
+        .radio-card {
+            background: #111;
             border: 2px solid #222;
             border-radius: 16px;
-            color: #fff;
-            font-size: 18px;
-            font-weight: 500;
-            cursor: pointer;
+            aspect-ratio: 1 / 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            cursor: pointer;
             padding: 10px;
+            box-sizing: border-box;
+            transition: transform 0.1s, border-color 0.15s;
+            position: relative;
+        }
+        .radio-card:active {
+            transform: scale(0.95);
+        }
+        .radio-card.playing {
+            border-color: #ff9f0a !important;
+            background: #151515;
+        }
+        .radio-card img {
+            width: 75%;
+            height: 75%;
+            object-fit: contain;
+        }
+        .radio-card span {
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #aaa;
+            text-align: center;
+            margin-top: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+        .radio-card i {
+            font-size: 40px;
         }
 
-        .radio-btn i {
-            font-size: 28px;
-            margin-bottom: 8px;
+        /* Sekcie pod-štítkov (ak chceme vizuálne oddeliť sub-stanice na celú plochu) */
+        .grid-separator {
+            grid-column: 1 / -1;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ff9f0a;
+            margin: 10px 0 2px 5px;
+            font-weight: 600;
+            border-bottom: 1px solid #111;
+            padding-bottom: 4px;
         }
 
-        .radio-btn.active {
-            border-color: #ff9f0a;
-            background-color: #221500;
+        /* --- SPODNÁ LIŠTA S PREHRÁVAČOM (FOOTER) --- */
+        .player-bar {
+            background: #050505;
+            border-top: 1px solid #111;
+            height: 85px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+        .current-track {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 35%;
+        }
+        .current-track h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+        }
+        .current-track p {
+            margin: 3px 0 0 0;
+            font-size: 12px;
+            color: #ff9f0a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .player-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-stop {
+            background: #222;
+            border: none;
+            color: #eb0028;
+            font-size: 26px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+        }
+        .btn-stop:active {
+            background: #333;
+        }
+
+        .player-utils {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 35%;
+            justify-content: flex-end;
+        }
+        .volume-slider {
+            accent-color: #ff9f0a;
+            width: 90px;
+            cursor: pointer;
+            background: #333;
+            height: 6px;
+            border-radius: 3px;
+        }
+
+        /* --- RESPONDZIVITA PRE VEĽKÉ OBRAZOVKY (TABLET / PC) --- */
+        @media (min-width: 768px) {
+            .radio-grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+                gap: 16px;
+                padding: 25px;
+            }
+            .radio-card span { font-size: 13px; margin-top: 6px; }
+            .volume-slider { width: 130px; }
+            .top-header { height: 75px; padding: 0 30px; }
+            .header-clock { font-size: 36px; }
+            .player-bar { height: 100px; padding: 0 30px; }
         }
     </style>
 </head>
-<body>
+<body id="mainBody">
 
-    <div class="app-container">
-        
-        <div class="left-panel">
-            <div id="radio-grid" class="grid-container"></div>
+    <audio id="audioPlayer" preload="none" playsinline></audio>
+
+    <header class="top-header">
+        <div class="header-clock" id="clock-display">00:00</div>
+        <div class="header-info">
+            <div id="date-display">--.--.----</div>
+            <div id="header-nameday">Meniny: ---</div>
         </div>
+    </header>
+
+    <main class="radio-grid-container" id="radioGrid">
         
-        <div class="right-panel">
-            <div id="time-display">00:00</div>
-            <div id="date-display">Pondelok, 1. Január</div>
+        <div class="grid-separator">Hlavné stanice</div>
+        
+        <div onclick="playRadio('https://icecast.stv.livebox.sk/slovensko_128.mp3', this, 'slovensko')" class="radio-card" data-type="slovensko" style="background:#00547E;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png" alt="Slovensko">
+        </div>
+        <div onclick="playRadio('https://stream.funradio.sk/fun192.mp3', this, 'fun')" class="radio-card" data-type="fun" style="background:#ffffff;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png" alt="Fun">
+        </div>
+        <div onclick="playRadio('https://stream.bauermedia.sk/rock-hi.mp3', this, 'rock')" class="radio-card" data-type="rock" style="background:#000000;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png" alt="Rock">
+        </div>
+        <div onclick="playRadio('https://ice.abradio.cz/blanikcz128.mp3', this, 'blanik')" class="radio-card" data-type="blanik" style="background:#005ea6;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png" alt="Blaník">
+        </div>
+        <div onclick="playRadio('https://stream.sunshine-live.de/techno/mp3-192/', this, 'S-techno')" class="radio-card" data-type="S-techno" style="background:#000000; color:#307CEB;">
+            <i class="fa-solid fa-bolt"></i><span>Techno</span>
         </div>
 
-    </div>
-
-<script>
-    // --- 1. DATABÁZA VŠETKÝCH DOSTUPNÝCH RÁDIÍ ---
-    // Na jednom mieste máme komplet dáta. Odtiaľto budeme neskôr vyberať.
-    const VSETKY_RADIA = [
-        { id: 'slovensko', nazov: 'Slovensko 1', ikona: 'fa-radio', farba: '#00547E' },
-        { id: 'fm', nazov: 'Rádio _FM', ikona: 'fa-music', farba: '#eb0028' },
-        { id: 'fun', nazov: 'Fun Rádio', ikona: 'fa-face-laugh-beam', farba: '#ffa500' },
-        { id: 'rock', nazov: 'Anténa Rock', ikona: 'fa-guitar', farba: '#000000' },
-        { id: 'blanik', nazov: 'Blaník', ikona: 'fa-sun', farba: '#005ea6' },
-        { id: 'vlna', nazov: 'Rádio Vlna', ikona: 'fa-water', farba: '#00ced1' },
-        { id: 'expres', nazov: 'Expres', ikona: 'fa-bolt', farba: '#ffa500' },
-        { id: 'melody', nazov: 'Melody', ikona: 'fa-heart', farba: '#ffb6c1' }
-    ];
-
-    // --- 2. FILTRÁCIA / VOĽBA POUŽÍVATEĽA ---
-    // Predstavme si, že toto pole nám neskôr naplnia "Nastavenia".
-    // Pre test si tu teraz môžeme meniť počet prvkov (napr. nechať len 3, 5 alebo všetkých 8 rádia).
-    const zvoleneRadia = [...VSETKY_RADIA]; // Teraz testujeme plných 8 tlačidiel
-
-    // --- 3. CHYTRÁ LOGIKA AUTOMATICKÉHO ŠKÁLOVANIA ---
-    function vykresliMriezku() {
-        const gridElement = document.getElementById('radio-grid');
-        gridElement.innerHTML = ''; // Vyčistiť mriežku
+        <div class="grid-separator">Rozhlas / RTVS sub-stanice</div>
         
-        const pocet = zvoleneRadia.length;
-        let stlpce = 3; // Predvolene 3 stĺpce pre monitory
+        <div onclick="playRadio('https://icecast.stv.livebox.sk/fm_128.mp3', this, 'fm')" class="radio-card" data-type="fm" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioFM.png" alt="Rádio_FM">
+        </div>
+        <div onclick="playRadio('https://icecast.stv.livebox.sk/devin_128.mp3', this, 'devin')" class="radio-card" data-type="devin" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioDevin.png" alt="Devín">
+        </div>
+        <div onclick="playRadio('https://icecast.stv.livebox.sk/litera_128.mp3', this, 'litera')" class="radio-card" data-type="litera" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioLitera.png" alt="Litera">
+        </div>
+        <div onclick="playRadio('https://icecast.stv.livebox.sk/junior_128.mp3', this, 'junior')" class="radio-card" data-type="junior" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioJunior.png" alt="Junior">
+        </div>
+        <div onclick="playRadio('https://icecast.stv.livebox.sk/regina-ba_128.mp3', this, 'regina')" class="radio-card" data-type="regina" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioReginaZ.png" alt="Regina">
+        </div>
+
+        <div class="grid-separator">Fun Radio sub-stanice</div>
         
-        // Ak si používateľ zvolí málo rádií (napr. 1 až 4), automaticky zúžime mriežku na 2 stĺpce,
-        // aby gombíky neboli smiešne malé a úzke.
-        if (pocet <= 4) {
-            stlpce = 2;
-        }
+        <div onclick="playRadio('https://stream.funradio.sk/chill128.mp3', this, 'funchill')" class="radio-card" data-type="funchill" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunChill.png" alt="Chill">
+        </div>
+        <div onclick="playRadio('https://stream.funradio.sk/cs128.mp3', this, 'funczsk')" class="radio-card" data-type="funczsk" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunCZSK.png" alt="CZ-SK">
+        </div>
+        <div onclick="playRadio('https://stream.funradio.sk/80-90-128.mp3', this, 'fun8090')" class="radio-card" data-type="fun8090" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun8090.png" alt="80-90">
+        </div>
+        <div onclick="playRadio('https://stream.funradio.sk/milenialky128.mp3', this, 'milenialky')" class="radio-card" data-type="milenialky" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun2000.png" alt="2000s">
+        </div>
 
-        // Vypočítame počet riadkov, ktoré budeme reálne potrebovať
-        let riadky = Math.ceil(pocet / stlpce);
+        <div class="grid-separator">Komerčné & Regionálne</div>
+        
+        <div onclick="playRadio('https://stream.bauermedia.sk/expres-hi.mp3', this, 'expres')" class="radio-card" data-type="expres" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoExpress.png" alt="Expres">
+        </div>
+        <div onclick="playRadio('https://stream.bauermedia.sk/europa2-hi.mp3', this, 'europa2')" class="radio-card" data-type="europa2" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoEuropa2.png" alt="Europa 2">
+        </div>
+        <div onclick="playRadio('https://stream.bauermedia.sk/melody-hi.mp3', this, 'melody')" class="radio-card" data-type="melody" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoMelody.png" alt="Melody">
+        </div>
+        <div onclick="playRadio('https://stream.radiovlna.sk/vlna-hi.mp3', this, 'vlna')" class="radio-card" data-type="vlna" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoVlna.png" alt="Vlna">
+        </div>
+        <div onclick="playRadio('https://corsproxy.io/?' + encodeURIComponent('http://80.242.44.249:8000/stream/1/'), this, 'topolcany')" class="radio-card" data-type="topolcany" style="background:#151515;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioTO.png" alt="Topolčany">
+        </div>
 
-        // Dynamicky nastavíme CSS Grid vlastnosti mriežky podľa počtu staníc
-        gridElement.style.gridTemplateColumns = `repeat(${stlpce}, 1fr)`;
-        gridElement.style.gridTemplateRows = `repeat(${riadky}, 1fr)`;
+        <div class="grid-separator">Rocková scéna</div>
+        
+        <div onclick="playRadio('https://stream.radiovlna.sk/rockovarepublika-hi.mp3', this, 'rockrepublika')" class="radio-card" data-type="rockrepublika" style="background:#151515; padding:18px;">
+            <img src="https://www.radia.sk/static/logos/radios/61_large.png" alt="Republika">
+        </div>
+        <div onclick="playRadio('https://ice.abradio.cz/beat128.mp3', this, 'beat')" class="radio-card" data-type="beat" style="background:#151515; padding:18px;">
+            <img src="https://www.radia.sk/static/logos/radios/142_large.png" alt="Beat">
+        </div>
+        <div onclick="playRadio('https://ice.abradio.cz/casrock128.mp3', this, 'casrock')" class="radio-card" data-type="casrock" style="background:#151515; padding:18px;">
+            <img src="https://www.casrock.cz/wp-content/themes/casrock/assets/images/logo.png" alt="Čas Rock">
+        </div>
 
-        // Vygenerujeme samotné gombíky
-        zvoleneRadia.forEach(radio => {
-            const btn = document.createElement('button');
-            btn.className = 'radio-btn';
-            btn.style.backgroundColor = radio.farba;
+        <div class="grid-separator">Sunshine Live Kluby</div>
+        
+        <div onclick="playRadio('https://stream.sunshine-live.de/schranz/mp3-192/', this, 'schranz')" class="radio-card" data-type="schranz" style="background:#111;">
+            <span style="font-size:13px; color:#fff;">schranz</span>
+        </div>
+        <div onclick="playRadio('https://stream.sunshine-live.de/melodic_beats/mp3-192/', this, 'melodic')" class="radio-card" data-type="melodic" style="background:#111;">
+            <span style="font-size:13px; color:#fff;">melodic</span>
+        </div>
+        <div onclick="playRadio('https://stream.sunshine-live.de/hardtechno/mp3-192', this, 'h-techno')" class="radio-card" data-type="h-techno" style="background:#111;">
+            <span style="font-size:13px; color:#fff;">h-techno</span>
+        </div>
+        <div onclick="playRadio('https://stream.sunshine-live.de/drumbass/mp3-192', this, 'Drumcode')" class="radio-card" data-type="Drumcode" style="background:#111;">
+            <span style="font-size:13px; color:#fff;">Drumcode 🔊</span>
+        </div>
+
+        <div class="grid-separator">Externé platformy</div>
+        
+        <div onclick="triggerSpotifyExternal()" class="radio-card" data-type="spotify" style="background:#21D844;">
+            <img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoSpotifySET.png" alt="Spotify Open">
+        </div>
+    </main>
+
+    <footer class="player-bar">
+        <div class="current-track">
+            <h4 id="player-station-title">RÁDIO VYPNUTÉ</h4>
+            <p id="player-song-title">Zvoľte stanicu zo zoznamu</p>
+        </div>
+
+        <div class="player-controls">
+            <button onclick="stopRadio()" class="btn-stop" title="Zastaviť rádio">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </div>
+
+        <div class="player-utils">
+            <i class="fa-solid fa-volume-high" style="color: #666; font-size: 14px;"></i>
+            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="80" oninput="changeVolume(this.value)">
+        </div>
+    </footer>
+
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        let currentPlayingType = "";
+        let dnesneMeno = "";
+        let poslednyDatumMenin = "";
+
+        // Prispôsobená mapa hlasitostí z vášho iPhonu
+        const VOLUME_MAP = { 
+            'slovensko': 0.3, 'fm': 0.5, 'devin': 0.5, 'litera': 0.5, 'junior': 0.5, 'regina': 0.5,
+            'fun': 1.0, 'funchill': 0.5, 'funczsk': 0.5, 'fun8090': 0.5, 'milenialky': 0.5,
+            'expres': 1.0, 'europa2': 1.0, 'melody': 1.0, 'vlna': 1.0,
+            'blanik': 0.5, 'rock': 0.5, 'rockrepublika': 0.5, 'beat': 0.5, 'casrock': 0.5, 
+            'S-techno': 1.0, 'schranz': 1.0, 'melodic': 1.0, 'h-techno': 1.0, 'Drumcode': 1.0,
+            'topolcany': 0.5
+        };
+
+        // --- POKROČILÁ AUDIO LOGIKA ---
+        function playRadio(url, element, type) {
+            currentPlayingType = type;
             
-            // Ak je pozadie príliš svetlé, ikona a text budú čierne (napr. pre FunRádio)
-            if(radio.farba === '#ffffff' || radio.farba === '#ffb6c1') {
-                btn.style.color = '#000';
+            // Uložíme poslednú voľbu do pamäte
+            localStorage.setItem('kiosk_last_radio_url', url);
+            localStorage.setItem('kiosk_last_radio_type', type);
+
+            // Odstránime vizuálny oranžový rámček (.playing) zo všetkých kariet
+            document.querySelectorAll('.radio-card').forEach(card => card.classList.remove('playing'));
+            
+            // Priradenie aktívneho rámčeka vybranej karte
+            if (element) {
+                element.classList.add('playing');
+            } else {
+                const tlacitko = document.querySelector(`[data-type="${type}"]`);
+                if (tlacitko) tlacitko.classList.add('playing');
             }
 
-            btn.innerHTML = `
-                <i class="fa-solid ${radio.ikona}"></i>
-                <span>${radio.nazov}</span>
-            `;
+            // Prepísanie textu v spodnom prehrávači
+            document.getElementById('player-station-title').textContent = type.toUpperCase();
+            document.getElementById('player-song-title').textContent = "Načítavam prúd zvuku...";
 
-            // Test klikateľnosti
-            btn.onclick = () => {
-                document.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                console.log(`Hrá rádio: ${radio.nazov}`);
-            };
+            // Výpočet a nastavenie hlasitosti
+            const sliderVal = document.getElementById('volumeSlider').value / 100;
+            const koeficient = VOLUME_MAP[type] || 1.0;
+            audio.volume = sliderVal * koeficient;
 
-            gridElement.appendChild(btn);
+            audio.src = url; 
+            audio.play()
+                .then(() => {
+                    document.getElementById('player-song-title').textContent = "Práve hrá";
+                    aktualizujAktualnuSkladbuSTVR();
+                })
+                .catch(e => {
+                    document.getElementById('player-song-title').textContent = "Chyba streamu (kliknite znova)";
+                });
+        }
+
+        function stopRadio() {
+            if (currentPlayingType !== "") {
+                audio.pause();
+                audio.src = "";
+                currentPlayingType = "";
+                
+                document.querySelectorAll('.radio-card').forEach(card => card.classList.remove('playing'));
+                document.getElementById('player-station-title').textContent = "RÁDIO VYPNUTÉ";
+                document.getElementById('player-song-title').textContent = "Zvoľte stanicu zo zoznamu";
+            } else {
+                // Štart naposledy hraného rádia pri kliku na vypnutý power button
+                const savedUrl = localStorage.getItem('kiosk_last_radio_url');
+                const savedType = localStorage.getItem('kiosk_last_radio_type');
+                if (savedUrl && savedType) {
+                    playRadio(savedUrl, null, savedType);
+                }
+            }
+        }
+
+        function changeVolume(val) {
+            const sliderVal = val / 100;
+            const koeficient = VOLUME_MAP[currentPlayingType] || 1.0;
+            audio.volume = sliderVal * koeficient;
+        }
+
+        function triggerSpotifyExternal() {
+            audio.pause();
+            audio.src = "";
+            currentPlayingType = "spotify";
+            document.querySelectorAll('.radio-card').forEach(card => card.classList.remove('playing'));
+            const sBtn = document.querySelector('[data-type="spotify"]');
+            if (sBtn) sBtn.classList.add('playing');
+            
+            document.getElementById('player-station-title').textContent = "SPOTIFY";
+            document.getElementById('player-song-title').textContent = "Otváram externú aplikáciu...";
+            
+            window.location.href = "https://open.spotify.com/search";
+        }
+
+        // --- MERANIE ČASU A HODINY ---
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('clock-display').textContent = `${h}:${m}`;
+            
+            const dni = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
+            const denSlovom = dni[now.getDay()];
+            const formatovanyDatum = `${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`;
+            document.getElementById('date-display').textContent = `${denSlovom}, ${formatovanyDatum}`;
+        }
+
+        // --- SKLADBY RTVS API ---
+        async function aktualizujAktualnuSkladbuSTVR() {
+            const stvrChannels = { 'slovensko': 1, 'fm': 2, 'devin': 3, 'junior': 4, 'litera': 8 };
+            const aktualnyKanal = stvrChannels[currentPlayingType];
+            
+            if (!aktualnyKanal) return;
+
+            try {
+                const response = await fetch(`https://fm.stvr.sk/json/snippet/radio_playlist.json?channel=${aktualnyKanal}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data["0"]) {
+                        const interpret = data["0"].interpret || "";
+                        const title = data["0"].title || "";
+                        if (interpret && title) {
+                            document.getElementById('player-song-title').textContent = `${interpret} - ${title}`;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log("STVR API nedostupné (CORS brána)");
+            }
+        }
+        setInterval(aktualizujAktualnuSkladbuSTVR, 20000);
+
+        // --- MENINY API ---
+        async function updateNameday() {
+            const now = new Date();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const targetDate = `${mm}-${dd}`;
+
+            if (poslednyDatumMenin === `${dd}.${mm}.` && dnesneMeno !== "") return;
+
+            try {
+                const response = await fetch('https://raw.githubusercontent.com/spacek/slovensky-kalendar-menin/master/sk-meniny.csv');
+                const text = await response.text();
+                const lines = text.split('\n');
+                for (let line of lines) {
+                    if (line.includes(targetDate)) {
+                        const parts = line.split(/[;,]/);
+                        if (parts.length > 1) {
+                            dnesneMeno = parts[1].trim();
+                            document.getElementById('header-nameday').textContent = `Meniny: ${dnesneMeno}`;
+                            poslednyDatumMenin = `${dd}.${mm}.`;
+                        }
+                        break;
+                    }
+                }
+            } catch (e) { console.log("Chyba menín"); }
+        }
+
+        // --- ŠTART A INICIALIZÁCIA ---
+        document.addEventListener('DOMContentLoaded', () => {
+            updateClock();
+            setInterval(updateClock, 1000);
+            updateNameday();
+            setInterval(updateNameday, 3600000);
+
+            // Obnovenie posledného rádia po zapnutí (vizuálne nastavenie textu do standby)
+            const savedType = localStorage.getItem('kiosk_last_radio_type');
+            if (savedType) {
+                document.getElementById('player-station-title').textContent = "STANDBY";
+                document.getElementById('player-song-title').textContent = `Naposledy hralo: ${savedType.toUpperCase()} (ťuknite na vypínač alebo kartu)`;
+            }
         });
-    }
-
-    // --- 4. KLASICKÉ HODINY A DÁTUM (ZÁKLAD) ---
-    function updateClock() {
-        const now = new Date();
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        document.getElementById('time-display').textContent = `${h}:${m}`;
-
-        const dni = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
-        const mesiace = ['Január', 'Február', 'Marec', 'Apríl', 'Máj', 'Jún', 'Júl', 'August', 'September', 'Október', 'November', 'December'];
-        
-        document.getElementById('date-display').textContent = `${dni[now.getDay()]}, ${now.getDate()}. ${mesiace[now.getMonth()]}`;
-    }
-
-    // Inicializácia pri štarte
-    vykresliMriezku();
-    setInterval(updateClock, 1000);
-    updateClock();
-</script>
+    </script>
 </body>
 </html>
