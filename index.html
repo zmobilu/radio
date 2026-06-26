@@ -11,22 +11,26 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
 
-    <title>Tvoje rádio</title>
+    <title>Tvoje radio</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>">
     
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/zmobilu/assets/main/kiosk-ikona.png">
+    <link class="apple-touch-icon" href="https://raw.githubusercontent.com/zmobilu/assets/main/kiosk-ikona.png">
     <meta property="og:image" content="https://raw.githubusercontent.com/zmobilu/assets/main/kiosk-ikona.png">
     
     <style>
+        /* --- CENTRÁLNE RIADENÁ FARBA NOCNÉHO REŽIMU --- */
+        :root {
+            --night-color: #ffff00;
+        }
+
         /* --- RESET A ZÁKLADNÉ NASTAVENIE --- */
         body {
             margin: 0; padding: 0; background-color: #000; color: #fff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex; flex-direction: column; height: 100vh; width: 100vw;
             overflow: hidden; box-sizing: border-box; -webkit-user-select: none; user-select: none;
-            /* Ochrana pred posúvaním celej aplikácie prstom na iPhone */
             position: fixed; top: 0; left: 0; bottom: 0; right: 0;
         }
 
@@ -35,7 +39,6 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 15px; background: #050505; border-bottom: 1px solid #111;
             height: 40px; box-sizing: border-box; flex-shrink: 0;
-            /* Bezpečná rezerva pre iPhony s výrezom v horizontálnej polohe */
             padding-left: calc(15px + env(safe-area-inset-left));
             padding-right: calc(15px + env(safe-area-inset-right));
         }
@@ -67,14 +70,13 @@
         .fav-card i { font-size: 30px; }
         .fav-card span { font-size: 11px; font-weight: 600; text-transform: uppercase; text-align: center; margin-top: 2px; }
         
-        /* Prazdny slot v paneli */
         .fav-card.empty { border: 1px dashed #222; background: transparent; cursor: default; }
         .fav-card.empty i { color: #333; font-size: 22px; }
 
         /* Pravá sekcia: Hlavný obsah alebo nastavenia (65%) */
         .main-content-area { width: 65%; background: #000; position: relative; overflow: hidden; }
         
-        /* --- PROFI DIZAJN VEĽKÝCH HODÍN (DOMOVSKÁ OBRAZOVKA) --- */
+        /* --- PROFI DIZAJN VEĽKÝCH HODÍN --- */
         .placeholder-view {
             display: flex; width: 100%; height: 100%; flex-direction: column;
             align-items: center; justify-content: center; background: #000; box-sizing: border-box;
@@ -82,7 +84,7 @@
         }
         .big-clock-time {
             font-size: 16vw; font-weight: 700; line-height: 0.9; letter-spacing: -4px;
-            display: flex; align-items: baseline; transform: scaleY(1.05);
+            display: flex; align-items: baseline; transform: scaleY(1.05); cursor: pointer;
         }
         .big-clock-hours { color: #fff; font-weight: 700; }
         .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 2px; }
@@ -95,6 +97,21 @@
         .big-clock-nameday {
             font-size: 2.2vw; font-weight: 400; color: #ff9f0a; letter-spacing: 0.5px; margin-top: 2px;
         }
+
+        /* --- ZÚŽENÝ EXTRA KOMPAKTNÝ PANEL BEZ TEXTOV --- */
+        .settings-night-panel {
+            background: #0d0d0d; padding: 8px; border-bottom: 2px solid #1a1a1a;
+            display: flex; flex-direction: row; gap: 6px; box-sizing: border-box; justify-content: space-between;
+        }
+        .settings-night-row { 
+            display: flex; align-items: center; background: #151515; padding: 6px 10px; 
+            border-radius: 8px; border: 1px solid #222; gap: 8px; flex: 1; justify-content: center;
+        }
+        .settings-night-row i.label-icon { font-size: 14px; color: #666; width: 16px; text-align: center; }
+        .settings-night-row button { background: #222; color: #fff; border: 1px solid #444; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; }
+        .color-picker-group { display: flex; gap: 5px; }
+        .color-dot { width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; box-sizing: border-box; }
+        .color-dot.active-color { border-color: #fff !important; transform: scale(1.1); }
 
         /* Mriežka všetkých rádií v režime nastavení */
         .settings-grid-view {
@@ -112,7 +129,6 @@
         .cfg-mini-card i { font-size: 22px; }
         .cfg-mini-card span { font-size: 9px; text-transform: uppercase; font-weight: 600; text-align: center; color: #888; margin-top: 3px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        /* Hrubé oranžové orámovanie pre zvolené stanice */
         .cfg-mini-card.selected { border: 3px solid #ff9f0a !important; background: #1a1a1a; }
         .cfg-mini-card.selected span { color: #ff9f0a; }
 
@@ -147,17 +163,46 @@
         .player-utility-block { display: flex; align-items: center; gap: 8px; width: 35%; justify-content: flex-end; }
         .slider-vol { accent-color: #ff9f0a; width: 85px; cursor: pointer; height: 5px; background: #333; border-radius: 3px; border: none; }
 
-        /* --- KOREKCIE PRE HORIZONTÁLNY IPHONE / TABLET --- */
+        #nightBottomInfo { display: none; }
+
+        /* --- STYLING PRE FILTROVANIE CELOOBRAZOVKOVÉHO NOČNÉHO REŽIMU --- */
+        body.full-night-mode .top-navbar,
+        body.full-night-mode .favorites-sidebar,
+        body.full-night-mode .bottom-player-bar,
+        body.full-night-mode .big-clock-date-wrapper {
+            display: none !important;
+        }
+        body.full-night-mode .workspace-container { width: 100vw; height: 100vh; }
+        body.full-night-mode .main-content-area { width: 100vw; height: 100vh; }
+        body.full-night-mode .placeholder-view {
+            width: 100vw !important; height: 100vh !important;
+            justify-content: center !important; align-items: center !important; padding: 0 !important;
+        }
+        body.full-night-mode .big-clock-time {
+            font-size: 28vw !important; letter-spacing: -2px !important; margin: 0 !important;
+        }
+        body.full-night-mode .big-clock-hours,
+        body.full-night-mode .big-clock-minutes,
+        body.full-night-mode #nightBottomInfo {
+            color: var(--night-color) !important;
+        }
+        body.full-night-mode #nightBottomInfo {
+            display: block !important; position: absolute !important; bottom: 8vh !important;
+            font-size: 2.8vw !important; font-weight: 300; letter-spacing: 1px; opacity: 0.85; text-align: center;
+        }
+
         @media (min-width: 768px) {
             .top-navbar { height: 45px; }
             .bottom-player-bar { height: 75px; }
             .favorites-sidebar { gap: 10px; padding: 10px; }
             .fav-card span { font-size: 12px; }
             .slider-vol { width: 120px; }
+            .settings-night-panel { padding: 10px; gap: 10px; }
+            .color-dot { width: 22px; height: 22px; }
         }
     </style>
 </head>
-<body>
+<body id="mainBody">
 
     <audio id="audioPlayer" preload="none" playsinline></audio>
 
@@ -175,23 +220,52 @@
     <div class="workspace-container">
         
         <aside class="favorites-sidebar" id="favSidebarContainer">
-            </aside>
+        </aside>
 
         <main class="main-content-area">
             
             <div class="placeholder-view" id="rightPlaceholder">
-                <div class="big-clock-time">
+                <div class="big-clock-time" onclick="handleBigClockClick()">
                     <span class="big-clock-hours" id="bigHours">00</span>
                     <span class="big-clock-minutes" id="bigMinutes">00</span>
                 </div>
                 <div class="big-clock-date-wrapper">
                     <span class="big-clock-date" id="bigDate">Pondelok, 1.1.</span>
-                    <span class="big-clock-nameday" id="bigNameday">Dnes má sviatok: ---</span>
+                    <span class="big-clock-nameday" id="bigNameday">Dnes má meniny: ---</span>
                 </div>
+                <div id="nightBottomInfo"></div>
             </div>
 
             <div class="settings-grid-view" id="settingsGridView">
+                
+                <div class="settings-night-panel" style="grid-column: 1 / -1;">
+                    <div class="settings-night-row">
+                        <i class="fa-solid fa-clock label-icon" title="Trvanie noci"></i>
+                        <div>
+                            <button onclick="zmenNastavenieCasu('od')" id="set-night-from">20:00</button>
+                            <span style="color: #444; margin: 0 2px;">-</span>
+                            <button onclick="zmenNastavenieCasu('do')" id="set-night-to">05:20</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-night-row">
+                        <i class="fa-solid fa-bed label-icon" title="Prerušenie noci (Snooze)"></i>
+                        <button onclick="zmenDobuOdkladu()" id="set-snooze-time">1 min</button>
+                    </div>
+                    
+                    <div class="settings-night-row">
+                        <i class="fa-solid fa-palette label-icon" title="Farba nočného zobrazenia"></i>
+                        <div class="color-picker-group">
+                            <div onclick="nastavFarbuNoci('#ffff00', this)" class="color-dot" style="background: #ffff00;"></div>
+                            <div onclick="nastavFarbuNoci('#eb0028', this)" class="color-dot" style="background: #eb0028;"></div>
+                            <div onclick="nastavFarbuNoci('#ffa500', this)" class="color-dot" style="background: #ffa500;"></div>
+                            <div onclick="nastavFarbuNoci('#32CD32', this)" class="color-dot" style="background: #32CD32;"></div>
+                            <div onclick="nastavFarbuNoci('#ffffff', this)" class="color-dot" style="background: #ffffff;"></div>
+                        </div>
+                    </div>
                 </div>
+
+            </div>
         </main>
     </div>
 
@@ -219,9 +293,15 @@
         let isSettingsModeActive = false;
         let dnesneMeno = "";
 
+        // --- REGISTRE / PREMENNÉ PRE NOČNÝ REŽIM ---
+        let cfgNocOd = localStorage.getItem('cfg_night_from') || "20:00";
+        let cfgNocDo = localStorage.getItem('cfg_night_to') || "05:20";
+        let cfgSnoozeMin = parseInt(localStorage.getItem('cfg_snooze_min') || "1");
+        let cfgFarbaNoci = localStorage.getItem('cfg_night_color') || "#ffff00";
+        let nocnyRezimSnoozeDo = 0;
+
         // --- VNÚTORNÁ DATABÁZA KIOSKU ---
         const DATABASE = [
-            // 1. Verejnoprávne (Slovenský Rozhlas)
             { id: "slovensko", name: "Slovensko", url: "https://icecast.stv.livebox.sk/slovensko_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png", style: "background:#00547E;", category: "Verejnoprávne" },
             { id: "fm", name: "Rádio_FM", url: "https://icecast.stv.livebox.sk/fm_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioFM.png", style: "background:#111;", category: "Verejnoprávne" },
             { id: "regina", name: "Regina", url: "https://icecast.stv.livebox.sk/regina-ba_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioReginaZ.png", style: "background:#111;", category: "Verejnoprávne" },
@@ -229,14 +309,12 @@
             { id: "junior", name: "Junior", url: "https://icecast.stv.livebox.sk/junior_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioJunior.png", style: "background:#111;", category: "Verejnoprávne" },
             { id: "litera", name: "Litera", url: "https://icecast.stv.livebox.sk/litera_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioLitera.png", style: "background:#111;", category: "Verejnoprávne" },
             
-            // 2. Fun Kontajner
             { id: "fun", name: "Fun Radio", url: "https://stream.funradio.sk/fun192.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png", style: "background:#fff;", category: "Fun Kontajner" },
             { id: "funchill", name: "Fun Chill", url: "https://stream.funradio.sk/chill128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunChill.png", style: "background:#111;", category: "Fun Kontajner" },
             { id: "fun8090", name: "Fun 80-90", url: "https://stream.funradio.sk/80-90-128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun8090.png", style: "background:#111;", category: "Fun Kontajner" },
             { id: "funczsk", name: "Fun CZ-SK", url: "https://stream.funradio.sk/cs128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunCZSK.png", style: "background:#111;", category: "Fun Kontajner" },
             { id: "milenialky", name: "Milenialky", url: "https://stream.funradio.sk/milenialky128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun2000.png", style: "background:#111;", category: "Fun Kontajner" },
             
-            // 3. Komerčné & Ostatné
             { id: "rock", name: "Radio rock", url: "https://stream.bauermedia.sk/rock-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png", style: "background:#000000;", category: "Komerčné & Ostatné" },
             { id: "blanik", name: "Blaník", url: "https://ice.abradio.cz/blanikcz128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png", style: "background:#005ea6;", category: "Komerčné & Ostatné" },
             { id: "expres", name: "Expres", url: "https://stream.bauermedia.sk/expres-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoExpress.png", style: "background:#111;", category: "Komerčné & Ostatné" },
@@ -245,14 +323,12 @@
             { id: "vlna", name: "Rádio Vlna", url: "https://stream.radiovlna.sk/vlna-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoVlna.png", style: "background:#111;", category: "Komerčné & Ostatné" },
             { id: "topolcany", name: "Rádio TO", url: "https://corsproxy.io/?" + encodeURIComponent("http://80.242.44.249:8000/stream/1/"), img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioTO.png", style: "background:#111;", category: "Komerčné & Ostatné" },
             
-            // 4. Club Techno
             { id: "S-techno", name: "Techno", url: "https://stream.sunshine-live.de/techno/mp3-192/", icon: "fa-solid fa-bolt", color: "#307CEB", style: "background:#111;", category: "Techno scéna" },
             { id: "schranz", name: "Schranz", url: "https://stream.sunshine-live.de/schranz/mp3-192/", icon: "fa-solid fa-triangle-exclamation", color: "#fff", style: "background:#111;", category: "Techno scéna" },
             { id: "melodic", name: "Melodic Beats", url: "https://stream.sunshine-live.de/melodic_beats/mp3-192/", icon: "fa-solid fa-wave-square", color: "#fff", style: "background:#111;", category: "Techno scéna" },
             { id: "h-techno", name: "Hard Techno", url: "https://stream.sunshine-live.de/hardtechno/mp3-192", icon: "fa-solid fa-circle-radiation", color: "#fff", style: "background:#111;", category: "Techno scéna" },
             { id: "Drumcode", name: "Drumcode", url: "https://stream.sunshine-live.de/drumbass/mp3-192", icon: "fa-solid fa-volume-high", color: "#fff", style: "background:#111;", category: "Techno scéna" },
             
-            // 5. Hudobné aplikácie
             { id: "spotify", name: "Spotify", url: "https://open.spotify.com", icon: "fa-brands fa-spotify", color: "#1DB954", style: "background:#111;", category: "Externé Aplikácie" },
             { id: "applemusic", name: "Apple Music", url: "https://music.apple.com", icon: "fa-solid fa-music", color: "#FA243C", style: "background:#111;", category: "Externé Aplikácie" },
             { id: "youtube", name: "YT Music", url: "https://music.youtube.com", icon: "fa-brands fa-youtube", color: "#FF0000", style: "background:#111;", category: "Externé Aplikácie" },
@@ -268,9 +344,60 @@
 
         let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v2')) || ["slovensko", "funchill", "rock", "blanik", "fun", "spotify"];
 
+        // --- MANAŽMENT PANELU NASTAVENÍ NOČNÉHO REŽIMU ---
+        function inicializujPlochuNastaveni() {
+            const elFrom = document.getElementById('set-night-from');
+            const elTo = document.getElementById('set-night-to');
+            const elSnooze = document.getElementById('set-snooze-time');
+            
+            if (elFrom) elFrom.textContent = cfgNocOd;
+            if (elTo) elTo.textContent = cfgNocDo;
+            if (elSnooze) elSnooze.textContent = cfgSnoozeMin + " min";
+            
+            document.documentElement.style.setProperty('--night-color', cfgFarbaNoci);
+            
+            document.querySelectorAll('.color-dot').forEach(dot => {
+                dot.classList.remove('active-color');
+                if (dot.style.backgroundColor === cfgFarbaNoci || (cfgFarbaNoci === '#ffff00' && dot.style.backgroundColor === 'yellow')) {
+                    dot.classList.add('active-color');
+                }
+            });
+        }
+
+        function zmenNastavenieCasu(typ) {
+            let povodny = (typ === 'od') ? cfgNocOd : cfgNocDo;
+            let novy = prompt(`Zadaj čas pre ${typ === 'od' ? 'ZAČIATOK' : 'KONIEC'} noci (HH:MM):`, povodny);
+            if (novy && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(novy)) {
+                if (novy.length === 4 && novy.indexOf(':') === 1) novy = "0" + novy;
+                if (typ === 'od') { cfgNocOd = novy; localStorage.setItem('cfg_night_from', novy); } 
+                else { cfgNocDo = novy; localStorage.setItem('cfg_night_to', novy); }
+                inicializujPlochuNastaveni();
+                runClockEngine();
+            }
+        }
+
+        function zmenDobuOdkladu() {
+            let novaDoba = prompt("Zadaj dobu prebudenia hodín v minútach (Snooze):", cfgSnoozeMin);
+            if (novaDoba && !isNaN(novaDoba) && parseInt(novaDoba) > 0) {
+                cfgSnoozeMin = parseInt(novaDoba);
+                localStorage.setItem('cfg_snooze_min', cfgSnoozeMin);
+                inicializujPlochuNastaveni();
+            }
+        }
+
+        function nastavFarbuNoci(hexFarba, element) {
+            cfgFarbaNoci = hexFarba;
+            localStorage.setItem('cfg_night_color', hexFarba);
+            document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active-color'));
+            if(element) element.classList.add('active-color');
+            document.documentElement.style.setProperty('--night-color', hexFarba);
+            runClockEngine();
+        }
+
         // --- RENDER ĽAVÉHO PANELU ---
         function renderSidebarFavorites() {
             const container = document.getElementById('favSidebarContainer');
+            if(!container) return;
             container.innerHTML = "";
 
             for (let i = 0; i < 6; i++) {
@@ -300,7 +427,11 @@
         // --- RENDER CONFIG mriežky ---
         function renderSettingsGrid() {
             const grid = document.getElementById('settingsGridView');
-            grid.innerHTML = "";
+            if(!grid) return;
+            
+            const nightPanelHTML = document.querySelector('.settings-night-panel').outerHTML;
+            grid.innerHTML = nightPanelHTML;
+            
             let currentCategory = "";
 
             DATABASE.forEach(item => {
@@ -327,6 +458,8 @@
                 }
                 grid.appendChild(card);
             });
+            
+            inicializujPlochuNastaveni();
         }
 
         function handleChannelSelectionToggle(id) {
@@ -431,24 +564,63 @@
             setTimeout(() => { window.location.href = url; }, 300);
         }
 
-        // --- HODINY & KALENDÁR ---
+        // --- SNOOZE FUNKCIA (KLIK NA VEĽKÉ HODINY) ---
+        function handleBigClockClick() {
+            if (document.body.classList.contains('full-night-mode')) {
+                nocnyRezimSnoozeDo = Date.now() + (cfgSnoozeMin * 60 * 1000);
+                document.body.classList.remove('full-night-mode');
+            }
+        }
+
+        // --- ENGINE HODÍN, KALENDÁRA A KONTROLY NOČNÉHO REŽIMU ---
         function runClockEngine() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             
-            // Spoločný čas pre malé aj veľké hodiny
             const timeString = `${h}:${m}`;
             document.getElementById('clockBox').textContent = timeString;
             document.getElementById('bigHours').textContent = h;
             document.getElementById('bigMinutes').textContent = m;
             
             const dni = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
-            const formatMaly = `${dni[now.getDay()]}, ${now.getDate()}.${now.getMonth() + 1}.`;
+            const mesiaceSvk = ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
+            
+            const formatMaly = `${dni[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}.`;
             const formatVelky = `${dni[now.getDay()]}, ${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`;
             
             document.getElementById('dateBox').textContent = formatMaly;
             document.getElementById('bigDate').textContent = formatVelky;
+
+            const aktualnyCasVMinutach = now.getHours() * 60 + now.getMinutes();
+            const terazMili = Date.now();
+
+            const [odH, odM] = cfgNocOd.split(':').map(Number);
+            const [doH, doM] = cfgNocDo.split(':').map(Number);
+            const casOd = odH * 60 + odM;
+            const casDo = doH * 60 + doM;
+
+            let jeNocnyCas = (casOd > casDo) 
+                ? (aktualnyCasVMinutach >= casOd || aktualnyCasVMinutach < casDo)
+                : (aktualnyCasVMinutach >= casOd && aktualnyCasVMinutach < casDo);
+
+            const bodyEl = document.getElementById('mainBody');
+            const bottomInfoEl = document.getElementById('nightBottomInfo');
+
+            if (jeNocnyCas && terazMili > nocnyRezimSnoozeDo && !isSettingsModeActive) {
+                bodyEl.classList.add('full-night-mode');
+                
+                let radioNocturnalText = "";
+                if (currentPlayingType && currentPlayingType !== "none") {
+                    radioNocturnalText = `  •  📻 ${currentPlayingType.toUpperCase()}`;
+                }
+                
+                if (bottomInfoEl) {
+                    bottomInfoEl.innerHTML = `${dni[now.getDay()]}, ${now.getDate()}. ${mesiaceSvk[now.getMonth()]}${radioNocturnalText}`;
+                }
+            } else {
+                bodyEl.classList.remove('full-night-mode');
+            }
         }
 
         async function fetchNamedayData() {
@@ -461,10 +633,8 @@
                 for (let line of text.split('\n')) {
                     if (line.includes(`${mm}-${dd}`)) {
                         dnesneMeno = line.split(/[;,]/)[1].trim();
-                        
-                        // Zápis do malej aj veľkej sekcie kalendára
                         document.getElementById('nameBox').textContent = `Meniny: ${dnesneMeno}`;
-                        document.getElementById('bigNameday').textContent = `Dnes má sviatok: ${dnesneMeno}`;
+                        document.getElementById('bigNameday').textContent = `Dnes má meniny: ${dnesneMeno}`;
                         break;
                     }
                 }
@@ -476,6 +646,7 @@
             setInterval(runClockEngine, 1000);
             fetchNamedayData();
             renderSidebarFavorites();
+            inicializujPlochuNastaveni();
 
             const savedType = localStorage.getItem('kiosk_last_radio_type');
             if (savedType) {
@@ -484,7 +655,6 @@
             }
         });
 
-        // Zamedzenie neželaného zoomovania na iOS pri dvojitom poklepaní
         document.addEventListener('touchstart', function (event) {
             if (event.touches.length > 1) {
                 event.preventDefault();
