@@ -379,7 +379,7 @@
 <body id="mainBody">
 
     <audio id="audioPlayer" preload="none" playsinline></audio>
-
+    <video id="wakeLockVideo" playsinline autoplay loop muted style="position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none;" src="https://raw.githubusercontent.com/bmarisol/nosleep-video/master/nosleep.mp4"></video>
     <header class="top-navbar">
         <div class="nav-left-info">
             <span class="nav-clock" id="clockBox">00:00</span>
@@ -986,6 +986,13 @@
         }
 
         function playRadio(url, id) {
+            // Udržanie zapnutej obrazovky
+            const wlVideo = document.getElementById('wakeLockVideo');
+                if (wlVideo) {
+                wlVideo.play().catch(e => {
+                console.log("Video čaká na interakciu, skúsim znova po dotyku...");
+            });
+            }
             currentPlayingType = id;
             localStorage.setItem('kiosk_last_radio_url', url);
             localStorage.setItem('kiosk_last_radio_type', id);
@@ -1162,7 +1169,16 @@
                 document.getElementById('lblTrack').textContent = `Naposledy: ${savedType.toUpperCase()}`;
             }
         });
+        
+        // Aktivácia Wake Lock videa pri akomkoľvek prvom dotyku na displej
+        document.addEventListener('touchstart', function() {
+            const wlVideo = document.getElementById('wakeLockVideo');
+            if (wlVideo) {
+                wlVideo.play().catch(e => console.log("Video čaká na uvoľnenie prehliadačom"));
+            }
+        }, { once: true });
 
+        // Pôvodný blok pre zabránenie zoomu
         document.addEventListener('touchstart', function (event) {
             if (event.touches.length > 1) event.preventDefault();
         }, { passive: false });
