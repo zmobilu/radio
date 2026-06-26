@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kiosk OS v2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        /* --- NÁPAD S OHRANIČENÍM DO FullHD --- */
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: #000; /* Okolitý čierny blok na 4K monitoroch */
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Hlavný kontajner aplikácie */
+        .app-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: 1920px;  /* Stop na FullHD šírke */
+            max-height: 1080px; /* Stop na FullHD výške */
+            background-color: #000;
+            display: flex;
+            box-shadow: 0 0 100px rgba(0,0,0,0.8); /* Jemný tieň do okolitého 4K priestoru */
+        }
+
+        /* --- ROZDELENIE 30% / 70% --- */
+        
+        /* Ľavý panel pre dynamické tlačidlá (30%) */
+        .left-panel {
+            width: 30%;
+            height: 100%;
+            background-color: #050505;
+            border-right: 1px solid #111;
+            box-sizing: border-box;
+            padding: 15px;
+            
+            /* Tlačidlá budeme riadiť cez Flexbox/Grid pomocou JS */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Pravý panel pre hodiny a dátum (70%) */
+        .right-panel {
+            width: 70%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+        }
+
+        /* --- PRAVÁ STRANA: KLASICKÝ ČAS A DÁTUM --- */
+        #time-display {
+            font-size: 16vw; /* Používame relatívne jednotky, ktoré sa prispôsobia FullHD kontajneru */
+            font-weight: 600;
+            line-height: 0.9;
+            letter-spacing: -2px;
+        }
+        
+        #date-display {
+            font-size: 3.5vw;
+            font-weight: 300;
+            color: #888;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* --- ĽAVÁ STRANA: DYNAMICKÁ MRIEŽKA RÁDIÍ --- */
+        .grid-container {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            gap: 12px; /* Medzera medzi tlačidlami */
+            box-sizing: border-box;
+        }
+
+        /* Univerzálny štýl pre vygenerované tlačidlo */
+        .radio-btn {
+            background-color: #151515;
+            border: 2px solid #222;
+            border-radius: 16px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            padding: 10px;
+        }
+
+        .radio-btn i {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .radio-btn.active {
+            border-color: #ff9f0a;
+            background-color: #221500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div class="left-panel">
+            <div id="radio-grid" class="grid-container"></div>
+        </div>
+        
+        <div class="right-panel">
+            <div id="time-display">00:00</div>
+            <div id="date-display">Pondelok, 1. Január</div>
+        </div>
+
+    </div>
+
+<script>
+    // --- 1. DATABÁZA VŠETKÝCH DOSTUPNÝCH RÁDIÍ ---
+    // Na jednom mieste máme komplet dáta. Odtiaľto budeme neskôr vyberať.
+    const VSETKY_RADIA = [
+        { id: 'slovensko', nazov: 'Slovensko 1', ikona: 'fa-radio', farba: '#00547E' },
+        { id: 'fm', nazov: 'Rádio _FM', ikona: 'fa-music', farba: '#eb0028' },
+        { id: 'fun', nazov: 'Fun Rádio', ikona: 'fa-face-laugh-beam', farba: '#ffa500' },
+        { id: 'rock', nazov: 'Anténa Rock', ikona: 'fa-guitar', farba: '#000000' },
+        { id: 'blanik', nazov: 'Blaník', ikona: 'fa-sun', farba: '#005ea6' },
+        { id: 'vlna', nazov: 'Rádio Vlna', ikona: 'fa-water', farba: '#00ced1' },
+        { id: 'expres', nazov: 'Expres', ikona: 'fa-bolt', farba: '#ffa500' },
+        { id: 'melody', nazov: 'Melody', ikona: 'fa-heart', farba: '#ffb6c1' }
+    ];
+
+    // --- 2. FILTRÁCIA / VOĽBA POUŽÍVATEĽA ---
+    // Predstavme si, že toto pole nám neskôr naplnia "Nastavenia".
+    // Pre test si tu teraz môžeme meniť počet prvkov (napr. nechať len 3, 5 alebo všetkých 8 rádia).
+    const zvoleneRadia = [...VSETKY_RADIA]; // Teraz testujeme plných 8 tlačidiel
+
+    // --- 3. CHYTRÁ LOGIKA AUTOMATICKÉHO ŠKÁLOVANIA ---
+    function vykresliMriezku() {
+        const gridElement = document.getElementById('radio-grid');
+        gridElement.innerHTML = ''; // Vyčistiť mriežku
+        
+        const pocet = zvoleneRadia.length;
+        let stlpce = 3; // Predvolene 3 stĺpce pre monitory
+        
+        // Ak si používateľ zvolí málo rádií (napr. 1 až 4), automaticky zúžime mriežku na 2 stĺpce,
+        // aby gombíky neboli smiešne malé a úzke.
+        if (pocet <= 4) {
+            stlpce = 2;
+        }
+
+        // Vypočítame počet riadkov, ktoré budeme reálne potrebovať
+        let riadky = Math.ceil(pocet / stlpce);
+
+        // Dynamicky nastavíme CSS Grid vlastnosti mriežky podľa počtu staníc
+        gridElement.style.gridTemplateColumns = `repeat(${stlpce}, 1fr)`;
+        gridElement.style.gridTemplateRows = `repeat(${riadky}, 1fr)`;
+
+        // Vygenerujeme samotné gombíky
+        zvoleneRadia.forEach(radio => {
+            const btn = document.createElement('button');
+            btn.className = 'radio-btn';
+            btn.style.backgroundColor = radio.farba;
+            
+            // Ak je pozadie príliš svetlé, ikona a text budú čierne (napr. pre FunRádio)
+            if(radio.farba === '#ffffff' || radio.farba === '#ffb6c1') {
+                btn.style.color = '#000';
+            }
+
+            btn.innerHTML = `
+                <i class="fa-solid ${radio.ikona}"></i>
+                <span>${radio.nazov}</span>
+            `;
+
+            // Test klikateľnosti
+            btn.onclick = () => {
+                document.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                console.log(`Hrá rádio: ${radio.nazov}`);
+            };
+
+            gridElement.appendChild(btn);
+        });
+    }
+
+    // --- 4. KLASICKÉ HODINY A DÁTUM (ZÁKLAD) ---
+    function updateClock() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        document.getElementById('time-display').textContent = `${h}:${m}`;
+
+        const dni = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
+        const mesiace = ['Január', 'Február', 'Marec', 'Apríl', 'Máj', 'Jún', 'Júl', 'August', 'September', 'Október', 'November', 'December'];
+        
+        document.getElementById('date-display').textContent = `${dni[now.getDay()]}, ${now.getDate()}. ${mesiace[now.getMonth()]}`;
+    }
+
+    // Inicializácia pri štarte
+    vykresliMriezku();
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>
+</body>
+</html>
