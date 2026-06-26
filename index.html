@@ -38,15 +38,22 @@
         .top-navbar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 15px; background: #050505; border-bottom: 1px solid #111;
-            height: 40px; box-sizing: border-box; flex-shrink: 0;
+            height: 48px; box-sizing: border-box; flex-shrink: 0;
             padding-left: calc(15px + env(safe-area-inset-left));
             padding-right: calc(15px + env(safe-area-inset-right));
         }
         .nav-left-info { display: flex; align-items: center; gap: 15px; font-size: 14px; color: #aaa; font-weight: 400; }
         .nav-clock { font-size: 16px; font-weight: 700; color: #fff; }
         .nav-nameday { color: #ff9f0a; font-weight: 500; }
-        .btn-settings { background: none; border: none; color: #666; font-size: 18px; cursor: pointer; padding: 5px; transition: color 0.2s; }
-        .btn-settings.active { color: #ff9f0a; }
+        
+        /* Zväčšené a posunuté tlačidlo nastavení pre bezchybný dotyk na iOS */
+        .btn-settings { 
+            background: #111; border: 1px solid #222; color: #666; font-size: 20px; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            width: 44px; height: 44px; border-radius: 50%; margin-top: 4px;
+            transition: color 0.2s, background 0.2s, border-color 0.2s; 
+        }
+        .btn-settings.active { color: #ff9f0a; border-color: #ff9f0a; background: #1a1a1a; }
 
         /* --- HLAVNÁ ROZDELENÁ PLOCHA --- */
         .workspace-container { display: flex; flex: 1; width: 100vw; overflow: hidden; }
@@ -192,7 +199,7 @@
         }
 
         @media (min-width: 768px) {
-            .top-navbar { height: 45px; }
+            .top-navbar { height: 52px; }
             .bottom-player-bar { height: 75px; }
             .favorites-sidebar { gap: 10px; padding: 10px; }
             .fav-card span { font-size: 12px; }
@@ -212,7 +219,7 @@
             <span id="dateBox">--.--.----</span>
             <span class="nav-nameday" id="nameBox">Meniny: ---</span>
         </div>
-        <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode()" title="Správa obľúbených">
+        <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
             <i class="fa-solid fa-gear"></i>
         </button>
     </header>
@@ -236,31 +243,32 @@
                 <div id="nightBottomInfo"></div>
             </div>
 
-            <div class="settings-grid-view" id="settingsGridView">
+            <!-- Pridané zachytávanie kliknutí pre reštart 10s auto-close časovača -->
+            <div class="settings-grid-view" id="settingsGridView" onclick="resetSettingsTimer()">
                 
-                <div class="settings-night-panel" style="grid-column: 1 / -1;">
+                <div class="settings-night-panel" style="grid-column: 1 / -1;" onclick="resetSettingsTimer()">
                     <div class="settings-night-row">
                         <i class="fa-solid fa-clock label-icon" title="Trvanie noci"></i>
                         <div>
-                            <button onclick="zmenNastavenieCasu('od')" id="set-night-from">20:00</button>
+                            <button onclick="zmenNastavenieCasu('od'); event.stopPropagation();" id="set-night-from">20:00</button>
                             <span style="color: #444; margin: 0 2px;">-</span>
-                            <button onclick="zmenNastavenieCasu('do')" id="set-night-to">05:20</button>
+                            <button onclick="zmenNastavenieCasu('do'); event.stopPropagation();" id="set-night-to">05:20</button>
                         </div>
                     </div>
                     
                     <div class="settings-night-row">
                         <i class="fa-solid fa-bed label-icon" title="Prerušenie noci (Snooze)"></i>
-                        <button onclick="zmenDobuOdkladu()" id="set-snooze-time">1 min</button>
+                        <button onclick="zmenDobuOdkladu(); event.stopPropagation();" id="set-snooze-time">1 min</button>
                     </div>
                     
                     <div class="settings-night-row">
                         <i class="fa-solid fa-palette label-icon" title="Farba nočného zobrazenia"></i>
                         <div class="color-picker-group">
-                            <div onclick="nastavFarbuNoci('#ffff00', this)" class="color-dot" style="background: #ffff00;"></div>
-                            <div onclick="nastavFarbuNoci('#eb0028', this)" class="color-dot" style="background: #eb0028;"></div>
-                            <div onclick="nastavFarbuNoci('#ffa500', this)" class="color-dot" style="background: #ffa500;"></div>
-                            <div onclick="nastavFarbuNoci('#32CD32', this)" class="color-dot" style="background: #32CD32;"></div>
-                            <div onclick="nastavFarbuNoci('#ffffff', this)" class="color-dot" style="background: #ffffff;"></div>
+                            <div onclick="nastavFarbuNoci('#ffff00', this); event.stopPropagation();" class="color-dot" style="background: #ffff00;"></div>
+                            <div onclick="nastavFarbuNoci('#eb0028', this); event.stopPropagation();" class="color-dot" style="background: #eb0028;"></div>
+                            <div onclick="nastavFarbuNoci('#ffa500', this); event.stopPropagation();" class="color-dot" style="background: #ffa500;"></div>
+                            <div onclick="nastavFarbuNoci('#32CD32', this); event.stopPropagation();" class="color-dot" style="background: #32CD32;"></div>
+                            <div onclick="nastavFarbuNoci('#ffffff', this); event.stopPropagation();" class="color-dot" style="background: #ffffff;"></div>
                         </div>
                     </div>
                 </div>
@@ -292,6 +300,7 @@
         let currentPlayingType = "";
         let isSettingsModeActive = false;
         let dnesneMeno = "";
+        let settingsTimeout = null; // Časovač pre automatické zatvorenie
 
         // --- REGISTRE / PREMENNÉ PRE NOČNÝ REŽIM ---
         let cfgNocOd = localStorage.getItem('cfg_night_from') || "20:00";
@@ -374,6 +383,7 @@
                 inicializujPlochuNastaveni();
                 runClockEngine();
             }
+            resetSettingsTimer();
         }
 
         function zmenDobuOdkladu() {
@@ -383,6 +393,7 @@
                 localStorage.setItem('cfg_snooze_min', cfgSnoozeMin);
                 inicializujPlochuNastaveni();
             }
+            resetSettingsTimer();
         }
 
         function nastavFarbuNoci(hexFarba, element) {
@@ -392,6 +403,18 @@
             if(element) element.classList.add('active-color');
             document.documentElement.style.setProperty('--night-color', hexFarba);
             runClockEngine();
+            resetSettingsTimer();
+        }
+
+        // --- AUTOMATICKÉ ZATVÁRANIE NASTAVENÍ (10 SEKÚND) ---
+        function resetSettingsTimer() {
+            if (!isSettingsModeActive) return;
+            clearTimeout(settingsTimeout);
+            settingsTimeout = setTimeout(() => {
+                if (isSettingsModeActive) {
+                    toggleSettingsMode();
+                }
+            }, 10000); // 10 sekúnd bez akcie zatvorí režim nastavení
         }
 
         // --- RENDER ĽAVÉHO PANELU ---
@@ -449,7 +472,7 @@
                 const isSelected = slotFavorites.includes(item.id);
                 if (isSelected) card.classList.add("selected");
 
-                card.onclick = () => handleChannelSelectionToggle(item.id);
+                card.onclick = (e) => { handleChannelSelectionToggle(item.id); e.stopPropagation(); };
 
                 if (item.img) {
                     card.innerHTML = `<img src="${item.img}"><span>${item.name}</span>`;
@@ -480,6 +503,7 @@
             localStorage.setItem('kiosk_slots_v2', JSON.stringify(slotFavorites));
             renderSidebarFavorites();
             renderSettingsGrid();
+            resetSettingsTimer();
         }
 
         function toggleSettingsMode() {
@@ -493,7 +517,9 @@
                 placeholder.style.display = 'none';
                 gridView.style.display = 'grid';
                 renderSettingsGrid();
+                resetSettingsTimer(); // Spustenie odpočtu pri otvorení
             } else {
+                clearTimeout(settingsTimeout);
                 btn.classList.remove('active');
                 placeholder.style.display = 'flex';
                 gridView.style.display = 'none';
@@ -584,7 +610,6 @@
             document.getElementById('bigMinutes').textContent = m;
             
             const dni = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
-            const mesiaceSvk = ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
             
             const formatMaly = `${dni[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}.`;
             const formatVelky = `${dni[now.getDay()]}, ${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`;
@@ -615,8 +640,11 @@
                     radioNocturnalText = `  •  📻 ${currentPlayingType.toUpperCase()}`;
                 }
                 
+                // Pridané zobrazovanie mena oslávenca priamo do riadku noci
+                let meninyNocturnalText = dnesneMeno ? `Meniny: ${dnesneMeno}  •  ` : "";
+                
                 if (bottomInfoEl) {
-                    bottomInfoEl.innerHTML = `${dni[now.getDay()]}, ${now.getDate()}. ${mesiaceSvk[now.getMonth()]}${radioNocturnalText}`;
+                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dni[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}.${radioNocturnalText}`;
                 }
             } else {
                 bodyEl.classList.remove('full-night-mode');
@@ -634,7 +662,8 @@
                     if (line.includes(`${mm}-${dd}`)) {
                         dnesneMeno = line.split(/[;,]/)[1].trim();
                         document.getElementById('nameBox').textContent = `Meniny: ${dnesneMeno}`;
-                        document.getElementById('bigNameday').textContent = `Dnes má meniny: ${dnesneMeno}`;
+                        document.getElementById('bigNameday').textContent = `Meniny: ${dnesneMeno}`;
+                        runClockEngine(); // Okamžite obnovíme spodný panel noci po načítaní
                         break;
                     }
                 }
