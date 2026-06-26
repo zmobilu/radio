@@ -226,6 +226,7 @@
             { id: "milenialky", name: "Milenialky", url: "https://stream.funradio.sk/milenialky128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun2000.png", style: "background:#111;", category: "Fun Kontajner" },
             
             // 3. Komerčné & Ostatné
+            { id: "rock", name: "Radio rock", url: "https://stream.bauermedia.sk/rock-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png", style: "background:#000000;", category: "Komerčné & Ostatné" },
             { id: "blanik", name: "Blaník", url: "https://ice.abradio.cz/blanikcz128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png", style: "background:#005ea6;", category: "Komerčné & Ostatné" },
             { id: "expres", name: "Expres", url: "https://stream.bauermedia.sk/expres-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoExpress.png", style: "background:#111;", category: "Komerčné & Ostatné" },
             { id: "europa2", name: "Europa 2", url: "https://stream.bauermedia.sk/europa2-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoEuropa2.png", style: "background:#111;", category: "Komerčné & Ostatné" },
@@ -248,13 +249,13 @@
         ];
 
         const VOLUME_MAP = { 
-            'slovensko': 0.3, 'fm': 0.5, 'devin': 0.5, 'litera': 0.5, 'junior': 0.5, 'regina': 0.5,
+            'slovensko': 0.3, 'fm': 0.5, 'devin': 0.5, 'litera': 0.5, 'junior': 0.5, 'regina': 0.5, 'rock': 0.5,
             'fun': 1.0, 'funchill': 0.5, 'funczsk': 0.5, 'fun8090': 0.5, 'milenialky': 0.5,
             'expres': 1.0, 'europa2': 1.0, 'melody': 1.0, 'vlna': 1.0, 'blanik': 0.5, 'topolcany': 0.5,
             'h-techno': 1.0
         };
 
-        let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v2')) || ["slovensko", "fun", "S-techno", "blanik", "spotify", "h-techno"];
+        let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v2')) || ["slovensko", "funchill", "rock", "blanik", "fun", "spotify"];
 
         // --- RENDER ĽAVÉHO PANELU ---
         function renderSidebarFavorites() {
@@ -447,35 +448,6 @@
             } catch (e) {}
         }
 
-        async function fetchSTVRTrackInfo() {
-            const stvrChannels = { 'slovensko': 1, 'fm': 2, 'devin': 3, 'junior': 4, 'litera': 8 };
-            const kanal = stvrChannels[currentPlayingType];
-            if (!kanal) return;
-            try {
-                const r = await fetch(`https://fm.stvr.sk/json/snippet/radio_playlist.json?channel=${kanal}`);
-                const data = await r.json();
-                if (data && data["0"]) {
-                    const interpret = data["0"].interpret || "";
-                    const title = data["0"].title || "";
-                    if (interpret && title) document.getElementById('lblTrack').textContent = `${interpret} - ${title}`;
-                }
-            } catch (e) {}
-        }
-        setInterval(fetchSTVRTrackInfo, 20000);
-
-        document.addEventListener('DOMContentLoaded', () => {
-            runClockEngine();
-            setInterval(runClockEngine, 1000);
-            fetchNamedayData();
-            renderSidebarFavorites();
-
-            const savedType = localStorage.getItem('kiosk_last_radio_type');
-            if (savedType) {
-                document.getElementById('lblStation').textContent = "STANDBY";
-                document.getElementById('lblTrack').textContent = `Naposledy: ${savedType.toUpperCase()}`;
-            }
-        });
-        
         // Zamedzenie neželaného zoomovania na iOS pri dvojitom poklepaní
         document.addEventListener('touchstart', function (event) {
             if (event.touches.length > 1) {
