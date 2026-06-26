@@ -2,9 +2,27 @@
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kiosk Rádio 2026</title>
+    <!-- viewport-fit=cover roztiahne aplikáciu na iPhone na úplne celú obrazovku bez bielych okrajov -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- KĽÚČOVÉ ZNAČKY PRE IPHONE (Vynútia režim samostatnej aplikácie bez lišt Safari) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="📻">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Značky pre Android zariadenia -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+
+    <title>📻</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>">
+    
+    <!-- Ikony pre domovskú obrazovku iPhonu a náhľady -->
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/zmobilu/assets/main/kiosk-ikona.png">
+    <meta property="og:image" content="https://raw.githubusercontent.com/zmobilu/assets/main/kiosk-ikona.png">
+    
     <style>
         /* --- RESET A ZÁKLADNÉ NASTAVENIE --- */
         body {
@@ -12,6 +30,8 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex; flex-direction: column; height: 100vh; width: 100vw;
             overflow: hidden; box-sizing: border-box; -webkit-user-select: none; user-select: none;
+            /* Ochrana pred posúvaním celej aplikácie prstom na iPhone */
+            position: fixed; top: 0; left: 0; bottom: 0; right: 0;
         }
 
         /* --- HORNE MINIMALISTICKÉ MENU --- */
@@ -19,6 +39,9 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 15px; background: #050505; border-bottom: 1px solid #111;
             height: 40px; box-sizing: border-box; flex-shrink: 0;
+            /* Bezpečná rezerva pre iPhony s výrezom v horizontálnej polohe */
+            padding-left: calc(15px + env(safe-area-inset-left));
+            padding-right: calc(15px + env(safe-area-inset-right));
         }
         .nav-left-info { display: flex; align-items: center; gap: 15px; font-size: 14px; color: #aaa; font-weight: 400; }
         .nav-clock { font-size: 16px; font-weight: 700; color: #fff; }
@@ -34,6 +57,7 @@
             width: 35%; background: #050505; border-right: 1px solid #111;
             display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr);
             gap: 6px; padding: 6px; box-sizing: border-box;
+            padding-left: calc(6px + env(safe-area-inset-left));
         }
         .fav-card {
             background: #111; border: 1px solid #222; border-radius: 12px;
@@ -59,6 +83,7 @@
             display: none; width: 100%; height: 100%; overflow-y: auto;
             padding: 10px; box-sizing: border-box; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
             gap: 8px; align-content: start; background: #090909;
+            padding-right: calc(10px + env(safe-area-inset-right));
         }
         .cfg-mini-card {
             background: #151515; border: 1px solid #252525; border-radius: 10px;
@@ -90,6 +115,9 @@
             background: #050505; border-top: 1px solid #111; height: 65px;
             padding: 0 15px; display: flex; justify-content: space-between; align-items: center;
             box-sizing: border-box; flex-shrink: 0;
+            padding-left: calc(15px + env(safe-area-inset-left));
+            padding-right: calc(15px + env(safe-area-inset-right));
+            padding-bottom: env(safe-area-inset-bottom);
         }
         .player-info-block { display: flex; flex-direction: column; justify-content: center; width: 35%; overflow: hidden; }
         .player-info-block h4 { margin: 0; font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -180,7 +208,7 @@
         let currentPlayingType = "";
         let isSettingsModeActive = false;
 
-        // --- PREORGANIZOVANÁ STRUKTÚRA DATABÁZY BEZ ROCK ROZHLASOV A S KOMPLETNÝM TECHNO KONTRAKTOM ---
+        // --- VNÚTORNÁ DATABÁZA KIOSKU ---
         const DATABASE = [
             // 1. Verejnoprávne (Slovenský Rozhlas)
             { id: "slovensko", name: "Slovensko", url: "https://icecast.stv.livebox.sk/slovensko_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png", style: "background:#00547E;", category: "Verejnoprávne" },
@@ -198,7 +226,6 @@
             { id: "milenialky", name: "Milenialky", url: "https://stream.funradio.sk/milenialky128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun2000.png", style: "background:#111;", category: "Fun Kontajner" },
             
             // 3. Komerčné & Ostatné
-            { id: "rock", name: "Radio rock", url: "https://stream.bauermedia.sk/rock-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png", style: "background:#000000;", category: "Komerčné & Ostatné" },
             { id: "blanik", name: "Blaník", url: "https://ice.abradio.cz/blanikcz128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png", style: "background:#005ea6;", category: "Komerčné & Ostatné" },
             { id: "expres", name: "Expres", url: "https://stream.bauermedia.sk/expres-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoExpress.png", style: "background:#111;", category: "Komerčné & Ostatné" },
             { id: "europa2", name: "Europa 2", url: "https://stream.bauermedia.sk/europa2-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoEuropa2.png", style: "background:#111;", category: "Komerčné & Ostatné" },
@@ -206,7 +233,7 @@
             { id: "vlna", name: "Rádio Vlna", url: "https://stream.radiovlna.sk/vlna-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoVlna.png", style: "background:#111;", category: "Komerčné & Ostatné" },
             { id: "topolcany", name: "Rádio TO", url: "https://corsproxy.io/?" + encodeURIComponent("http://80.242.44.249:8000/stream/1/"), img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioTO.png", style: "background:#111;", category: "Komerčné & Ostatné" },
             
-            // 4. Club Techno (pôvodný CRO kontajner)
+            // 4. Club Techno
             { id: "S-techno", name: "Techno", url: "https://stream.sunshine-live.de/techno/mp3-192/", icon: "fa-solid fa-bolt", color: "#307CEB", style: "background:#111;", category: "Techno scéna" },
             { id: "schranz", name: "Schranz", url: "https://stream.sunshine-live.de/schranz/mp3-192/", icon: "fa-solid fa-triangle-exclamation", color: "#fff", style: "background:#111;", category: "Techno scéna" },
             { id: "melodic", name: "Melodic Beats", url: "https://stream.sunshine-live.de/melodic_beats/mp3-192/", icon: "fa-solid fa-wave-square", color: "#fff", style: "background:#111;", category: "Techno scéna" },
@@ -221,15 +248,15 @@
         ];
 
         const VOLUME_MAP = { 
-            'slovensko': 0.3, 'fm': 0.5, 'devin': 0.5, 'litera': 0.5, 'junior': 0.5, 'regina': 0.5, 'rock': 0.5,
+            'slovensko': 0.3, 'fm': 0.5, 'devin': 0.5, 'litera': 0.5, 'junior': 0.5, 'regina': 0.5,
             'fun': 1.0, 'funchill': 0.5, 'funczsk': 0.5, 'fun8090': 0.5, 'milenialky': 0.5,
-            'expres': 1.0, 'europa2': 1.0, 'melody': 1.0, 'vlna': 1.0, 'blanik': 0.5, 'topolcany': 0.5
+            'expres': 1.0, 'europa2': 1.0, 'melody': 1.0, 'vlna': 1.0, 'blanik': 0.5, 'topolcany': 0.5,
+            'h-techno': 1.0
         };
 
-        // Fixný zoznam presne 6 slotov v pamäti (ak neexistuje, vytvorí sa pole so 6 prázdnymi miestami)
-        let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v2')) || ["slovensko", "funchill", "rock", "blanik", "spotify", null];
+        let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v2')) || ["slovensko", "fun", "S-techno", "blanik", "spotify", "h-techno"];
 
-        // --- RENDER ĽAVÉHO PANELU (STRIKTNÉ CHOVANIE POZÍCIÍ) ---
+        // --- RENDER ĽAVÉHO PANELU ---
         function renderSidebarFavorites() {
             const container = document.getElementById('favSidebarContainer');
             container.innerHTML = "";
@@ -237,7 +264,6 @@
             for (let i = 0; i < 6; i++) {
                 const id = slotFavorites[i];
                 const item = DATABASE.find(d => d.id === id);
-
                 const card = document.createElement('div');
                 
                 if (item && id !== null) {
@@ -252,7 +278,6 @@
                         card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
                     }
                 } else {
-                    // Ponechanie prázdnej medzery na presnej pozícii
                     card.className = "fav-card empty";
                     card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
                 }
@@ -260,15 +285,13 @@
             }
         }
 
-        // --- RENDER SKUPINOVEJ MRIIEŽKY V NASTAVENIACH ---
+        // --- RENDER CONFIG mriežky ---
         function renderSettingsGrid() {
             const grid = document.getElementById('settingsGridView');
             grid.innerHTML = "";
-
             let currentCategory = "";
 
             DATABASE.forEach(item => {
-                // Pridanie nadpisov kategórií podľa zoradenia v poli DATABASE
                 if (item.category !== currentCategory) {
                     currentCategory = item.category;
                     const separator = document.createElement('div');
@@ -280,7 +303,6 @@
                 const card = document.createElement('div');
                 card.className = "cfg-mini-card";
                 
-                // Kontrola či sa id nachádza v niektorom zo 6 slotov
                 const isSelected = slotFavorites.includes(item.id);
                 if (isSelected) card.classList.add("selected");
 
@@ -295,17 +317,13 @@
             });
         }
 
-        // --- INTELIGENTNÁ LOGIKA SPRÁVY SLOTU BEZ POSUNU ---
         function handleChannelSelectionToggle(id) {
             const existingIndex = slotFavorites.indexOf(id);
 
             if (existingIndex !== -1) {
-                // Ak stanica už existuje v slote, uvoľníme iba jej miesto (zápis null) a neposúvame zbytok!
                 slotFavorites[existingIndex] = null;
             } else {
-                // Ak stanica nie je vybraná, hľadáme prvú voľnú medzeru (null) zľava doprava, zhora nadol
                 const freeSlotIndex = slotFavorites.indexOf(null);
-
                 if (freeSlotIndex !== -1) {
                     slotFavorites[freeSlotIndex] = id;
                 } else {
@@ -339,9 +357,7 @@
 
         function handleFavCardClick(item) {
             if (isSettingsModeActive) return;
-
             if (item.url) {
-                // Rozlišovanie medzi rádiom a externou linkou aplikácie
                 if (item.icon && (item.id === 'spotify' || item.id === 'applemusic' || item.id === 'youtube' || item.id === 'tidal')) {
                     triggerExternalApp(item.url, item.id);
                 } else {
@@ -381,7 +397,7 @@
             if (currentPlayingType !== "") {
                 audio.pause(); audio.src = ""; currentPlayingType = "";
                 document.getElementById('lblStation').textContent = "RÁDIO VYPNUTÉ";
-                document.getElementById('lblTrack').textContent = "ZvoLLte stanicu vľavo";
+                document.getElementById('lblTrack').textContent = "Zvoľte stanicu vľavo";
                 document.getElementById('powerBtn').classList.remove('playing');
                 renderSidebarFavorites();
             } else {
@@ -401,17 +417,15 @@
             document.getElementById('lblTrack').textContent = "Presmerovanie do aplikácie...";
             document.getElementById('powerBtn').classList.remove('playing');
             renderSidebarFavorites();
-            
             setTimeout(() => { window.location.href = url; }, 300);
         }
 
-        // --- HODINY, KALENDÁR A SCRIPT STARTS ---
+        // --- HODINY & KALENDÁR ---
         function runClockEngine() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             document.getElementById('clockBox').textContent = `${h}:${m}`;
-            
             const dni = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
             document.getElementById('dateBox').textContent = `${dni[now.getDay()]}, ${now.getDate()}.${now.getMonth() + 1}.`;
         }
@@ -461,6 +475,13 @@
                 document.getElementById('lblTrack').textContent = `Naposledy: ${savedType.toUpperCase()}`;
             }
         });
+        
+        // Zamedzenie neželaného zoomovania na iOS pri dvojitom poklepaní
+        document.addEventListener('touchstart', function (event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>
