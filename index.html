@@ -304,7 +304,7 @@
         <div class="nav-left-info">
             <span class="nav-clock" id="clockBox">00:00</span>
             <span id="dateBox">--.--.----</span>
-            <span class="nav-nameday" id="nameBox">Meniny: ---</span>
+            <span class="nav-nameday" id="nameBox">---</span>
         </div>
         <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
             <i class="fa-solid fa-gear"></i>
@@ -1067,7 +1067,7 @@
                     tempNocturnalText = Math.round(weatherDataBackup.current.temperature_2m) + "°C";
                 }
 
-                let meninyNocturnalText = dnesneMeno ? `Meniny: ${dnesneMeno}  •  ` : "";
+                let meninyNocturnalText = dnesneMeno ? ` ${dnesneMeno}  •  ` : "";
                 
                 if (bottomInfoEl) {
                     bottomInfoEl.innerHTML = `${meninyNocturnalText}${dni[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}.  •  <span style="color:${getTempColor(parseFloat(tempNocturnalText))}">${tempNocturnalText}</span>${radioNocturnalText}`;
@@ -1087,7 +1087,7 @@
                 for (let line of text.split('\n')) {
                     if (line.includes(`${mm}-${dd}`)) {
                         dnesneMeno = line.split(/[;,]/)[1].trim();
-                        document.getElementById('nameBox').textContent = `Meniny: ${dnesneMeno}`;
+                        document.getElementById('nameBox').textContent = ` ${dnesneMeno}`;
                         document.getElementById('bigNameday').textContent = `Dnes má meniny: ${dnesneMeno}`;
                         runClockEngine();
                         break;
