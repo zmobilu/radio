@@ -376,7 +376,9 @@
         let isSettingsModeActive = false;
         let dnesneMeno = "";
         let settingsTimeout = null; // Časovač pre automatické zatvorenie
-
+        // --- POMOCNÉ PREMENNÉ PRE AUDIO WATCHDOG ---
+        let watchdogPoslednyCas = -1;
+        let watchdogPocitadloZaseknutia = 0;
         // --- REGISTRE / PREMENNÉ PRE NOČNÝ REŽIM ---
         let cfgNocOd = localStorage.getItem('cfg_night_from') || "20:00";
         let cfgNocDo = localStorage.getItem('cfg_night_to') || "05:20";
@@ -732,10 +734,53 @@
                 let meninyNocturnalText = dnesneMeno ? `${dnesneMeno}  •  ` : "";
                 
                 if (bottomInfoEl) {
-                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dni[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}.${radioNocturnalText}`;
+                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}.${radioNocturnalText}`;
                 }
             } else {
                 bodyEl.classList.remove('full-night-mode');
+            }
+            // --- INTEGRÁCIA AUDIO WATCHDOGU ---
+            if (currentPlayingType !== "" && currentPlayingType !== "none" && !audio.paused) {
+                
+                // Ak sa čas streamu rovná tomu z predchádzajúcej sekundy
+                if (audio.currentTime === watchdogPoslednyCas) {
+                    watchdogPocitadloZaseknutia++;
+                    
+                    // Ak zásek trvá už 4 sekundy, ideme reštartovať
+                    if (watchdogPocitadloZaseknutia >= 4) {
+                        console.log("Watchdog: Detekovaný zásek streamu. Reštartujem...");
+                        document.getElementById('lblTrack').textContent = "Obnovujem spojenie...";
+                        
+                        const aktualnaUrl = audio.src;
+                        
+                        // Tvrdý reštart sieťového prenosu
+                        audio.pause();
+                        audio.src = "";
+                        audio.load();
+                        
+                        // Opätovné nakopnutie po vyčistení
+                        setTimeout(() => {
+                            audio.src = aktualnaUrl;
+                            audio.play()
+                                .then(() => {
+                                    document.getElementById('lblTrack').textContent = "Práve hrá";
+                                })
+                                .catch(() => {
+                                    document.getElementById('lblTrack').textContent = "Obnova zlyhala, stream offline";
+                                });
+                        }, 500);
+                        
+                        watchdogPocitadloZaseknutia = 0;
+                    }
+                } else {
+                    // Stream žije a čas beží, resetujeme počítadlo hrozieb
+                    watchdogPoslednyCas = audio.currentTime;
+                    watchdogPocitadloZaseknutia = 0;
+                }
+            } else {
+                // Rádio je vypnuté alebo pozastavené, strážny pes odpočíva
+                watchdogPoslednyCas = -1;
+                watchdogPocitadloZaseknutia = 0;
             }
         }
 
@@ -783,7 +828,7 @@
                             nameBox.style.color = "#5ac8fa"; // Modrá pre spolužiakov
                             bigNameday.style.color = "#5ac8fa";
                         } 
-                        else if (KOLEGOVA.includes(povodneMeno)) {
+                        else if (KOLEGOVIA.includes(povodneMeno)) {
                             dnesneMeno = `💼 ${povodneMeno}`;
                             nameBox.style.color = "#34c759"; // Zelená pre kolegov
                             bigNameday.style.color = "#34c759";
