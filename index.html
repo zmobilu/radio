@@ -395,8 +395,8 @@
                         </div>
                     </div>
                     <div class="settings-night-row">
-                        <i class="fa-solid fa-cloud-sun label-icon" title="Súradnice mesta"></i>
-                        <button onclick="zmenNastavenieMesta(); event.stopPropagation();" id="set-weather-coords">Mesto</button>
+                        <i class="fa-solid fa-cloud-sun label-icon" title="Mesto pre počasie"></i>
+                        <button onclick="zmenNastavenieMesta(); event.stopPropagation();" id="set-weather-coords">Mesto: Bratislava</button>
                     </div>
                 </div>
             </div>
@@ -438,10 +438,13 @@
         let nocnyRezimSnoozeDo = 0;
         let manualnaNocAktivna = false;
         const noSleep = new NoSleep();
-        // --- REGISTRE PRE POČASIE ---
-        let cfgLat = localStorage.getItem('cfg_weather_lat') || "48.1486"; // Predvolená Bratislava
+        // --- REGISTRE PRE POČASIE A HISTÓRIU ---
+        let cfgLat = localStorage.getItem('cfg_weather_lat') || "48.1486"; 
         let cfgLon = localStorage.getItem('cfg_weather_lon') || "17.1077";
-        let aktualnaTeplotaText = "--°C"; // Pomocná premenná pre nočný riadok
+        let cfgMestoNazov = localStorage.getItem('cfg_weather_name') || "Bratislava";
+        // Načítanie histórie miest (max 3)
+        let cfgHistoriaMest = JSON.parse(localStorage.getItem('cfg_weather_history')) || ["Bratislava"];
+        let aktualnaTeplotaText = "--°C";
 
         // Keď používateľ klikne na rádio a spustí hudbu, aktivuje sa aj neviditeľné video
         document.addEventListener('click', function enableNoSleep() {
@@ -617,19 +620,56 @@
             resetSettingsTimer();
         }
         function zmenNastavenieMesta() {
-            let lat = prompt("Zadaj zemepisnú šírku (Latitude) mesta (napr. 48.1486):", cfgLat);
-            let lon = prompt("Zadaj zemepisnú dĺžku (Longitude) mesta (napr. 17.1077):", cfgLon);
+            // Vytvoríme textový zoznam histórie pre používateľa
+            let historiaText = cfgHistoriaMest.map((m, i) => `${i + 1}. ${m}`).join(", ");
+            let promptText = `Zadaj názov mesta (napr. Kosice, Praha, Rim):\n\nNaposledy hľadané: ${historiaText || 'žiadne'}`;
             
-            if (lat && lon && !isNaN(lat) && !isNaN(lon)) {
-                cfgLat = lat;
-                cfgLon = lon;
-                localStorage.setItem('cfg_weather_lat', lat);
-                localStorage.setItem('cfg_weather_lon', lon);
+            let navrhMesta = prompt(promptText, cfgMestoNazov);
+            
+            if (navrhMesta && navrhMesta.trim() !== "") {
+                let cisteMesto = navrhMesta.trim();
                 
-                // Okamžite stiahni počasie pre nové mesto
-                fetchWeatherData();
+                // Zavoláme Geocoding API na prevod textu na GPS súradnice
+                fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cisteMesto)}&count=1&language=sk&format=json`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.results && data.results.length > 0) {
+                            const najdene = data.results[0];
+                            
+                            // Uložíme nové dáta
+                            cfgLat = najdene.latitude;
+                            cfgLon = najdene.longitude;
+                            cfgMestoNazov = najdene.name;
+                            
+                            localStorage.setItem('cfg_weather_lat', cfgLat);
+                            localStorage.setItem('cfg_weather_lon', cfgLon);
+                            localStorage.setItem('cfg_weather_name', cfgMestoNazov);
+                            
+                            // Aktualizácia histórie: odstránime duplikát, ak existuje, a pridáme na začiatok
+                            cfgHistoriaMest = cfgHistoriaMest.filter(m => m.toLowerCase() !== cfgMestoNazov.toLowerCase());
+                            cfgHistoriaMest.unshift(cfgMestoNazov);
+                            
+                            // Osekneme históriu na maximálne 3 mestá
+                            if (cfgHistoriaMest.length > 3) cfgHistoriaMest.pop();
+                            localStorage.setItem('cfg_weather_history', JSON.stringify(cfgHistoriaMest));
+                            
+                            // Aktualizujeme text na tlačidle a stiahneme počasie
+                            aktualizujTlacidloMesta();
+                            fetchWeatherData();
+                        } else {
+                            alert(`Mesto "${cisteMesto}" sa nenašlo. Skús bez diakritiky.`);
+                        }
+                    })
+                    .catch(e => alert("Chyba pri hľadaní mesta na serveri."));
             }
             resetSettingsTimer();
+        }
+
+        function aktualizujTlacidloMesta() {
+            const btn = document.getElementById('set-weather-coords');
+            if (btn) {
+                btn.textContent = `Mesto: ${cfgMestoNazov}`;
+            }
         }
 
         // --- AUTOMATICKÉ ZATVÁRANIE NASTAVENÍ (10 SEKÚND) ---
@@ -1020,6 +1060,7 @@
             fetchNamedayData();
             renderSidebarFavorites();
             inicializujPlochuNastaveni();
+            aktualizujTlacidloMesta();
 
             const savedType = localStorage.getItem('kiosk_last_radio_type');
             if (savedType) {
