@@ -265,13 +265,6 @@
         }
         /* --- AUTOMATICKÉ PREKRESLENIE PRE REŽIM NA VÝŠKU --- */
         @media (orientation: portrait) {
-            body {
-                position: relative !important;
-                height: 100% !important;
-                overflow-y: auto !important;
-                -webkit-overflow-scrolling: touch;
-            }
-
             /* Hlavný kontajner otočíme z horizontálneho na vertikálny smer */
             .workspace-container {
                 flex-direction: column;
@@ -289,7 +282,7 @@
                 border-top: 1px solid #111;
                 gap: 8px;
                 padding: 8px;
-                padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+                padding-bottom: calc(8px + env(safe-area-inset-bottom));
                 padding-left: calc(8px + env(safe-area-inset-left));
                 padding-right: calc(8px + env(safe-area-inset-right));
             }
@@ -314,17 +307,14 @@
                 font-size: 4vw;
             }
 
-            /* Lišta teraz sedí prirodzene na spodku a neprodukuje prázdny čierny pás. */
+            /* V režime na výšku skryjeme spodnú lištu prehrávača, 
+               keďže ovládanie hlasitosti a power button môžeme neskôr elegantne zapracovať priamo k hodinám,
+               alebo ak ju chceš nechať, stačí odstrániť riadok nižšie */
             .bottom-player-bar {
-                position: relative !important;
-                bottom: 0 !important; 
-                z-index: 999 !important;
-                background: #050505 !important;
-                box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5); 
-                margin-bottom: env(safe-area-inset-bottom);
+                /* display: none; */ /* Odtajni, ak chceš získať maximum miesta pre hodiny */
             }
 
-            /* Presun tlačidla do voľného priestoru pod dátumom */
+            /* TVOJ NAVRH: Presun tlačidla do voľného zeleného priestoru pod dátumom */
             .btn-settings {
                 position: absolute !important;
                 top: 54px !important;       /* Skočí z lišty tesne pod ňu do voľného priestoru */
@@ -334,27 +324,20 @@
                 border: 1px solid #222 !important;
                 margin: 0 !important;
             }
-        }
-
-        /* --- ELEGANTNÁ OPRAVA LIŠTY PRE PREHLIADAČE NA ŠÍRKU --- */
-        @media (orientation: landscape) {
-            /* Povolíme telu minimálny scroll, aby prehliadač dovolil schovať panel adresy */
-            body {
-                position: relative !important;
-                height: 100% !important;
-                overflow-y: auto !important;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            /* Pridáme neviditeľný priestor pod spodnú lištu, ktorý vykompenzuje panel adresy */
+            /* OPRAVA PRE BEŽNÉ PREHLIADAČE: Zdvihnutie ovládacej lišty nad systémový panel adresy */
             .bottom-player-bar {
-                margin-bottom: env(safe-area-inset-bottom);
+                position: relative !important;
+                /* Posunie celú lištu o 60 pixelov vyššie, takže vyskočí nad panel prehliadača */
+                bottom: 60px !important; 
+                z-index: 999 !important;
+                background: #050505 !important;
+                /* Pridáme jemný tieň navrchu, aby vizuálne pekne oddelila mriežku rádií */
+                box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5); 
             }
 
-            /* Poistka pre nočný režim na šírku: Posunieme text o 45px vyššie, 
-               aby neskončil utopený pod spodnou lištou prehliadača */
-            body.full-night-mode #nightBottomInfo {
-                bottom: calc(5vh + 45px) !important;
+            /* Kompenzácia priestoru pre mriežku rádií, aby sa pod lištu neschovali */
+            .favorites-sidebar {
+                padding-bottom: calc(65px + env(safe-area-inset-bottom)) !important;
             }
         }
         /* --- OCHRANA PROTI VYPAĽOVANIU (PIXEL SHIFTING) --- */
