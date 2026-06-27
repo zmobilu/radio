@@ -844,24 +844,41 @@
                 
                 let meninyNocturnalText = dnesneMeno ? `${dnesneMeno}  •  ` : "";
                 
-                // UPRAVENÝ RIADOK V runClockEngine(): Pridané počasie do nočného zobrazenia
                 if (bottomInfoEl) {
-                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}  •  ${aktualnaTeplotaText}${radioNocturnalText}`;
+                    // Vytiahneme čisté číslo teploty z premennej (odstránime ikonku a text °C)
+                    const lenCisloTeploty = parseInt(aktualnaTeplotaText.replace(/[^0-9.-]/g, ''));
+                    
+                    // Znovu použijeme tvoj farebný kľúč pre nočné zobrazenie
+                    function getTempColor(t) {
+                        if (isNaN(t)) return cfgFarbaNoci; // Poistka, ak by dáta zlyhali
+                        if (t < 0) return '#00bfff';
+                        if (t < 10) return '#87CEEB';
+                        if (t < 22) return '#98FB98';
+                        if (t < 28) return '#ffa500';
+                        return '#ff4500';
+                    }
+                    const tColorNoc = getTempColor(lenCisloTeploty);
+
+                    // Rozdelíme text teploty na ikonku a zafarbené číslo
+                    const ikonkaW = aktualnaTeplotaText.split(' ')[0] || "☀️";
+
+                    // ZÁPIS DO NOČNÉHO RIADKA: Dátum a rádio majú farbu noci, teplota má svoju vlastnú podľa počasia
+                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}  •  ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>${radioNocturnalText}`;
                 }
             } else {
                 bodyEl.classList.remove('full-night-mode');
                 // Ak kód zhodil nočný režim (napr. prešiel čas noci), vynulujeme aj manuálny príznak
                 if (!jeNocnyCas) manualnaNocAktivna = false;
             }
-            // --- INTEGRÁCIA AUDIO WATCHDOGU ---
-            if (currentPlayingType !== "" && currentPlayingType !== "none" && !audio.paused) {
+                // --- INTEGRÁCIA AUDIO WATCHDOGU ---
+                if (currentPlayingType !== "" && currentPlayingType !== "none" && !audio.paused) {
                 
                 // Ak sa čas streamu rovná tomu z predchádzajúcej sekundy
                 if (audio.currentTime === watchdogPoslednyCas) {
                     watchdogPocitadloZaseknutia++;
                     
-                    // Ak zásek trvá už 4 sekundy, ideme reštartovať
-                    if (watchdogPocitadloZaseknutia >= 4) {
+                // Ak zásek trvá už 4 sekundy, ideme reštartovať
+                if (watchdogPocitadloZaseknutia >= 4) {
                         console.log("Watchdog: Detekovaný zásek streamu. Reštartujem...");
                         document.getElementById('lblTrack').textContent = "Obnovujem spojenie...";
                         
