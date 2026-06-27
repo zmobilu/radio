@@ -217,8 +217,16 @@
             color: var(--night-color) !important;
         }
         body.full-night-mode #nightBottomInfo {
-            display: block !important; position: absolute !important; bottom: 8vh !important;
-            font-size: 2.8vw !important; font-weight: 300; letter-spacing: 1px; opacity: 0.85; text-align: center;
+        display: block !important; 
+        position: absolute !important; 
+        bottom: 6vh !important;         /* Posunuté o chlp nižšie, aby vznikla bezpečná medzera od obrovských číslic */
+        font-size: 4.5vw !important;    /* Výrazne zväčšené z pôvodných 2.8vw */
+        font-weight: 500;               /* Stredne hrubé písmo – ideálne na čítanie rozostreným zrakom */
+        letter-spacing: 1px; 
+        opacity: 1;                     /* Plný jas bez stlmenia pre maximálny kontrast v tme */
+        text-align: center;
+        width: 100%;                    /* Poistka pre presné vycentrovanie na stred */
+        left: 0;
         }
 
         @media (min-width: 768px) {
