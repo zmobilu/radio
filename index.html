@@ -36,22 +36,28 @@
 
         /* --- HORNE MINIMALISTICKÉ MENU --- */
         .top-navbar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 15px; background: #050505; border-bottom: 1px solid #111;
-            height: 48px; box-sizing: border-box; flex-shrink: 0;
-            padding-left: calc(15px + env(safe-area-inset-left));
-            padding-right: calc(15px + env(safe-area-inset-right));
-        }
-        .nav-left-info { display: flex; align-items: center; gap: 15px; font-size: 14px; color: #aaa; font-weight: 400; }
-        .nav-clock { font-size: 16px; font-weight: 700; color: #fff; }
-        .nav-nameday { color: #ff9f0a; font-weight: 500; }
-        
-        .btn-settings { 
-            background: #111; border: 1px solid #222; color: #666; font-size: 20px; 
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            width: 44px; height: 44px; border-radius: 50%; margin-top: 4px;
-            transition: color 0.2s, background 0.2s, border-color 0.2s; 
-        }
+    display: flex; justify-content: center; align-items: center; position: relative;
+    padding: 0 15px; background: #050505; border-bottom: 1px solid #111;
+    height: 48px; box-sizing: border-box; flex-shrink: 0;
+    padding-left: calc(15px + env(safe-area-inset-left));
+    padding-right: calc(15px + env(safe-area-inset-right));
+}
+.nav-left-info { 
+    display: flex; align-items: center; justify-content: center; gap: 12px; 
+    font-size: 14px; color: #aaa; font-weight: 400; width: 100%; text-align: center;
+}
+.nav-clock { font-size: 16px; font-weight: 700; color: #fff; }
+.nav-nameday { color: #ff9f0a; font-weight: 500; }
+.nav-weather-city { color: #aaa; text-transform: uppercase; font-weight: 500; }
+.nav-weather-temp { font-weight: bold; }
+
+.btn-settings { 
+    position: absolute; right: calc(15px + env(safe-area-inset-right));
+    background: #111; border: 1px solid #222; color: #666; font-size: 20px; 
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: 50%; margin-top: 4px; z-index: 10;
+    transition: color 0.2s, background 0.2s, border-color 0.2s; 
+}
         .btn-settings.active { color: #ff9f0a; border-color: #ff9f0a; background: #1a1a1a; }
 
         /* --- HLAVNÁ ROZDELENÁ PLOCHA (Dôsledné prerozdelenie 30/70) --- */
@@ -379,12 +385,15 @@
 <body id="mainBody">
 
     <audio id="audioPlayer" preload="none" playsinline></audio>
-    <video id="wakeLockVideo" playsinline autoplay loop muted style="position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none;" src="https://raw.githubusercontent.com/bmarisol/nosleep-video/master/nosleep.mp4"></video>
+
     <header class="top-navbar">
         <div class="nav-left-info">
             <span class="nav-clock" id="clockBox">00:00</span>
             <span id="dateBox">--.--.----</span>
             <span class="nav-nameday" id="nameBox">---</span>
+            <span style="color: #444;">•</span>
+            <span class="nav-weather-city" id="navWeatherCity">---</span>
+            <span class="nav-weather-temp" id="navWeatherTemp">--°C</span>
         </div>
         <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
             <i class="fa-solid fa-gear"></i>
@@ -653,6 +662,14 @@
                 if (inlineTempEl) {
                     inlineTempEl.textContent = currentTemp;
                     inlineTempEl.style.color = tColor;
+                }
+                const navCityEl = document.getElementById('navWeatherCity');
+                if (navCityEl) navCityEl.textContent = window.customCityName;
+
+                const navTempEl = document.getElementById('navWeatherTemp');
+                if (navTempEl) {
+                    navTempEl.textContent = currentTemp;
+                    navTempEl.style.color = tColor;
                 }
 
                 const inlineIconEl = document.getElementById('inlineWeatherIcon');
@@ -986,13 +1003,6 @@
         }
 
         function playRadio(url, id) {
-            // Udržanie zapnutej obrazovky
-            const wlVideo = document.getElementById('wakeLockVideo');
-                if (wlVideo) {
-                wlVideo.play().catch(e => {
-                console.log("Video čaká na interakciu, skúsim znova po dotyku...");
-            });
-            }
             currentPlayingType = id;
             localStorage.setItem('kiosk_last_radio_url', url);
             localStorage.setItem('kiosk_last_radio_type', id);
@@ -1169,16 +1179,7 @@
                 document.getElementById('lblTrack').textContent = `Naposledy: ${savedType.toUpperCase()}`;
             }
         });
-        
-        // Aktivácia Wake Lock videa pri akomkoľvek prvom dotyku na displej
-        document.addEventListener('touchstart', function() {
-            const wlVideo = document.getElementById('wakeLockVideo');
-            if (wlVideo) {
-                wlVideo.play().catch(e => console.log("Video čaká na uvoľnenie prehliadačom"));
-            }
-        }, { once: true });
 
-        // Pôvodný blok pre zabránenie zoomu
         document.addEventListener('touchstart', function (event) {
             if (event.touches.length > 1) event.preventDefault();
         }, { passive: false });
