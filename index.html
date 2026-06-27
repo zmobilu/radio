@@ -289,9 +289,10 @@
 
     <header class="top-navbar">
         <div class="nav-left-info">
-            <span class="nav-clock" id="clockBox">00:00</span>
+            <!-- PREHODENÉ PORADIE: Najprv dátum, potom hodiny, nakoniec meno -->
             <span id="dateBox">--.--.----</span>
-            <span class="nav-nameday" id="nameBox">Meniny: ---</span>
+            <span class="nav-clock" id="clockBox">00:00</span>
+            <span class="nav-nameday" id="nameBox">---</span>
         </div>
         <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
             <i class="fa-solid fa-gear"></i>
@@ -612,7 +613,6 @@
         }
 
         // --- AUDIO ENGINE ---
-        // --- AUDIO ENGINE ---
         function playRadio(url, id) {
             // BEZPEČNÉ VYČISTENIE STARÉHO STREAMU PRED ZMENOU
             audio.pause();
@@ -689,10 +689,13 @@
             document.getElementById('bigHours').textContent = h;
             document.getElementById('bigMinutes').textContent = m;
             
-            const dni = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
-            
-            const formatMaly = `${dni[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}.`;
-            const formatVelky = `${dni[now.getDay()]}, ${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`;
+            // NÁHRADA PRE FORMÁTOVANIE DÁTUMU V runClockEngine()
+            const dniDlhe = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
+            const dniSkratky = ['Ned', 'Pon', 'Uto', 'Str', 'Štv', 'Pia', 'Sob']; // Čisté 3-písmenové skratky
+            // Krátky formát do hornej lišty: bez roku, napr. "Sob 27.6."
+            const formatMaly = `${dniSkratky[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}.`;
+            // Veľký formát na plochu: plný názov s rokom, napr. "Sobota, 27.6.2026"
+            const formatVelky = `${dniDlhe[now.getDay()]}, ${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`;
             
             document.getElementById('dateBox').textContent = formatMaly;
             document.getElementById('bigDate').textContent = formatVelky;
@@ -721,7 +724,7 @@
                 }
                 
                 // Pridané zobrazovanie mena oslávenca priamo do riadku noci
-                let meninyNocturnalText = dnesneMeno ? `Dnes oslavuje: ${dnesneMeno}  •  ` : "";
+                let meninyNocturnalText = dnesneMeno ? `${dnesneMeno}  •  ` : "";
                 
                 if (bottomInfoEl) {
                     bottomInfoEl.innerHTML = `${meninyNocturnalText}${dni[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}.${radioNocturnalText}`;
@@ -741,8 +744,8 @@
                 for (let line of text.split('\n')) {
                     if (line.includes(`${mm}-${dd}`)) {
                         dnesneMeno = line.split(/[;,]/)[1].trim();
-                        document.getElementById('nameBox').textContent = `Meniny: ${dnesneMeno}`;
-                        document.getElementById('bigNameday').textContent = `Dnes má meniny: ${dnesneMeno}`;
+                        document.getElementById('nameBox').textContent = dnesneMeno;
+                        document.getElementById('bigNameday').textContent = dnesneMeno;
                         runClockEngine(); // Okamžite obnovíme spodný panel noci po načítaní
                         break;
                     }
