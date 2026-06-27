@@ -418,6 +418,11 @@
             { id: "youtube", name: "YT Music", url: "https://music.youtube.com", icon: "fa-brands fa-youtube", color: "#FF0000", style: "background:#111;", category: "Externé Aplikácie" },
             { id: "tidal", name: "Tidal", url: "https://tidal.com", icon: "fa-solid fa-wave-square", color: "#00FFFF", style: "background:#111;", category: "Externé Aplikácie" }
         ];
+        const RODINA = ['Dominik', 'Janka', 'Patrik', 'Martin', 'Andrea', 'Roman', 'Emília', 'Ján', 'Mária', 'Juraj', 'Tatiana', 'Rastislav', 'Viktor', 'Adela', 'Linda', 'Michal', 'Ondrej', 'Jana', 'Viliam', 'Nataša', 'Kristína', 'Tibor', 'Ema'];
+        const KOLEGOVIA = ['Ivana', 'Mária', 'Iveta', 'Nina', 'Adriana', 'Jaroslava', 'Eva', 'Jana', 'Judita', 'Martin', 'Jozef', 'Marcel', 'Karol', 'Anna', 'Petra', 'Dominika'];
+        const SPOLUZIACI = ['Claudia', 'Bibiana','Zuzana', 'Kristína','Hana', 'Amanda','Viktória', 'Karin','Alexandra', 'Vanesa','Tamara', 'Zoe','Ela', 'Ema','Sebastian', 'Barbora','Jakub', 
+                    'Paulína', 'Timothy', 'Maximilián','Adam', 'Milica','Alica', 'Linda', 'Róbert', 'Daniel','Laura', 'Lili', 'Oskar', 'Tomáš','Samuel','Maxim','Alex','Erik','Oliver'];
+        const MOJE_MENA = ['Peter', 'Lenka', 'Daniel', 'Hana', 'Lucia', 'Katarína', 'Andrej', 'Zuzana', 'Radoslav', 'Martina', 'Róbert', 'Milan', 'Juraj', 'Ladislav', 'Pavol']; 
 
         const VOLUME_MAP = { 
             'slovensko': 0.3, 'fm': 0.5, 'devin': 0.5, 'litera': 0.5, 'junior': 0.5, 'regina': 0.5, 'rock': 0.5,
@@ -743,10 +748,52 @@
                 const text = await response.text();
                 for (let line of text.split('\n')) {
                     if (line.includes(`${mm}-${dd}`)) {
-                        dnesneMeno = line.split(/[;,]/)[1].trim();
-                        document.getElementById('nameBox').textContent = dnesneMeno;
-                        document.getElementById('bigNameday').textContent = dnesneMeno;
-                        runClockEngine(); // Okamžite obnovíme spodný panel noci po načítaní
+                        let povodneMeno = line.split(/[;,]/)[1].trim();
+                        
+                        // ZÁKLADNÉ NASTAVENIE PREMENNEJ
+                        dnesneMeno = povodneMeno; 
+
+                        // ELEMENTY PRE ZOBRAZENIE
+                        const nameBox = document.getElementById('nameBox');
+                        const bigNameday = document.getElementById('bigNameday');
+
+                        // RESET ŠTÝLOV (aby neostalo staré podfarbenie z predchádzajúceho dňa)
+                        nameBox.style.color = "#ff9f0a";
+                        nameBox.style.background = "transparent";
+                        nameBox.style.padding = "0";
+                        nameBox.style.borderRadius = "0";
+                        bigNameday.style.color = "#ff9f0a";
+
+                        // KONTROLA A ZVÝRAZNENIE PODĽA SKUPÍN
+                        if (RODINA.includes(povodneMeno)) {
+                            dnesneMeno = `❤️ ${povodneMeno}`;
+                            nameBox.style.color = "#ff3b30"; // Červená pre rodinu
+                            bigNameday.style.color = "#ff3b30";
+                        } 
+                        else if (MOJE_MENA.includes(povodneMeno)) {
+                            dnesneMeno = `⭐ ${povodneMeno}`;
+                            // Zvýraznenie v hornom riadku jemným oranžovým pozadím (kapsula)
+                            nameBox.style.background = "#ff9f0a22";
+                            nameBox.style.padding = "2px 8px";
+                            nameBox.style.borderRadius = "6px";
+                            nameBox.style.color = "#ff9f0a";
+                        } 
+                        else if (SPOLUZIACI.includes(povodneMeno)) {
+                            dnesneMeno = `🎓 ${povodneMeno}`;
+                            nameBox.style.color = "#5ac8fa"; // Modrá pre spolužiakov
+                            bigNameday.style.color = "#5ac8fa";
+                        } 
+                        else if (KOLEGOVA.includes(povodneMeno)) {
+                            dnesneMeno = `💼 ${povodneMeno}`;
+                            nameBox.style.color = "#34c759"; // Zelená pre kolegov
+                            bigNameday.style.color = "#34c759";
+                        }
+
+                        // ZÁPIS DO STRÁNKY
+                        nameBox.textContent = dnesneMeno;
+                        bigNameday.textContent = dnesneMeno;
+                        
+                        runClockEngine(); // Aktualizácia spodného panelu noci
                         break;
                     }
                 }
