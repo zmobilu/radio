@@ -175,7 +175,7 @@
             box-sizing: border-box; flex-shrink: 0;
             padding-left: calc(15px + env(safe-area-inset-left));
             padding-right: calc(15px + env(safe-area-inset-right));
-            padding-bottom: env(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom) !important;
         }
         .player-info-block { display: flex; flex-direction: column; justify-content: center; width: 35%; overflow: hidden; }
         .player-info-block h4 { margin: 0; font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -219,7 +219,8 @@
         body.full-night-mode #nightBottomInfo {
         display: block !important; 
         position: absolute !important; 
-        bottom: 6vh !important;         /* Posunuté o chlp nižšie, aby vznikla bezpečná medzera od obrovských číslic */
+        bottom: 5vh !important;         /* Posunuté o chlp nižšie, aby vznikla bezpečná medzera od obrovských číslic */
+        padding-bottom: env(safe-area-inset-bottom) !important;
         font-size: 4.5vw !important;    /* Výrazne zväčšené z pôvodných 2.8vw */
         font-weight: 500;               /* Stredne hrubé písmo – ideálne na čítanie rozostreným zrakom */
         letter-spacing: 1px; 
