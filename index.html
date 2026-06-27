@@ -130,12 +130,32 @@
 
         /* --- ZÚŽENÝ EXTRA KOMPAKTNÝ PANEL BEZ TEXTOV --- */
         .settings-night-panel {
-            background: #0d0d0d; padding: 8px; border-bottom: 2px solid #1a1a1a;
-            display: flex; flex-direction: row; gap: 6px; box-sizing: border-box; justify-content: space-between;
+        background: #0d0d0d; 
+        padding: 8px; 
+        border-bottom: 2px solid #1a1a1a;
+        display: flex; 
+        /* ZMENA: Zapneme automatické zalamovanie a usporiadanie pod seba */
+        flex-wrap: wrap; 
+        flex-direction: row; 
+        gap: 8px; 
+        box-sizing: border-box; 
+        justify-content: space-between;
         }
         .settings-night-row { 
-            display: flex; align-items: center; background: #151515; padding: 6px 10px; 
-            border-radius: 8px; border: 1px solid #222; gap: 8px; flex: 1; justify-content: center;
+        display: flex; 
+        align-items: center; 
+        background: #151515; 
+        /* ZMENA: Kompaktnejší padding pre úsporu miesta */
+        padding: 4px 8px; 
+        border-radius: 8px; 
+        border: 1px solid #222; 
+        gap: 6px; 
+        flex: 1; 
+        /* ZMENA: Nastavíme minimálnu šírku, aby sa prvky pekne zalomili do dvoch riadkov */
+        min-width: calc(50% - 8px); 
+        height: 42px; /* Jednotná výška pre všetky boxy */
+        justify-content: center;
+        box-sizing: border-box;
         }
         .settings-night-row i.label-icon { font-size: 14px; color: #666; width: 16px; text-align: center; }
         .settings-night-row button { background: #222; color: #fff; border: 1px solid #444; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; }
@@ -376,7 +396,7 @@
                     </div>
                     <div class="settings-night-row">
                         <i class="fa-solid fa-cloud-sun label-icon" title="Súradnice mesta"></i>
-                        <button onclick="zmenNastavenieMesta(); event.stopPropagation();" id="set-weather-coords">Nastaviť GPS</button>
+                        <button onclick="zmenNastavenieMesta(); event.stopPropagation();" id="set-weather-coords">Mesto</button>
                     </div>
                 </div>
             </div>
