@@ -205,8 +205,12 @@
         body.full-night-mode .workspace-container { width: 100vw; height: 100vh; }
         body.full-night-mode .main-content-area { width: 100vw; height: 100vh; }
         body.full-night-mode .placeholder-view {
-            width: 100vw !important; height: 100vh !important;
-            justify-content: center !important; align-items: center !important; padding: 0 !important;
+            width: 100vw !important; 
+            height: 100vh !important; 
+            transform: translateY(-6dvh) !important; /* Zmenené z -3dvh na -6dvh pre viditeľnejší posun hodín nahor */
+            justify-content: center !important; 
+            align-items: center !important; 
+            padding: 0 !important;
         }
         body.full-night-mode .big-clock-time {
             font-size: 28vw !important; letter-spacing: -2px !important; margin: 0 !important;
@@ -492,6 +496,16 @@
                     if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) icon = "🌧️";
                     if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) icon = "❄️";
                     if (code >= 95 && code <= 99) icon = "⛈️";
+                    
+                    // TU CHÝBAL TVOJ FAREBNÝ KĽÚČ PRE HORNE ZOBRAZENIE
+                    function getTempColor(t) {
+                        if (t < 0) return '#00bfff';
+                        if (t < 10) return '#87CEEB';
+                        if (t < 22) return '#98FB98';
+                        if (t < 28) return '#ffa500';
+                        return '#ff4500';
+                    }
+                    const tColor = getTempColor(temp);
                     
                     aktualnaTeplotaText = `${icon} ${temp}°C`; // Táto premenná zostáva pre nočný režim
                     
