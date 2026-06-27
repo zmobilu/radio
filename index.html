@@ -265,37 +265,17 @@
         }
         /* --- AUTOMATICKÉ PREKRESLENIE PRE REŽIM NA VÝŠKU --- */
         @media (orientation: portrait) {
-            /* ZMENA: Povolíme telu na výšku jemný scroll, aby prehliadač schoval lištu s adresou */
             body {
                 position: relative !important;
                 height: 100% !important;
                 overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch;
             }
-            /* --- ELEGANTNÁ OPRAVA LIŠTY PRE PREHLIADAČE NA ŠÍRKU --- */
-        @media (orientation: landscape) {
-            /* Povolíme telu minimálny scroll, aby prehliadač dovolil schovať panel adresy */
-            body {
-                position: relative !important;
-                height: 100% !important;
-                overflow-y: auto !important;
-                -webkit-overflow-scrolling: touch;
-            }
+
             /* Hlavný kontajner otočíme z horizontálneho na vertikálny smer */
             .workspace-container {
                 flex-direction: column;
             }
-            /* Pridáme neviditeľný priestor pod spodnú lištu, ktorý vykompenzuje panel adresy */
-            .bottom-player-bar {
-                margin-bottom: env(safe-area-inset-bottom);
-            }
-
-            /* Poistka pre nočný režim na šírku: Posunieme text o 45px vyššie, 
-               aby neskončil utopený pod spodnou lištou prehliadača */
-            body.full-night-mode #nightBottomInfo {
-                bottom: calc(5vh + 45px) !important;
-            }
-        }
 
             /* Ľavá sekcia (teraz spodná): Rádia berú celú šírku a cca 30% výšky obrazovky */
             .favorites-sidebar {
@@ -334,8 +314,7 @@
                 font-size: 4vw;
             }
 
-            /* ZMENA: Odstránili sme natvrdé posunutie o 60px. Lišta teraz sedí prirodzene na spodku
-               a neprodukuje prázdny čierny pás. */
+            /* Lišta teraz sedí prirodzene na spodku a neprodukuje prázdny čierny pás. */
             .bottom-player-bar {
                 position: relative !important;
                 bottom: 0 !important; 
@@ -345,7 +324,7 @@
                 margin-bottom: env(safe-area-inset-bottom);
             }
 
-            /* TVOJ NAVRH: Presun tlačidla do voľného zeleného priestoru pod dátumom */
+            /* Presun tlačidla do voľného priestoru pod dátumom */
             .btn-settings {
                 position: absolute !important;
                 top: 54px !important;       /* Skočí z lišty tesne pod ňu do voľného priestoru */
@@ -355,9 +334,27 @@
                 border: 1px solid #222 !important;
                 margin: 0 !important;
             }
-            /* Kompenzácia priestoru pre mriežku rádií, aby sa pod lištu neschovali */
-            .favorites-sidebar {
-                padding-bottom: calc(65px + env(safe-area-inset-bottom)) !important;
+        }
+
+        /* --- ELEGANTNÁ OPRAVA LIŠTY PRE PREHLIADAČE NA ŠÍRKU --- */
+        @media (orientation: landscape) {
+            /* Povolíme telu minimálny scroll, aby prehliadač dovolil schovať panel adresy */
+            body {
+                position: relative !important;
+                height: 100% !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Pridáme neviditeľný priestor pod spodnú lištu, ktorý vykompenzuje panel adresy */
+            .bottom-player-bar {
+                margin-bottom: env(safe-area-inset-bottom);
+            }
+
+            /* Poistka pre nočný režim na šírku: Posunieme text o 45px vyššie, 
+               aby neskončil utopený pod spodnou lištou prehliadača */
+            body.full-night-mode #nightBottomInfo {
+                bottom: calc(5vh + 45px) !important;
             }
         }
         /* --- OCHRANA PROTI VYPAĽOVANIU (PIXEL SHIFTING) --- */
