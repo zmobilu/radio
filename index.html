@@ -317,7 +317,7 @@
             <span id="dateBox">--.--.----</span>
             <span class="nav-clock" id="clockBox" onclick="manualnyNocturnalToggle(); event.stopPropagation();" style="cursor: pointer;">00:00</span>
             <span class="nav-nameday" id="nameBox">---</span>
-            <span id="navWeather" style="color: #5ac8fa; font-weight: 500;">--°C</span>
+            <span id="navWeather" style="font-weight: 500;">--°C</span>
         </div>
         <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
             <i class="fa-solid fa-gear"></i>
@@ -493,11 +493,12 @@
                     if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) icon = "❄️";
                     if (code >= 95 && code <= 99) icon = "⛈️";
                     
-                    aktualnaTeplotaText = `${icon} ${temp}°C`;
+                    aktualnaTeplotaText = `${icon} ${temp}°C`; // Táto premenná zostáva pre nočný režim
                     
-                    // Zápis do hornej lišty
-                    document.getElementById('navWeather').textContent = aktualnaTeplotaText;
-                    
+                    const weatherBox = document.getElementById('navWeather');
+                    if (weatherBox) {
+                        weatherBox.innerHTML = `${icon} <span style="color: ${tColor} !important; font-weight: 700 !important;">${temp}°C</span>`;
+                    }
                     // Ak práve beží noc, okamžite aktualizujeme aj spodný riadok
                     runClockEngine();
                 }
