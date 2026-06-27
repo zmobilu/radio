@@ -36,15 +36,38 @@
 
         /* --- HORNE MINIMALISTICKÉ MENU --- */
         .top-navbar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 15px; background: #050505; border-bottom: 1px solid #111;
-            height: 48px; box-sizing: border-box; flex-shrink: 0;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 0 15px; 
+            background: #050505; 
+            border-bottom: 1px solid #111;
+            height: 48px; 
+            box-sizing: border-box; 
+            flex-shrink: 0;
             padding-left: calc(15px + env(safe-area-inset-left));
             padding-right: calc(15px + env(safe-area-inset-right));
+            position: relative; /* Pridané pre absolútne centrovanie vnútra */
         }
-        .nav-left-info { display: flex; align-items: center; gap: 15px; font-size: 14px; color: #aaa; font-weight: 400; }
-        .nav-clock { font-size: 16px; font-weight: 700; color: #fff; }
-        .nav-nameday { color: #ff9f0a; font-weight: 500; }
+        .nav-left-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 18px;            /* Mierne zväčšená medzera medzi prvkami */
+            font-size: 16px;      /* Zväčšené základné písmo (z 14px) */
+            color: #aaa; 
+            font-weight: 400; 
+            
+            /* Magické centrovanie presne na stred lišty */
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;  /* Zabráni nežiaducemu zalomeniu textu */
+        }
+        
+        /* O chlp zväčšíme aj jednotlivé podprvky pre lepší kontrast */
+        .nav-clock { font-size: 19px; font-weight: 700; color: #fff; }
+        .nav-nameday { color: #ff9f0a; font-weight: 500; font-size: 16px; }
         
         /* Zväčšené a posunuté tlačidlo nastavení pre bezchybný dotyk na iOS */
         .btn-settings { 
