@@ -145,6 +145,10 @@
             width: 100%; background: #111; color: #fff; border: 1px solid #444; border-radius: 8px;
             padding: 4px 10px; font-size: 1.8vw; outline: none; font-family: inherit;
         }
+        input, textarea {
+            -webkit-user-select: text !important;
+            user-select: text !important;
+        }
         .weather-search-box button {
             background: #222; color: #ff9f0a; border: 1px solid #ff9f0a; padding: 2px 12px;
             border-radius: 8px; font-size: 1.8vw; font-weight: bold; cursor: pointer; white-space: nowrap;
@@ -1181,8 +1185,11 @@
         });
 
         document.addEventListener('touchstart', function (event) {
-            if (event.touches.length > 1) event.preventDefault();
-        }, { passive: false });
+    if (event.target.tagName === 'INPUT' || event.target.tagName === 'BUTTON') {
+        return;
+    }
+    if (event.touches.length > 1) event.preventDefault();
+}, { passive: false });
     </script>
 </body>
 </html>
