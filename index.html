@@ -313,6 +313,17 @@
             .bottom-player-bar {
                 /* display: none; */ /* Odtajni, ak chceš získať maximum miesta pre hodiny */
             }
+
+            /* TVOJ NAVRH: Presun tlačidla do voľného zeleného priestoru pod dátumom */
+            .btn-settings {
+                position: absolute !important;
+                top: 54px !important;       /* Skočí z lišty tesne pod ňu do voľného priestoru */
+                left: 15px !important;      /* Zarovná sa pekne k ľavému okraju */
+                z-index: 100 !important;    /* Vynúti si prvenstvo pre bezproblémový klik prstom */
+                background: #111 !important;/* Čisté tmavé pozadie kapsuly */
+                border: 1px solid #222 !important;
+                margin: 0 !important;
+            }
         }
         /* --- OCHRANA PROTI VYPAĽOVANIU (PIXEL SHIFTING) --- */
         @keyframes antiBurnIn {
@@ -336,16 +347,16 @@
     <audio id="audioPlayer" preload="none" playsinline></audio>
 
     <header class="top-navbar">
+        <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
+            <i class="fa-solid fa-gear"></i>
+        </button>
+
         <div class="nav-left-info">
-            <!-- PREHODENÉ PORADIE: Najprv dátum, potom hodiny, nakoniec meno -->
             <span id="dateBox">--.--.----</span>
             <span class="nav-clock" id="clockBox" onclick="manualnyNocturnalToggle(); event.stopPropagation();" style="cursor: pointer;">00:00</span>
             <span class="nav-nameday" id="nameBox">---</span>
             <span id="navWeather" style="font-weight: 500;">--°C</span>
         </div>
-        <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
-            <i class="fa-solid fa-gear"></i>
-        </button>
     </header>
 
     <div class="workspace-container">
@@ -394,9 +405,13 @@
                             <div onclick="nastavFarbuNoci('#ffffff', this); event.stopPropagation();" class="color-dot" style="background: #ffffff;"></div>
                         </div>
                     </div>
-                    <div class="settings-night-row">
-                        <i class="fa-solid fa-cloud-sun label-icon" title="Mesto pre počasie"></i>
-                        <button onclick="zmenNastavenieMesta(); event.stopPropagation();" id="set-weather-coords">Mesto: Bratislava</button>
+                    <div class="settings-night-row" style="flex-direction: column; height: auto; gap: 4px; padding: 6px 8px;">
+                        <div style="display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center;">
+                            <i class="fa-solid fa-cloud-sun label-icon" title="Mesto pre počasie"></i>
+                            <button onclick="zmenNastavenieMesta(); event.stopPropagation();" id="set-weather-coords">Mesto: Bratislava</button>
+                        </div>
+                        <!-- Tu sa automaticky vykreslia 3 rýchle klikateľné tlačidlá miest -->
+                        <div id="weather-history-buttons" style="display: flex; gap: 4px; margin-top: 2px; justify-content: center; width: 100%;"></div>
                     </div>
                 </div>
             </div>
@@ -438,11 +453,10 @@
         let nocnyRezimSnoozeDo = 0;
         let manualnaNocAktivna = false;
         const noSleep = new NoSleep();
-        // --- REGISTRE PRE POČASIE A HISTÓRIU ---
+        // --- REGISTRE PRE POČASIE A HISTÓRIU MIERU ---
         let cfgLat = localStorage.getItem('cfg_weather_lat') || "48.1486"; 
         let cfgLon = localStorage.getItem('cfg_weather_lon') || "17.1077";
         let cfgMestoNazov = localStorage.getItem('cfg_weather_name') || "Bratislava";
-        // Načítanie histórie miest (max 3)
         let cfgHistoriaMest = JSON.parse(localStorage.getItem('cfg_weather_history')) || ["Bratislava"];
         let aktualnaTeplotaText = "--°C";
 
@@ -620,48 +634,49 @@
             resetSettingsTimer();
         }
         function zmenNastavenieMesta() {
-            // Vytvoríme textový zoznam histórie pre používateľa
-            let historiaText = cfgHistoriaMest.map((m, i) => `${i + 1}. ${m}`).join(", ");
-            let promptText = `Zadaj názov mesta (napr. Kosice, Praha, Rim):\n\nNaposledy hľadané: ${historiaText || 'žiadne'}`;
-            
-            let navrhMesta = prompt(promptText, cfgMestoNazov);
+            let navrhMesta = prompt("Zadaj názov mesta (napr. Bratislava, Kosice, Praha, Rim):", cfgMestoNazov);
             
             if (navrhMesta && navrhMesta.trim() !== "") {
-                let cisteMesto = navrhMesta.trim();
-                
-                // Zavoláme Geocoding API na prevod textu na GPS súradnice
-                fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cisteMesto)}&count=1&language=sk&format=json`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data && data.results && data.results.length > 0) {
-                            const najdene = data.results[0];
-                            
-                            // Uložíme nové dáta
-                            cfgLat = najdene.latitude;
-                            cfgLon = najdene.longitude;
-                            cfgMestoNazov = najdene.name;
-                            
-                            localStorage.setItem('cfg_weather_lat', cfgLat);
-                            localStorage.setItem('cfg_weather_lon', cfgLon);
-                            localStorage.setItem('cfg_weather_name', cfgMestoNazov);
-                            
-                            // Aktualizácia histórie: odstránime duplikát, ak existuje, a pridáme na začiatok
-                            cfgHistoriaMest = cfgHistoriaMest.filter(m => m.toLowerCase() !== cfgMestoNazov.toLowerCase());
-                            cfgHistoriaMest.unshift(cfgMestoNazov);
-                            
-                            // Osekneme históriu na maximálne 3 mestá
-                            if (cfgHistoriaMest.length > 3) cfgHistoriaMest.pop();
-                            localStorage.setItem('cfg_weather_history', JSON.stringify(cfgHistoriaMest));
-                            
-                            // Aktualizujeme text na tlačidle a stiahneme počasie
-                            aktualizujTlacidloMesta();
-                            fetchWeatherData();
-                        } else {
-                            alert(`Mesto "${cisteMesto}" sa nenašlo. Skús bez diakritiky.`);
-                        }
-                    })
-                    .catch(e => alert("Chyba pri hľadaní mesta na serveri."));
+                vyhladajMestoPodlaTextu(navrhMesta.trim());
             }
+            resetSettingsTimer();
+        }
+
+        // Spoločná funkcia pre prompt aj pre kliknutie na históriu
+        function vyhladajMestoPodlaTextu(cisteMesto) {
+            fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cisteMesto)}&count=1&language=sk&format=json`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.results && data.results.length > 0) {
+                        const najdene = data.results[0];
+                        
+                        cfgLat = najdene.latitude;
+                        cfgLon = najdene.longitude;
+                        cfgMestoNazov = najdene.name;
+                        
+                        localStorage.setItem('cfg_weather_lat', cfgLat);
+                        localStorage.setItem('cfg_weather_lon', cfgLon);
+                        localStorage.setItem('cfg_weather_name', cfgMestoNazov);
+                        
+                        // Aktualizácia histórie top 3 miest
+                        cfgHistoriaMest = cfgHistoriaMest.filter(m => m.toLowerCase() !== cfgMestoNazov.toLowerCase());
+                        cfgHistoriaMest.unshift(cfgMestoNazov);
+                        if (cfgHistoriaMest.length > 3) cfgHistoriaMest.pop();
+                        localStorage.setItem('cfg_weather_history', JSON.stringify(cfgHistoriaMest));
+                        
+                        aktualizujTlacidloMesta();
+                        fetchWeatherData();
+                    } else {
+                        alert(`Mesto "${cisteMesto}" sa nenašlo.`);
+                    }
+                })
+                .catch(e => console.log("Chyba geokódovania."));
+        }
+
+        // Funkcia, ktorá sa spustí hneď, ako ťukneš na rýchle tlačidlo histórie
+        function klikolNaHistoriuMest(mesto, event) {
+            if (event) event.stopPropagation(); // Zabráni zavretiu menu nastavení
+            vyhladajMestoPodlaTextu(mesto);
             resetSettingsTimer();
         }
 
@@ -669,6 +684,28 @@
             const btn = document.getElementById('set-weather-coords');
             if (btn) {
                 btn.textContent = `Mesto: ${cfgMestoNazov}`;
+            }
+
+            // VYGENERUJE KLIKATEĽNÉ TLAČIDLÁ HISTÓRIE
+            const historyContainer = document.getElementById('weather-history-buttons');
+            if (historyContainer) {
+                historyContainer.innerHTML = "";
+                
+                cfgHistoriaMest.forEach(mesto => {
+                    // Vytvoríme malé decentné tlačidlo pre každé zapamätané mesto
+                    const histBtn = document.createElement('button');
+                    histBtn.style.cssText = "background: #252525; color: #aaa; border: 1px solid #333; padding: 2px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; font-weight: normal; margin: 0 2px;";
+                    histBtn.textContent = mesto;
+                    
+                    // Ak je to aktuálne zobrazené mesto, jemne ho zvýrazníme oranžovou obrubou
+                    if (mesto.toLowerCase() === cfgMestoNazov.toLowerCase()) {
+                        histBtn.style.borderColor = "#ff9f0a";
+                        histBtn.style.color = "#fff";
+                    }
+                    
+                    histBtn.onclick = (e) => klikolNaHistoriuMest(mesto, e);
+                    historyContainer.appendChild(histBtn);
+                });
             }
         }
 
