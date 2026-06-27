@@ -324,6 +324,21 @@
                 border: 1px solid #222 !important;
                 margin: 0 !important;
             }
+            /* OPRAVA PRE BEŽNÉ PREHLIADAČE: Zdvihnutie ovládacej lišty nad systémový panel adresy */
+            .bottom-player-bar {
+                position: relative !important;
+                /* Posunie celú lištu o 60 pixelov vyššie, takže vyskočí nad panel prehliadača */
+                bottom: 60px !important; 
+                z-index: 999 !important;
+                background: #050505 !important;
+                /* Pridáme jemný tieň navrchu, aby vizuálne pekne oddelila mriežku rádií */
+                box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5); 
+            }
+
+            /* Kompenzácia priestoru pre mriežku rádií, aby sa pod lištu neschovali */
+            .favorites-sidebar {
+                padding-bottom: calc(65px + env(safe-area-inset-bottom)) !important;
+            }
         }
         /* --- OCHRANA PROTI VYPAĽOVANIU (PIXEL SHIFTING) --- */
         @keyframes antiBurnIn {
@@ -786,6 +801,8 @@
             });
             
             inicializujPlochuNastaveni();
+            // Poistka, aby ti 3 klikateľné mestá nezmizli z obrazovky po renderi mriežky
+            aktualizujTlacidloMesta(); 
         }
 
         function handleChannelSelectionToggle(id) {
