@@ -292,7 +292,7 @@
         <div class="nav-left-info">
             <!-- PREHODENÉ PORADIE: Najprv dátum, potom hodiny, nakoniec meno -->
             <span id="dateBox">--.--.----</span>
-            <span class="nav-clock" id="clockBox">00:00</span>
+            <span class="nav-clock" id="clockBox" onclick="manualnyNocturnalToggle(); event.stopPropagation();" style="cursor: pointer;">00:00</span>
             <span class="nav-nameday" id="nameBox">---</span>
         </div>
         <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
@@ -386,6 +386,7 @@
         let cfgSnoozeMin = parseInt(localStorage.getItem('cfg_snooze_min') || "1");
         let cfgFarbaNoci = localStorage.getItem('cfg_night_color') || "#ffff00";
         let nocnyRezimSnoozeDo = 0;
+        let manualnaNocAktivna = false;
         const noSleep = new NoSleep();
 
         // Keď používateľ klikne na rádio a spustí hudbu, aktivuje sa aj neviditeľné video
@@ -463,6 +464,29 @@
                     dot.classList.add('active-color');
                 }
             });
+        }
+        function manualnyNocturnalToggle() {
+            // Ak už beží klasická noc podľa časovača, kliknutie ignorujeme
+            const now = new Date();
+            const aktualnyCasVMinutach = now.getHours() * 60 + now.getMinutes();
+            const [odH, odM] = cfgNocOd.split(':').map(Number);
+            const [doH, doM] = cfgNocDo.split(':').map(Number);
+            const casOd = odH * 60 + odM;
+            const casDo = doH * 60 + doM;
+            let jeNocnyCas = (casOd > casDo) 
+                ? (aktualnyCasVMinutach >= casOd || aktualnyCasVMinutach < casDo)
+                : (aktualnyCasVMinutach >= casOd && aktualnyCasVMinutach < casDo);
+
+            if (jeNocnyCas) return; // Automatika už beží, netreba prepínať manuálne
+
+            // Prepíname stav manuálnej noci (zapnúť / vypnúť)
+            manualnaNocAktivna = !manualnaNocAktivna;
+            
+            // Resetujeme snooze, ak by bol aktívny
+            nocnyRezimSnoozeDo = 0; 
+            
+            // Okamžite prekreslíme obrazovku
+            runClockEngine();
         }
 
         function zmenNastavenieCasu(typ) {
@@ -690,6 +714,8 @@
         // --- SNOOZE FUNKCIA (KLIK NA VEĽKÉ HODINY) ---
         function handleBigClockClick() {
             if (document.body.classList.contains('full-night-mode')) {
+                // OPRAVA: Vynulujeme aj manuálny príznak, aby sa dalo rádio cez deň prebudiť kliknutím na veľké hodiny
+                manualnaNocAktivna = false;
                 nocnyRezimSnoozeDo = Date.now() + (cfgSnoozeMin * 60 * 1000);
                 document.body.classList.remove('full-night-mode');
             }
@@ -732,7 +758,8 @@
             const bodyEl = document.getElementById('mainBody');
             const bottomInfoEl = document.getElementById('nightBottomInfo');
 
-            if (jeNocnyCas && terazMili > nocnyRezimSnoozeDo && !isSettingsModeActive) {
+            // UPRAVENÁ PODMIENKA: Režim noci sa aktivuje, ak je nocný čas ALEBO ak bola zapnutá manuálne
+            if ((jeNocnyCas || manualnaNocAktivna) && terazMili > nocnyRezimSnoozeDo && !isSettingsModeActive) {
                 bodyEl.classList.add('full-night-mode');
                 
                 let radioNocturnalText = "";
@@ -740,7 +767,6 @@
                     radioNocturnalText = `  •  📻 ${currentPlayingType.toUpperCase()}`;
                 }
                 
-                // Pridané zobrazovanie mena oslávenca priamo do riadku noci
                 let meninyNocturnalText = dnesneMeno ? `${dnesneMeno}  •  ` : "";
                 
                 if (bottomInfoEl) {
@@ -748,6 +774,8 @@
                 }
             } else {
                 bodyEl.classList.remove('full-night-mode');
+                // Ak kód zhodil nočný režim (napr. prešiel čas noci), vynulujeme aj manuálny príznak
+                if (!jeNocnyCas) manualnaNocAktivna = false;
             }
             // --- INTEGRÁCIA AUDIO WATCHDOGU ---
             if (currentPlayingType !== "" && currentPlayingType !== "none" && !audio.paused) {
