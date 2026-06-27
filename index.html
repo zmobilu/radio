@@ -282,6 +282,7 @@
             }
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
 <body id="mainBody">
 
@@ -385,6 +386,15 @@
         let cfgSnoozeMin = parseInt(localStorage.getItem('cfg_snooze_min') || "1");
         let cfgFarbaNoci = localStorage.getItem('cfg_night_color') || "#ffff00";
         let nocnyRezimSnoozeDo = 0;
+        const noSleep = new NoSleep();
+
+        // Keď používateľ klikne na rádio a spustí hudbu, aktivuje sa aj neviditeľné video
+        document.addEventListener('click', function enableNoSleep() {
+            noSleep.enable();
+            console.log("NoSleep aktivovaný - obrazovka nezhasne.");
+            // Odstránime poslucháč, aby sme to neaktivovali pri každom kliku
+            document.removeEventListener('click', enableNoSleep);
+        }, false);
 
         // --- VNÚTORNÁ DATABÁZA KIOSKU ---
         const DATABASE = [
