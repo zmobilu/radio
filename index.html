@@ -289,6 +289,20 @@
                 /* display: none; */ /* Odtajni, ak chceš získať maximum miesta pre hodiny */
             }
         }
+        /* --- OCHRANA PROTI VYPAĽOVANIU (PIXEL SHIFTING) --- */
+        @keyframes antiBurnIn {
+            0%   { transform: translate(0, 0); }
+            20%  { transform: translate(2px, -3px); }
+            40%  { transform: translate(-3px, 2px); }
+            60%  { transform: translate(3px, 3px); }
+            80%  { transform: translate(-2px, -2px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* Aktivuje sa iba v nočnom režime na celý svietiaci stred */
+        body.full-night-mode .placeholder-view {
+            animation: antiBurnIn 300s infinite linear;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
