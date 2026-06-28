@@ -268,11 +268,17 @@
 
             /* DOPLNENÉ: Zmenšenie písma a medzier v lište, aby mesto a meniny držali v jednom riadku na výšku */
             .nav-left-info {
-            font-size: 12px !important;
-            gap: 10px !important;
-            width: 100% !important;
-            justify-content: center !important;
+                font-size: 12px !important;
+                gap: 10px !important;
+                width: 100% !important;
+                justify-content: center !important;
             }
+            
+            /* OPRAVA syntaxe: Tieto tri riadky musia byť samostatne, nie vnútri .nav-left-info */
+            .weather-big-icon { font-size: 55px !important; }
+            .weather-big-temp { font-size: 48px !important; }
+            .forecast-temp { font-size: 15px !important; }
+            
             .nav-clock { font-size: 15px !important; }
             .nav-nameday { font-size: 12px !important; }
 
@@ -426,7 +432,10 @@
                     <span class="big-clock-date" id="bigDate">Pondelok, 1.1.</span>
                     <span class="big-clock-nameday" id="bigNameday">Dnes má meniny: ---</span>
                 </div>
-                <div class="weather-detail-view" id="weatherDetailView" onclick="toggleWeatherView()" style="display: none;">
+                <div id="nightBottomInfo"></div>
+            </div>
+
+            <div class="weather-detail-view" id="weatherDetailView" onclick="toggleWeatherView()" style="display: none;">
                 <div class="weather-left-column">
                     <div class="weather-forecast-box">
                         <span class="forecast-label">DNES</span>
@@ -449,12 +458,8 @@
                     </div>
                 </div>
             </div>
-                <div id="nightBottomInfo"></div>
-            </div>
 
-            <!-- Pridané zachytávanie kliknutí pre reštart 10s auto-close časovača -->
-            <div class="settings-grid-view" id="settingsGridView" onclick="resetSettingsTimer()">
-                
+            <div class="settings-grid-view" id="settingsGridView" onclick="resetSettingsTimer()">                
                 <div class="settings-night-panel" style="grid-column: 1 / -1;" onclick="resetSettingsTimer()">
                     <div class="settings-night-row">
                         <i class="fa-solid fa-clock label-icon" title="Trvanie noci"></i>
