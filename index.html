@@ -387,37 +387,50 @@
             height: 100%; 
             background: #000; 
             box-sizing: border-box;
-            padding: 20px; 
+            padding: 10px 20px; 
             padding-right: env(safe-area-inset-right); 
             cursor: pointer;
-            
-            /* OPRAVA: Zarovnanie prvkov na stred pravej polovice obrazovky */
             align-items: center;
             justify-content: center;
-            gap: 30px;
         }
+        /* Ľavý stĺpec s predpoveďou (Dnes / Zajtra nad sebou) */
         .weather-left-column {
-            width: 45%; height: 100%; display: flex; flex-direction: column; gap: 10px; justify-content: center;
+            width: 42%; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            justify-content: center;
         }
         .weather-forecast-box {
-            flex: 1; background: #050505; border: 1px solid #111; border-radius: 12px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px;
+            flex: 1; 
+            background: #000; /* Čisto čierne pozadie ako na koncepte */
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 5px;
+            box-sizing: border-box;
         }
-        /* Poriadne zväčšenie ikon predpovede */
-        .forecast-label { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: 1px; }
-        .forecast-icon { font-size: 42px; margin: 4px 0; }
-        .forecast-temp { font-size: 20px; font-weight: 600; color: #ccc; }
+        .forecast-label { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+        .forecast-icon { font-size: 55px; margin: 2px 0; line-height: 1; }
+        .forecast-temp { font-size: 32px; font-weight: 600; color: #ccc; }
         
+        /* Pravý dominantný stĺpec s aktuálnym počasím */
         .weather-right-column {
-            width: 55%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 58%; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
         }
-        /* Brutálne dominantné zobrazenie aktuálneho počasia (žiadny malý text) */
-        .weather-big-city { font-size: 24px; font-weight: 700; color: #ffa500; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
-        .weather-big-icon { font-size: 110px; line-height: 1; margin: 5px 0; }
-        .weather-big-temp { font-size: 95px; font-weight: 700; color: #ffa500; line-height: 0.95; }
-        .weather-sub-info { display: flex; gap: 25px; font-size: 32px; font-weight: 600; margin-top: 15px; }
+        .weather-big-city { font-size: 28px; font-weight: 700; color: #ffa500; letter-spacing: 1.5px; text-transform: uppercase; border-bottom: 2px dashed #444; padding-bottom: 2px; margin-bottom: 8px; }
+        .weather-big-icon { font-size: 115px; line-height: 1; margin: 2px 0; }
+        .weather-big-temp { font-size: 105px; font-weight: 700; color: #ffa500; line-height: 0.9; }
+        .weather-sub-info { display: flex; gap: 30px; font-size: 38px; font-weight: 600; margin-top: 12px; }
         .weather-sub-tomorrow { color: #ff4500; }
-        .weather-sub-humidity { color: #888; }
+        .weather-sub-humidity { color: #aaa; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
