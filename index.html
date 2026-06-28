@@ -262,9 +262,20 @@
             .slider-vol { width: 120px; }
             .settings-night-panel { padding: 10px; gap: 10px; }
             .color-dot { width: 22px; height: 22px; }
-        }
-        /* --- AUTOMATICKÉ PREKRESLENIE PRE REŽIM NA VÝŠKU --- */
-        @media (orientation: portrait) {
+            }
+            /* --- AUTOMATICKÉ PREKRESLENIE PRE REŽIM NA VÝŠKU --- */
+            @media (orientation: portrait) {
+
+            /* DOPLNENÉ: Zmenšenie písma a medzier v lište, aby mesto a meniny držali v jednom riadku na výšku */
+            .nav-left-info {
+            font-size: 12px !important;
+            gap: 10px !important;
+            width: 100% !important;
+            justify-content: center !important;
+            }
+            .nav-clock { font-size: 15px !important; }
+            .nav-nameday { font-size: 12px !important; }
+
             /* Hlavný kontajner otočíme z horizontálneho na vertikálny smer */
             .workspace-container {
                 flex-direction: column;
@@ -563,7 +574,8 @@
                     
                     const weatherBox = document.getElementById('navWeather');
                     if (weatherBox) {
-                        weatherBox.innerHTML = `${icon} <span style="color: ${tColor} !important; font-weight: 700 !important;">${temp}°C</span>`;
+                        // TU VYMIEŇAŠ RIADOK: Mesto aj teplota používajú rovnakú tColor a hrúbku
+                        weatherBox.innerHTML = `<span style="color: ${tColor} !important; font-weight: 700 !important; margin-right: 6px;">${cfgMestoNazov}</span>${icon} <span style="color: ${tColor} !important; font-weight: 700 !important;">${temp}°C</span>`;
                     }
                     // Ak práve beží noc, okamžite aktualizujeme aj spodný riadok
                     runClockEngine();
