@@ -69,11 +69,24 @@
         .nav-clock { font-size: 19px; font-weight: 700; color: #fff; }
         .nav-nameday { color: #ff9f0a; font-weight: 500; font-size: 16px; }
         
-        /* Zväčšené a posunuté tlačidlo nastavení pre bezchybný dotyk na iOS */
+        /* --- PERMANENTNÉ UKOTVENIE NASTAVENÍ VPRAVO HORE --- */
         .btn-settings { 
-            background: #111; border: 1px solid #222; color: #666; font-size: 20px; 
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            width: 44px; height: 44px; border-radius: 50%; margin-top: 4px;
+            position: absolute !important;
+            top: 10px !important;
+            right: 15px !important;
+            z-index: 999 !important;
+            background: #111 !important; 
+            border: 1px solid #222 !important; 
+            color: #666; 
+            font-size: 20px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            width: 44px; 
+            height: 44px; 
+            border-radius: 50%;
+            margin: 0 !important;
             transition: color 0.2s, background 0.2s, border-color 0.2s; 
         }
         .btn-settings.active { color: #ff9f0a; border-color: #ff9f0a; background: #1a1a1a; }
@@ -439,10 +452,6 @@
     <audio id="audioPlayer" preload="none" playsinline></audio>
 
     <header class="top-navbar">
-        <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
-            <i class="fa-solid fa-gear"></i>
-        </button>
-
         <div class="nav-left-info">
             <span id="dateBox">--.--.----</span>
             <span class="nav-clock" id="clockBox" onclick="manualnyNocturnalToggle(); event.stopPropagation();" style="cursor: pointer;">00:00</span>
@@ -457,6 +466,9 @@
         </aside>
 
         <main class="main-content-area">
+            <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
+                <i class="fa-solid fa-gear"></i>
+            </button>
             
             <div class="placeholder-view" id="rightPlaceholder">
                 <div class="big-clock-time" onclick="handleBigClockClick()">
