@@ -504,7 +504,6 @@
                 <div class="weather-right-column">
                     <span class="weather-big-icon" id="weatherBigIcon">☀️</span>
                     <span class="weather-big-temp" id="weatherBigTemp">--°C</span>
-                    <span id="weatherApparentTemp" style="font-size: 2.5vw; color: #aaa; font-weight: 400; margin-top: -5px; margin-bottom: 5px;">Pocitovo: --°C</span>
                     
                     <div class="weather-sub-info">
                         <span class="weather-sub-tomorrow" id="weatherSubTomorrow">--°</span>
@@ -700,9 +699,11 @@
                         document.getElementById('weatherBigIcon').textContent = icon;
                         document.getElementById('weatherBigTemp').textContent = `${temp}°C`;
                         document.getElementById('weatherBigTemp').style.color = tColor;
-                        // PRIDANÝ ZÁPIS DO STRÁNKY
-                        document.getElementById('weatherApparentTemp').textContent = `Pocitovo: ${appTemp}°C`;
-                        document.getElementById('weatherSubHumidity').innerHTML = `<i class="fa-solid fa-droplet"></i> ${humidity}%`;
+                        
+                        // --- OPRAVENÝ ZÁPIS: Pocitová teplota ide do pôvodného bloku a vlhkosť bez kvapky ---
+                        document.getElementById('weatherApparentTemp').textContent = `${appTemp}°`;
+                        document.getElementById('weatherSubHumidity').textContent = `${humidity}%`;
+                        // ---------------------------------------------------------------------------------
                         
                         if (data.daily) {
                             // Dnes max / min
