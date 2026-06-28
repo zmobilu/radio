@@ -570,6 +570,9 @@
     </footer>
 
     <script>
+        // --- OPRAVA: Pridaná chýbajúca premenná pre sloty obľúbených rádií ---
+        let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v2')) || ["slovensko", "funchill", "rock", "blanik", "fun", "spotify"];
+        
         const audio = document.getElementById('audioPlayer');
         let currentPlayingType = "";
         let isSettingsModeActive = false;
