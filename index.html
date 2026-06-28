@@ -365,8 +365,9 @@
             .placeholder-view {
                 justify-content: space-evenly !important;
                 padding-bottom: 20px;
-           
-        }
+            }
+        } /* <--- TÁTO DRUHÁ ZÁTVORKA TU CHÝBALA! Ukončí @media režim na výšku */
+
         /* --- OCHRANA PROTI VYPAĽOVANIU (PIXEL SHIFTING) --- */
         @keyframes antiBurnIn {
             0%   { transform: translate(0, 0); }
@@ -470,7 +471,7 @@
                 <div id="nightBottomInfo"></div>
             </div>
 
-            <div class="weather-detail-view" id="weatherDetailView" onclick="toggleWeatherView()" style="display: none;">
+           <div class="weather-detail-view" id="weatherDetailView" onclick="toggleWeatherView()" style="display: none; width: 100%; height: 100%; box-sizing: border-box;">
                 <div class="weather-left-column">
                     <div class="weather-forecast-box">
                         <span class="forecast-label">DNES</span>
@@ -694,7 +695,6 @@
                             document.getElementById('forecastTempZajtra').textContent = `${zajtraMax}° / ${zajtraMin}°`;
                             
                             // Pomocný spodný text (Zajtrajšie maximum)
-                            document.getElementById('weatherSubTomorrow').textContent = `${zajtraMax}°`;
                             document.getElementById('weatherSubTomorrow').style.color = getTempColor(zajtraMax);
                         }
                     }
