@@ -263,8 +263,8 @@
             .settings-night-panel { padding: 10px; gap: 10px; }
             .color-dot { width: 22px; height: 22px; }
             }
-            /* --- AUTOMATICKÉ PREKRESLENIE PRE REŽIM NA VÝŠKU --- */
-            @media (orientation: portrait) {
+        /* --- AUTOMATICKÉ PREKRESLENIE PRE REŽIM NA VÝŠKU --- */
+        @media (orientation: portrait) {
 
             /* DOPLNENÉ: Zmenšenie písma a medzier v lište, aby mesto a meniny držali v jednom riadku na výšku */
             .nav-left-info {
@@ -365,6 +365,31 @@
         body.full-night-mode .placeholder-view {
             animation: antiBurnIn 300s infinite linear;
         }
+        /* --- DETAILNÉ ZOBRAZENIE POČASIA NA PLOCHE --- */
+        .weather-detail-view {
+            display: flex; width: 100%; height: 100%; background: #000; box-sizing: border-box;
+            padding: 10px; padding-right: env(safe-area-inset-right); cursor: pointer;
+        }
+        .weather-left-column {
+            width: 40%; height: 100%; display: flex; flex-direction: column; gap: 4px;
+        }
+        .weather-forecast-box {
+            flex: 1; background: #050505; border: 1px solid #111; border-radius: 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px;
+        }
+        .forecast-label { font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 1px; margin-bottom: 2px; }
+        .forecast-icon { font-size: 28px; margin: 2px 0; }
+        .forecast-temp { font-size: 18px; font-weight: 400; color: #ccc; }
+        
+        .weather-right-column {
+            width: 60%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
+        }
+        .weather-big-city { font-size: 18px; font-weight: 700; color: #ffa500; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px dashed #444; padding-bottom: 2px; margin-bottom: 5px; }
+        .weather-big-icon { font-size: 65px; line-height: 1; margin: 2px 0; }
+        .weather-big-temp { font-size: 58px; font-weight: 700; color: #ffa500; line-height: 0.95; }
+        .weather-sub-info { display: flex; gap: 15px; font-size: 24px; font-weight: 400; margin-top: 5px; }
+        .weather-sub-tomorrow { color: #ff4500; }
+        .weather-sub-humidity { color: #888; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
@@ -381,7 +406,7 @@
             <span id="dateBox">--.--.----</span>
             <span class="nav-clock" id="clockBox" onclick="manualnyNocturnalToggle(); event.stopPropagation();" style="cursor: pointer;">00:00</span>
             <span class="nav-nameday" id="nameBox">---</span>
-            <span id="navWeather" style="font-weight: 500;">--°C</span>
+            <span id="navWeather" style="font-weight: 500; cursor: pointer;" onclick="toggleWeatherView(); event.stopPropagation();">--°C</span>
         </div>
     </header>
 
@@ -401,6 +426,29 @@
                     <span class="big-clock-date" id="bigDate">Pondelok, 1.1.</span>
                     <span class="big-clock-nameday" id="bigNameday">Dnes má meniny: ---</span>
                 </div>
+                <div class="weather-detail-view" id="weatherDetailView" onclick="toggleWeatherView()" style="display: none;">
+                <div class="weather-left-column">
+                    <div class="weather-forecast-box">
+                        <span class="forecast-label">DNES</span>
+                        <span class="forecast-icon" id="forecastIconDnes">☀️</span>
+                        <span class="forecast-temp" id="forecastTempDnes">--° / --°</span>
+                    </div>
+                    <div class="weather-forecast-box">
+                        <span class="forecast-label">ZAJTRA</span>
+                        <span class="forecast-icon" id="forecastIconZajtra">☀️</span>
+                        <span class="forecast-temp" id="forecastTempZajtra">--° / --°</span>
+                    </div>
+                </div>
+                <div class="weather-right-column">
+                    <span class="weather-big-city" id="weatherBigCity">BRATISLAVA</span>
+                    <span class="weather-big-icon" id="weatherBigIcon">☀️</span>
+                    <span class="weather-big-temp" id="weatherBigTemp">--°C</span>
+                    <div class="weather-sub-info">
+                        <span class="weather-sub-tomorrow" id="weatherSubTomorrow">--°</span>
+                        <span class="weather-sub-humidity" id="weatherSubHumidity"><i class="fa-solid fa-droplet"></i> --%</span>
+                    </div>
+                </div>
+            </div>
                 <div id="nightBottomInfo"></div>
             </div>
 
@@ -1057,7 +1105,26 @@
                 watchdogPocitadloZaseknutia = 0;
             }
         }
-
+        // --- PREPÍNANIE HODÍN A DETAILNÉHO POČASIA ---
+        function toggleWeatherView() {
+            // Ak sú aktívne nastavenia, najprv ich zavrieme
+            if (isSettingsModeActive) toggleSettingsMode();
+            
+            const clockView = document.getElementById('rightPlaceholder');
+            const weatherView = document.getElementById('weatherDetailView');
+            const settingsView = document.getElementById('settingsGridView');
+            
+            if (weatherView.style.display === 'none') {
+                clockView.style.display = 'none';
+                settingsView.style.display = 'none';
+                weatherView.style.display = 'flex';
+                // Hneď aktualizujeme dáta v okne
+                fetchWeatherData();
+            } else {
+                weatherView.style.display = 'none';
+                clockView.style.display = 'flex';
+            }
+        }
         async function fetchNamedayData() {
             const now = new Date();
             const mm = String(now.getMonth() + 1).padStart(2, '0');
