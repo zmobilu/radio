@@ -356,6 +356,15 @@
             .favorites-sidebar {
                 padding-bottom: calc(65px + env(safe-area-inset-bottom)) !important;
             }
+            /* Zabezpečí, že sa mriežka rádií pri pretiahnutí neprekryje so zdvihnutou spodnou lištou */
+            .settings-grid-view {
+                padding-bottom: calc(130px + env(safe-area-inset-bottom)) !important;
+            }
+            /* Upraví flexibilitu hodín, aby v režime na výšku netlačili komponenty pod seba */
+            .placeholder-view {
+                justify-content: space-evenly !important;
+                padding-bottom: 20px;
+           
         }
         /* --- OCHRANA PROTI VYPAĽOVANIU (PIXEL SHIFTING) --- */
         @keyframes antiBurnIn {
