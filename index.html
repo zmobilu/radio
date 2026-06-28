@@ -770,8 +770,11 @@
             const grid = document.getElementById('settingsGridView');
             if(!grid) return;
             
-            const nightPanelHTML = document.querySelector('.settings-night-panel').outerHTML;
-            grid.innerHTML = nightPanelHTML;
+            // Zachováme nočný panel na nultej pozícii a vymažeme len staré generované rádiá a separátory pod ním
+            const nightPanel = grid.querySelector('.settings-night-panel');
+            while (grid.lastChild && grid.lastChild !== nightPanel) {
+                grid.removeChild(grid.lastChild);
+            }
             
             let currentCategory = "";
 
@@ -801,7 +804,6 @@
             });
             
             inicializujPlochuNastaveni();
-            // Poistka, aby ti 3 klikateľné mestá nezmizli z obrazovky po renderi mriežky
             aktualizujTlacidloMesta(); 
         }
 
