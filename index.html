@@ -720,8 +720,10 @@
                             document.getElementById('forecastIconZajtra').textContent = getWeatherIcon(zajtraCode);
                             document.getElementById('forecastTempZajtra').textContent = `${zajtraMax}° / ${zajtraMin}°`;
                             
-                            // Pomocný spodný text (Zajtrajšie maximum)
-                            document.getElementById('weatherSubTomorrow').style.color = getTempColor(zajtraMax);
+                            // --- KOREKCIA: Vymaž alebo zmeň staré priraďovanie farby ---
+                            // document.getElementById('weatherSubTomorrow').style.color = getTempColor(zajtraMax);
+                            // Ak chceš, aby mala pocitová teplota farbu podľa reálnej hodnoty (napr. oranžová v teple), daj tam namiesto neho toto:
+                            document.getElementById('weatherApparentTemp').style.color = getTempColor(appTemp);
                         }
                     }
                     
