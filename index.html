@@ -383,6 +383,12 @@
                     <span class="big-clock-date" id="bigDate">Pondelok, 1.1.</span>
                     <span class="big-clock-nameday" id="bigNameday">Dnes má meniny: ---</span>
                 </div>
+                
+                <div id="mainWeatherWidget" onclick="toggleWeatherView(); event.stopPropagation();" style="margin-top: 12px; font-size: 3.5vw; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                    <span id="mainWeatherIcon">☀️</span>
+                    <span id="mainWeatherTemp">--°C</span>
+                </div>
+
                 <div id="nightBottomInfo"></div>
             </div>
 
@@ -565,6 +571,15 @@
                     const tColor = getTempColor(temp);
                     
                     aktualnaTeplotaText = `${icon} ${temp}°C`;
+                    
+                    // --- DOPLNENIE: Plnenie widgetu na hlavnej ploche pod hodinami ---
+                    const mainWIcon = document.getElementById('mainWeatherIcon');
+                    const mainWTemp = document.getElementById('mainWeatherTemp');
+                    if (mainWIcon && mainWTemp) {
+                        mainWIcon.textContent = icon;
+                        mainWTemp.textContent = `${temp}°C`;
+                        mainWTemp.style.color = tColor;
+                    }
                    
                     // --- PLNENIE DETAILNÉHO POHĽADU POČASIA ---
                     if (document.getElementById('weatherDetailView')) {
@@ -1012,15 +1027,13 @@
 
                     // ZÁPIS DO NOČNÉHO RIADKA: Dátum a rádio majú farbu noci, teplota má svoju vlastnú podľa počasia
             bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}   •  ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>${radioNocturnalText}`;
+                }
+            } else {
+                bodyEl.classList.remove('full-night-mode');
+                // Ak kód zhodil nočný režim (napr. prešiel čas noci), vynulujeme aj manuálny príznak
+                if (!jeNocnyCas) manualnaNocAktivna = false;
+            }
         }
-    } else {
-        bodyEl.classList.remove('full-night-mode');
-        // Ak kód zhodil nočný režim (napr. prešiel čas noci), vynulujeme aj manuálny príznak
-        if (!jeNocnyCas) manualnaNocAktivna = false;
-    }
-    
-    // SEKCOV WATCHDOGU SME ÚPLNE VYMAZALI
-}
         // --- PREPÍNANIE HODÍN A DETAILNÉHO POČASIA ---
         function toggleWeatherView() {
             if (isSettingsModeActive) toggleSettingsMode();
