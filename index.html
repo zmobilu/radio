@@ -888,15 +888,19 @@
         }
 
         function handleFavCardClick(item) {
-            if (isSettingsModeActive) return;
-            if (item.url) {
-                if (item.icon && (item.id === 'spotify' || item.id === 'applemusic' || item.id === 'youtube' || item.id === 'tidal')) {
-                    triggerExternalApp(item.url, item.id);
-                } else {
-                    playRadio(item.url, item.id);
-                }
+    if (isSettingsModeActive) return;
+    if (item.url) {
+        if (currentPlayingType === item.id) {
+            vypniRadio(); // Použijeme novú čistú funkciu
+        } else {
+            if (item.icon && (item.id === 'spotify' || item.id === 'applemusic' || item.id === 'youtube' || item.id === 'tidal')) {
+                triggerExternalApp(item.url, item.id);
+            } else {
+                playRadio(item.url, item.id);
             }
         }
+    }
+}
 
         // --- AUDIO ENGINE ---
         function playRadio(url, id) {
@@ -916,19 +920,18 @@
             audio.play()
             .then(() => {
             renderSidebarFavorites();
-            })
+            runClockEngine(); // Pridané: okamžitá aktualizácia nočného textu po zapnutí
+        })
         .catch((e) => console.log("Stream offline alebo blokovaný", e));
 }
 
-        function handlePowerButton() {
-            if (currentPlayingType !== "") {
-                audio.pause(); audio.src = ""; currentPlayingType = "";
-                renderSidebarFavorites();
-            } else {
-                const sUrl = localStorage.getItem('kiosk_last_radio_url');
-                const sType = localStorage.getItem('kiosk_last_radio_type');
-                if (sUrl && sType) playRadio(sUrl, sType);
-            }
+       function vypniRadio() {
+            audio.pause();
+            audio.src = "";
+            audio.load(); // Uvoľní sieťový buffer v iOS
+            currentPlayingType = "";
+            renderSidebarFavorites();
+            runClockEngine();
         }
 
         function adjustVolume(val) {
