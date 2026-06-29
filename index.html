@@ -1206,16 +1206,17 @@
             // Ak je zapnuté, vypneme ho
             if (bodyEl.classList.contains('weather-active-mode')) {
                 bodyEl.classList.remove('weather-active-mode');
-                leftWeather.style.display = 'none';
-                graphView.style.display = 'none';
-                clockView.style.display = 'flex';
+                if (leftWeather) leftWeather.style.display = 'none';
+                if (graphView) graphView.style.display = 'none';
+                if (clockView) clockView.style.display = 'flex';
                 renderSidebarFavorites(); // Vráti späť obľúbené rádio stanice vľavo
             } else {
                 // Zapíname plnohodnotný meteo režim
                 if (settingsView) settingsView.style.display = 'none';
-                clockView.style.display = 'none';
+                if (clockView) clockView.style.display = 'none';
                 bodyEl.classList.add('weather-active-mode');
-                leftWeather.style.display = 'flex';
+                if (leftWeather) leftWeather.style.display = 'flex';
+                if (graphView) graphView.style.display = 'flex'; // OPRAVA: Explicitne vynútime zobrazenie grafu
                 
                 // Vytiahneme graf pre aktuálny deň (null znamená "Teraz / Dnes")
                 vykresliNovyGraf(null);
