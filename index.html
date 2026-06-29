@@ -33,41 +33,6 @@
             overflow: hidden; box-sizing: border-box; -webkit-user-select: none; user-select: none;
             position: fixed; top: 0; left: 0; bottom: 0; right: 0;
         }
-
-        /* --- HORNE MINIMALISTICKÉ MENU --- */
-        .top-navbar {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            padding: 0 15px; 
-            background: #050505; 
-            border-bottom: 1px solid #111;
-            height: 48px; 
-            box-sizing: border-box; 
-            flex-shrink: 0;
-            padding-left: calc(15px + env(safe-area-inset-left));
-            padding-right: calc(15px + env(safe-area-inset-right));
-            position: relative; /* Pridané pre absolútne centrovanie vnútra */
-        }
-        .nav-left-info { 
-            display: flex; 
-            align-items: center; 
-            gap: 18px;            /* Mierne zväčšená medzera medzi prvkami */
-            font-size: 16px;      /* Zväčšené základné písmo (z 14px) */
-            color: #aaa; 
-            font-weight: 400; 
-            
-            /* Magické centrovanie presne na stred lišty */
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            white-space: nowrap;  /* Zabráni nežiaducemu zalomeniu textu */
-        }
-        
-        /* O chlp zväčšíme aj jednotlivé podprvky pre lepší kontrast */
-        .nav-clock { font-size: 19px; font-weight: 700; color: #fff; }
-        .nav-nameday { color: #ff9f0a; font-weight: 500; font-size: 16px; }
         
         /* --- PERMANENTNÉ UKOTVENIE NASTAVENÍ VPRAVO HORE --- */
         .btn-settings { 
@@ -200,38 +165,11 @@
             letter-spacing: 1.5px; color: #555; margin: 12px 0 2px 4px;
             font-weight: 700; border-bottom: 1px solid #1a1a1a; padding-bottom: 3px;
         }
-
-        /* --- SPODNÁ FIXNÁ OVLÁDACIA LIŠTA --- */
-        .bottom-player-bar {
-            background: #050505; border-top: 1px solid #111; height: 65px;
-            padding: 0 15px; display: flex; justify-content: space-between; align-items: center;
-            box-sizing: border-box; flex-shrink: 0;
-            padding-left: calc(15px + env(safe-area-inset-left));
-            padding-right: calc(15px + env(safe-area-inset-right));
-            padding-bottom: env(safe-area-inset-bottom) !important;
-        }
-        .player-info-block { display: flex; flex-direction: column; justify-content: center; width: 35%; overflow: hidden; }
-        .player-info-block h4 { margin: 0; font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
-        .player-info-block p { margin: 1px 0 0 0; font-size: 11px; color: #ff9f0a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        .player-action-block { display: flex; align-items: center; justify-content: center; }
-        .btn-power-toggle {
-            background: #151515; border: 1px solid #222; color: #eb0028; font-size: 22px;
-            width: 46px; height: 46px; border-radius: 50%; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; transition: background 0.15s;
-        }
-        .btn-power-toggle:active { background: #252525; }
-        .btn-power-toggle.playing { color: #21D844; border-color: #21D844; }
-
-        .player-utility-block { display: flex; align-items: center; gap: 8px; width: 35%; justify-content: flex-end; }
-        .slider-vol { accent-color: #ff9f0a; width: 85px; cursor: pointer; height: 5px; background: #333; border-radius: 3px; border: none; }
-
+    
         #nightBottomInfo { display: none; }
 
         /* --- STYLING PRE FILTROVANIE CELOOBRAZOVKOVÉHO NOČNÉHO REŽIMU --- */
-        body.full-night-mode .top-navbar,
         body.full-night-mode .favorites-sidebar,
-        body.full-night-mode .bottom-player-bar,
         body.full-night-mode .big-clock-date-wrapper,
         body.full-night-mode .btn-settings { /* <--- PRIDANÝ TENTO RIADOK */
             display: none !important;
@@ -269,33 +207,19 @@
         }
 
         @media (min-width: 768px) {
-            .top-navbar { height: 52px; }
-            .bottom-player-bar { height: 75px; }
             .favorites-sidebar { gap: 10px; padding: 10px; }
             .fav-card span { font-size: 12px; }
-            .slider-vol { width: 120px; }
             .settings-night-panel { padding: 10px; gap: 10px; }
             .color-dot { width: 22px; height: 22px; }
             }
         /* --- AUTOMATICKÉ PREKRESLENIE PRE REŽIM NA VÝŠKU --- */
         @media (orientation: portrait) {
-
-            /* DOPLNENÉ: Zmenšenie písma a medzier v lište, aby mesto a meniny držali v jednom riadku na výšku */
-            .nav-left-info {
-                font-size: 12px !important;
-                gap: 10px !important;
-                width: 100% !important;
-                justify-content: center !important;
-            }
             
             /* OPRAVA syntaxe: Tieto tri riadky musia byť samostatne, nie vnútri .nav-left-info */
             .weather-big-icon { font-size: 55px !important; }
             .weather-big-temp { font-size: 48px !important; }
             .forecast-temp { font-size: 15px !important; }
             
-            .nav-clock { font-size: 15px !important; }
-            .nav-nameday { font-size: 12px !important; }
-
             /* Hlavný kontajner otočíme z horizontálneho na vertikálny smer */
             .workspace-container {
                 flex-direction: column;
@@ -337,24 +261,7 @@
             .big-clock-nameday {
                 font-size: 4vw;
             }
-            /* V režime na výšku skryjeme spodnú lištu prehrávača, 
-               keďže ovládanie hlasitosti a power button môžeme neskôr elegantne zapracovať priamo k hodinám,
-               alebo ak ju chceš nechať, stačí odstrániť riadok nižšie */
-            .bottom-player-bar {
-                /* display: none; */ /* Odtajni, ak chceš získať maximum miesta pre hodiny */
-            }
-            /* OPRAVA PRE BEŽNÉ PREHLIADAČE: Zdvihnutie ovládacej lišty nad systémový panel adresy */
-            .bottom-player-bar {
-                position: relative !important;
-                /* Posunie celú lištu o 60 pixelov vyššie, takže vyskočí nad panel prehliadača */
-                bottom: 60px !important; 
-                z-index: 999 !important;
-                background: #050505 !important;
-                /* Pridáme jemný tieň navrchu, aby vizuálne pekne oddelila mriežku rádií */
-                box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5); 
-            }
-
-            /* Kompenzácia priestoru pre mriežku rádií, aby sa pod lištu neschovali */
+               /* Kompenzácia priestoru pre mriežku rádií, aby sa pod lištu neschovali */
             .favorites-sidebar {
                 padding-bottom: calc(65px + env(safe-area-inset-bottom)) !important;
             }
@@ -457,15 +364,6 @@
 
     <audio id="audioPlayer" preload="none" playsinline></audio>
 
-    <header class="top-navbar">
-        <div class="nav-left-info">
-            <span id="dateBox">--.--.----</span>
-            <span class="nav-clock" id="clockBox" onclick="manualnyNocturnalToggle(); event.stopPropagation();" style="cursor: pointer;">00:00</span>
-            <span class="nav-nameday" id="nameBox">---</span>
-            <span id="navWeather" style="font-weight: 500; cursor: pointer;" onclick="toggleWeatherView(); event.stopPropagation();">--°C</span>
-        </div>
-    </header>
-
     <div class="workspace-container">
         
         <aside class="favorites-sidebar" id="favSidebarContainer">
@@ -549,26 +447,8 @@
             </div>
          </main>
     </div>
-
-    <footer class="bottom-player-bar">
-        <div class="player-info-block">
-            <h4 id="lblStation">RÁDIO VYPNUTÉ</h4>
-            <p id="lblTrack">Zvoľte stanicu vľavo</p>
-        </div>
-
-        <div class="player-action-block">
-            <button onclick="handlePowerButton()" class="btn-power-toggle" id="powerBtn" title="Zapnúť / Vypnúť">
-                <i class="fa-solid fa-power-off"></i>
-            </button>
-        </div>
-
-        <div class="player-utility-block">
-            <i class="fa-solid fa-volume-low" style="color: #444; font-size: 12px;"></i>
-            <input type="range" id="volControl" class="slider-vol" min="0" max="100" value="80" oninput="adjustVolume(this.value)">
-        </div>
-    </footer>
-
-    <script>
+    
+        <script>
         // --- OPRAVA: Pridaná chýbajúca premenná pre sloty obľúbených rádií ---
         let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v2')) || ["slovensko", "funchill", "rock", "blanik", "fun", "spotify"];
         
@@ -685,12 +565,7 @@
                     const tColor = getTempColor(temp);
                     
                     aktualnaTeplotaText = `${icon} ${temp}°C`;
-                    
-                    const weatherBox = document.getElementById('navWeather');
-                    if (weatherBox) {
-                        weatherBox.innerHTML = `<span style="color: ${tColor} !important; font-weight: 700 !important; margin-right: 6px;">${cfgMestoNazov}</span>${icon} <span style="color: ${tColor} !important; font-weight: 700 !important;">${temp}°C</span>`;
-                    }
-
+                   
                     // --- PLNENIE DETAILNÉHO POHĽADU POČASIA ---
                     if (document.getElementById('weatherDetailView')) {
                         // Hlavný panel vpravo
@@ -1034,32 +909,20 @@
             localStorage.setItem('kiosk_last_radio_url', url);
             localStorage.setItem('kiosk_last_radio_type', id);
 
-            document.getElementById('lblStation').textContent = id.toUpperCase();
-            document.getElementById('lblTrack').textContent = "Načítavam audio prúd...";
-            
-            const pBtn = document.getElementById('powerBtn');
-            pBtn.classList.add('playing');
+            audio.volume = 0.8 * (VOLUME_MAP[id] || 1.0);
 
-            const sliderVal = document.getElementById('volControl').value / 100;
-            audio.volume = sliderVal * (VOLUME_MAP[id] || 1.0);
-
+            // DOPLŇ TÝCHTO PÁR RIADKOV SEM:
             audio.src = url;
             audio.play()
-                .then(() => {
-                    document.getElementById('lblTrack').textContent = "Práve hrá";
-                    renderSidebarFavorites();
-                })
-                .catch(() => {
-                    document.getElementById('lblTrack').textContent = "Stream je offline";
-                });
-        }
+            .then(() => {
+            renderSidebarFavorites();
+            })
+        .catch((e) => console.log("Stream offline alebo blokovaný", e));
+}
 
         function handlePowerButton() {
             if (currentPlayingType !== "") {
                 audio.pause(); audio.src = ""; currentPlayingType = "";
-                document.getElementById('lblStation').textContent = "RÁDIO VYPNUTÉ";
-                document.getElementById('lblTrack').textContent = "Zvoľte stanicu vľavo";
-                document.getElementById('powerBtn').classList.remove('playing');
                 renderSidebarFavorites();
             } else {
                 const sUrl = localStorage.getItem('kiosk_last_radio_url');
@@ -1074,9 +937,6 @@
 
         function triggerExternalApp(url, id) {
             audio.pause(); audio.src = ""; currentPlayingType = id;
-            document.getElementById('lblStation').textContent = id.toUpperCase();
-            document.getElementById('lblTrack').textContent = "Presmerovanie do aplikácie...";
-            document.getElementById('powerBtn').classList.remove('playing');
             renderSidebarFavorites();
             setTimeout(() => { window.location.href = url; }, 300);
         }
@@ -1097,20 +957,13 @@
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             
-            const timeString = `${h}:${m}`;
-            document.getElementById('clockBox').textContent = timeString;
             document.getElementById('bigHours').textContent = h;
             document.getElementById('bigMinutes').textContent = m;
             
             // NÁHRADA PRE FORMÁTOVANIE DÁTUMU V runClockEngine()
             const dniDlhe = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
-            const dniSkratky = ['Ned', 'Pon', 'Uto', 'Str', 'Štv', 'Pia', 'Sob']; // Čisté 3-písmenové skratky
-            // Krátky formát do hornej lišty: bez roku, napr. "Sob 27.6."
-            const formatMaly = `${dniSkratky[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}.`;
-            // Veľký formát na plochu: plný názov s rokom, napr. "Sobota, 27.6.2026"
             const formatVelky = `${dniDlhe[now.getDay()]}, ${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`;
             
-            document.getElementById('dateBox').textContent = formatMaly;
             document.getElementById('bigDate').textContent = formatVelky;
 
             const aktualnyCasVMinutach = now.getHours() * 60 + now.getMinutes();
@@ -1174,27 +1027,13 @@
                     
                 // Ak zásek trvá už 4 sekundy, ideme reštartovať
                 if (watchdogPocitadloZaseknutia >= 4) {
-                        console.log("Watchdog: Detekovaný zásek streamu. Reštartujem...");
-                        document.getElementById('lblTrack').textContent = "Obnovujem spojenie...";
-                        
+                        console.log("Watchdog: Detekovaný zásek streamu. Reštartujem...");                        
                         const aktualnaUrl = audio.src;
                         
                         // Tvrdý reštart sieťového prenosu
                         audio.pause();
                         audio.src = "";
                         audio.load();
-                        
-                        // Opätovné nakopnutie po vyčistení
-                        setTimeout(() => {
-                            audio.src = aktualnaUrl;
-                            audio.play()
-                                .then(() => {
-                                    document.getElementById('lblTrack').textContent = "Práve hrá";
-                                })
-                                .catch(() => {
-                                    document.getElementById('lblTrack').textContent = "Obnova zlyhala, stream offline";
-                                });
-                        }, 500);
                         
                         watchdogPocitadloZaseknutia = 0;
                     }
@@ -1242,43 +1081,27 @@
                         dnesneMeno = povodneMeno; 
 
                         // ELEMENTY PRE ZOBRAZENIE
-                        const nameBox = document.getElementById('nameBox');
                         const bigNameday = document.getElementById('bigNameday');
-
-                        // RESET ŠTÝLOV (aby neostalo staré podfarbenie z predchádzajúceho dňa)
-                        nameBox.style.color = "#ff9f0a";
-                        nameBox.style.background = "transparent";
-                        nameBox.style.padding = "0";
-                        nameBox.style.borderRadius = "0";
                         bigNameday.style.color = "#ff9f0a";
 
                         // KONTROLA A ZVÝRAZNENIE PODĽA SKUPÍN
                         if (RODINA.includes(povodneMeno)) {
                             dnesneMeno = `❤️ ${povodneMeno}`;
-                            nameBox.style.color = "#ff3b30"; // Červená pre rodinu
                             bigNameday.style.color = "#ff3b30";
                         } 
                         else if (MOJE_MENA.includes(povodneMeno)) {
                             dnesneMeno = `⭐ ${povodneMeno}`;
-                            // Zvýraznenie v hornom riadku jemným oranžovým pozadím (kapsula)
-                            nameBox.style.background = "#ff9f0a22";
-                            nameBox.style.padding = "2px 8px";
-                            nameBox.style.borderRadius = "6px";
-                            nameBox.style.color = "#ff9f0a";
                         } 
                         else if (SPOLUZIACI.includes(povodneMeno)) {
                             dnesneMeno = `🎓 ${povodneMeno}`;
-                            nameBox.style.color = "#5ac8fa"; // Modrá pre spolužiakov
                             bigNameday.style.color = "#5ac8fa";
                         } 
                         else if (KOLEGOVIA.includes(povodneMeno)) {
                             dnesneMeno = `💼 ${povodneMeno}`;
-                            nameBox.style.color = "#34c759"; // Zelená pre kolegov
                             bigNameday.style.color = "#34c759";
                         }
 
                         // ZÁPIS DO STRÁNKY
-                        nameBox.textContent = dnesneMeno;
                         bigNameday.textContent = dnesneMeno;
                         
                         runClockEngine(); // Aktualizácia spodného panelu noci
@@ -1298,12 +1121,6 @@
             renderSidebarFavorites();
             inicializujPlochuNastaveni();
             aktualizujTlacidloMesta();
-
-            const savedType = localStorage.getItem('kiosk_last_radio_type');
-            if (savedType) {
-                document.getElementById('lblStation').textContent = "STANDBY";
-                document.getElementById('lblTrack').textContent = `Naposledy: ${savedType.toUpperCase()}`;
-            }
         });
 
         document.addEventListener('touchstart', function (event) {
