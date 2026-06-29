@@ -904,35 +904,32 @@
 
         // --- AUDIO ENGINE ---
         function playRadio(url, id) {
-            // BEZPEČNÉ VYČISTENIE STARÉHO STREAMU PRED ZMENOU
-            audio.pause();
-            audio.src = "";
-            audio.load(); // Vynúti uvoľnenie sieťového bufferu v iOS
+    audio.pause();
+    audio.src = url; // Priame priradenie novej URL
+    audio.load();    // Prehliadač pripraví nový stream
 
-            currentPlayingType = id;
-            localStorage.setItem('kiosk_last_radio_url', url);
-            localStorage.setItem('kiosk_last_radio_type', id);
+    currentPlayingType = id;
+    localStorage.setItem('kiosk_last_radio_url', url);
+    localStorage.setItem('kiosk_last_radio_type', id);
 
-            audio.volume = 0.8 * (VOLUME_MAP[id] || 1.0);
+    audio.volume = 0.8 * (VOLUME_MAP[id] || 1.0);
 
-            // DOPLŇ TÝCHTO PÁR RIADKOV SEM:
-            audio.src = url;
-            audio.play()
-            .then(() => {
-            renderSidebarFavorites();
-            runClockEngine(); // Pridané: okamžitá aktualizácia nočného textu po zapnutí
-        })
-        .catch((e) => console.log("Stream offline alebo blokovaný", e));
+    audio.play()
+    .then(() => {
+        renderSidebarFavorites();
+        runClockEngine(); 
+    })
+    .catch((e) => console.log("Stream offline alebo blokovaný", e));
 }
 
        function vypniRadio() {
-            audio.pause();
-            audio.src = "";
-            audio.load(); // Uvoľní sieťový buffer v iOS
-            currentPlayingType = "";
-            renderSidebarFavorites();
-            runClockEngine();
-        }
+        audio.pause();
+        audio.src = ""; // Desktop potrebuje vidieť vyprázdnenie pred load()
+        audio.load();   // Toto na desktope definitívne zabije sieťové pripojenie k streamu
+        currentPlayingType = "";
+        renderSidebarFavorites();
+        runClockEngine();
+}
 
         function adjustVolume(val) {
             audio.volume = (val / 100) * (VOLUME_MAP[currentPlayingType] || 1.0);
