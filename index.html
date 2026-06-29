@@ -715,87 +715,91 @@
             }
         }
             function vykresliNovyGraf(targetDayIndex) {
-            const chartContainer = document.getElementById('hourlyChartContainerNew');
-            if (!chartContainer || !window.weatherDataBackup) return;
-            chartContainer.innerHTML = '';
+    const chartContainer = document.getElementById('hourlyChartContainerNew');
+    if (!chartContainer || !window.weatherDataBackup) return;
+    chartContainer.innerHTML = '';
 
-            // Globálna pomocná funkcia pre farby teploty v grafe
-            function ziskajFarbuPreGraf(t) {
-                if (t < 0) return '#00bfff';
-                if (t < 10) return '#87CEEB';
-                if (t < 22) return '#98FB98';
-                if (t < 28) return '#ffa500';
-                return '#ff4500';
-            }
+    // Globálna pomocná funkcia pre farby teploty v grafe
+    function ziskajFarbuPreGraf(t) {
+        if (t < 0) return '#00bfff';
+        if (t < 10) return '#87CEEB';
+        if (t < 22) return '#98FB98';
+        if (t < 28) return '#ffa500';
+        return '#ff4500';
+    }
 
-            // Pomocná funkcia na ikony pre hodinový graf
-            function ziskajIkonuPreGraf(wCode) {
-                if (wCode >= 1 && wCode <= 3) return "⛅";
-                if (wCode >= 45 && wCode <= 48) return "🌫️";
-                if ((wCode >= 51 && wCode <= 67) || (wCode >= 80 && wCode <= 82)) return "🌧️";
-                if ((wCode >= 71 && wCode <= 77) || (wCode >= 85 && wCode <= 86)) return "❄️";
-                if (wCode >= 95 && wCode <= 99) return "⛈️";
-                return "☀️";
-            }
+    // Pomocná funkcia na ikony pre hodinový graf
+    function ziskajIkonuPreGraf(wCode) {
+        if (wCode >= 1 && wCode <= 3) return "⛅";
+        if (wCode >= 45 && wCode <= 48) return "🌫️";
+        if ((wCode >= 51 && wCode <= 67) || (wCode >= 80 && wCode <= 82)) return "🌧️";
+        if ((wCode >= 71 && wCode <= 77) || (wCode >= 85 && wCode <= 86)) return "❄️";
+        if (wCode >= 95 && wCode <= 99) return "⛈️";
+        return "☀️";
+    }
 
-            let temps = [], labels = [], codes = [];
-            const currentHourIndex = new Date().getHours();
+    let temps = [], labels = [], codes = [];
+    const currentHourIndex = new Date().getHours();
 
-            if (targetDayIndex === null || targetDayIndex === 0) {
-                // Nasledujúcich 12 hodín odteraz
-                temps = window.weatherDataBackup.hourly.temperature_2m.slice(currentHourIndex, currentHourIndex + 12);
-                codes = window.weatherDataBackup.hourly.weather_code.slice(currentHourIndex, currentHourIndex + 12);
-                for (let idx = 0; idx < 12; idx++) {
-                    labels.push(idx === 0 ? 'Teraz' : String((currentHourIndex + idx) % 24));
-                }
-            } else {
-                // Celý zvolený deň (kroky po 2 hodinách)
-                const startHour = targetDayIndex * 24;
-                for (let step = 0; step < 12; step++) {
-                    const offset = startHour + (step * 2);
-                    temps.push(window.weatherDataBackup.hourly.temperature_2m[offset]);
-                    codes.push(window.weatherDataBackup.hourly.weather_code[offset]);
-                    labels.push(String(step * 2));
-                }
-            }
-
-            const maxT = Math.max(...temps);
-            const minT = Math.min(...temps);
-            const range = (maxT - minT) || 1;
-
-            temps.forEach((temp, idx) => {
-                if (temp === undefined) return;
-                const pct = ((temp - minT) / range) * 55 + 15; // Výška stĺpca v %
-                const colBackground = `linear-gradient(to top, rgba(255,255,255, 0.08), ${ziskajFarbuPreGraf(temp)})`;
-                
-                const hodinaCode = codes[idx] !== undefined ? codes[idx] : 0;
-                const hodinaIcon = ziskajIkonuPreGraf(hodinaCode);
-
-                const column = document.createElement('div');
-                column.style.cssText = `display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 7.5%;`;
-                column.innerHTML = `
-                    <span style="font-size: 4vw; margin-bottom: 2px;">${hodinaIcon}</span> 
-                    <span style="font-size: 12px; font-weight: 600; color: ${ziskajFarbuPreGraf(temp)}; margin-bottom: 4px;">${Math.round(temp)}°</span>
-                    <div style="width: 100%; height: ${pct}%; background: ${colBackground}; border-radius: 6px 6px 0 0; border: 1px solid #222; border-bottom: none;"></div>
-                    <span style="font-size: 11px; color: #fff; margin-top: 5px; font-weight: 500;">${labels[idx]}</span>
-                `;
-                chartContainer.appendChild(column);
-            });
-
-            // --- VIZUÁLNE ZVÝRAZNENIE VYBRANÉHO DŇA ---
-            document.querySelectorAll('.weather-forecast-box, .extended-strip-new div').forEach(el => {
-                el.style.borderColor = '#222';
-                el.style.background = '#111';
-            });
-            
-            if (targetDayIndex === 0 || targetDayIndex === null) {
-                const dnesBox = document.getElementById('boxMiniDnes');
-                if (dnesBox) { dnesBox.style.borderColor = '#ff9f0a'; dnesBox.style.background = '#151515'; }
-            } else if (targetDayIndex === 1) {
-                const zajtraBox = document.getElementById('boxMiniZajtra');
-                if (zajtraBox) { zajtraBox.style.borderColor = '#ff9f0a'; zajtraBox.style.background = '#151515'; }
-            }
+    if (targetDayIndex === null || targetDayIndex === 0) {
+        // Nasledujúcich 12 hodín odteraz
+        temps = window.weatherDataBackup.hourly.temperature_2m.slice(currentHourIndex, currentHourIndex + 12);
+        codes = window.weatherDataBackup.hourly.weather_code.slice(currentHourIndex, currentHourIndex + 12);
+        for (let idx = 0; idx < 12; idx++) {
+            labels.push(idx === 0 ? 'Teraz' : String((currentHourIndex + idx) % 24));
         }
+    } else {
+        // Celý zvolený deň (kroky po 2 hodinách)
+        const startHour = targetDayIndex * 24;
+        for (let step = 0; step < 12; step++) {
+            const offset = startHour + (step * 2);
+            temps.push(window.weatherDataBackup.hourly.temperature_2m[offset]);
+            codes.push(window.weatherDataBackup.hourly.weather_code[offset]);
+            labels.push(String(step * 2));
+        }
+    }
+
+    const maxT = Math.max(...temps);
+    const minT = Math.min(...temps);
+    const range = (maxT - minT) || 1;
+
+    temps.forEach((temp, idx) => {
+        if (temp === undefined) return;
+        const pct = ((temp - minT) / range) * 55 + 15; // Výška stĺpca v %
+        const colBackground = `linear-gradient(to top, rgba(255,255,255, 0.08), ${ziskajFarbuPreGraf(temp)})`;
+        
+        const hodinaCode = codes[idx] !== undefined ? codes[idx] : 0;
+        const hodinaIcon = ziskajIkonuPreGraf(hodinaCode);
+
+        const column = document.createElement('div');
+        column.style.cssText = `display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 7.5%;`;
+        column.innerHTML = `
+            <span style="font-size: 4vw; margin-bottom: 2px;">${hodinaIcon}</span> 
+            <span style="font-size: 12px; font-weight: 600; color: ${ziskajFarbuPreGraf(temp)}; margin-bottom: 4px;">${Math.round(temp)}°</span>
+            <div style="width: 100%; height: ${pct}%; background: ${colBackground}; border-radius: 6px 6px 0 0; border: 1px solid #222; border-bottom: none;"></div>
+            <span style="font-size: 11px; color: #fff; margin-top: 5px; font-weight: 500;">${labels[idx]}</span>
+        `;
+        chartContainer.appendChild(column);
+    });
+
+    // POISTKA: Ak kontajner pre spodné boxy neexistuje, bezpečne ukončíme funkciu
+    const extStripCheck = document.getElementById('extendedForecastContainerNew');
+    if (!extStripCheck) return;
+
+    // --- VIZUÁLNE ZVÝRAZNENIE VYBRANÉHO DŇA ---
+    document.querySelectorAll('.weather-forecast-box, #extendedForecastContainerNew div').forEach(el => {
+        el.style.borderColor = '#222';
+        el.style.background = '#111';
+    });
+    
+    if (targetDayIndex === 0 || targetDayIndex === null) {
+        const dnesBox = document.getElementById('boxMiniDnes');
+        if (dnesBox) { dnesBox.style.borderColor = '#ff9f0a'; dnesBox.style.background = '#151515'; }
+    } else if (targetDayIndex === 1) {
+        const zajtraBox = document.getElementById('boxMiniZajtra');
+        if (zajtraBox) { zajtraBox.style.borderColor = '#ff9f0a'; zajtraBox.style.background = '#151515'; }
+    }
+}
         // --- MANAŽMENT PANELU NASTAVENÍ NOČNÉHO REŽIMU ---
         function inicializujPlochuNastaveni() {
             const elFrom = document.getElementById('set-night-from');
@@ -1194,34 +1198,36 @@
             }
         }
         // --- PREPÍNANIE HODÍN A DETAILNÉHO POČASIA ---
-        function toggleWeatherView() {
-            if (isSettingsModeActive) toggleSettingsMode();
-            
-            const bodyEl = document.getElementById('mainBody');
-            const clockView = document.getElementById('rightPlaceholder');
-            const graphView = document.getElementById('weatherRightGraphArea');
-            const leftWeather = document.getElementById('weatherLeftLive');
-            const settingsView = document.getElementById('settingsGridView');
+function toggleWeatherView() {
+    if (isSettingsModeActive) toggleSettingsMode();
+    
+    const bodyEl = document.getElementById('mainBody');
+    const clockView = document.getElementById('rightPlaceholder');
+    const graphView = document.getElementById('weatherRightGraphArea');
+    const leftWeather = document.getElementById('weatherLeftLive');
+    const settingsView = document.getElementById('settingsGridView');
 
-            // Ak je zapnuté, vypneme ho
-            if (bodyEl.classList.contains('weather-active-mode')) {
-                bodyEl.classList.remove('weather-active-mode');
-                if (leftWeather) leftWeather.style.display = 'none';
-                if (graphView) graphView.style.display = 'none';
-                if (clockView) clockView.style.display = 'flex';
-                renderSidebarFavorites(); // Vráti späť obľúbené rádio stanice vľavo
-            } else {
-                // Zapíname plnohodnotný meteo režim
-                if (settingsView) settingsView.style.display = 'none';
-                if (clockView) clockView.style.display = 'none';
-                bodyEl.classList.add('weather-active-mode');
-                if (leftWeather) leftWeather.style.display = 'flex';
-                if (graphView) graphView.style.display = 'flex'; // OPRAVA: Explicitne vynútime zobrazenie grafu
-                
-                // Vytiahneme graf pre aktuálny deň (null znamená "Teraz / Dnes")
-                vykresliNovyGraf(null);
-            }
-        }
+    // Ak je režim aktívny, vypneme ho a vrátime hodiny
+    if (bodyEl.classList.contains('weather-active-mode')) {
+        bodyEl.classList.remove('weather-active-mode');
+        if (leftWeather) leftWeather.style.display = 'none';
+        if (graphView) graphView.style.display = 'none';
+        if (clockView) clockView.style.display = 'flex';
+        renderSidebarFavorites(); // Vráti späť mriežku obľúbených rádií naľavo
+    } else {
+        // Zapíname plnohodnotný meteo režim
+        if (settingsView) settingsView.style.display = 'none';
+        if (clockView) clockView.style.display = 'none';
+        bodyEl.classList.add('weather-active-mode');
+        
+        // OPRAVA: Vynútime zobrazenie oboch strán (živé info vľavo, graf vpravo)
+        if (leftWeather) leftWeather.style.display = 'flex';
+        if (graphView) graphView.style.display = 'flex';
+        
+        // Vygenerujeme a vykreslíme hodinový graf
+        vykresliNovyGraf(null);
+    }
+}
         async function fetchNamedayData() {
             const now = new Date();
             const mm = String(now.getMonth() + 1).padStart(2, '0');
