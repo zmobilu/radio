@@ -485,7 +485,7 @@
 
         // --- VNÚTORNÁ DATABÁZA KIOSKU ---
         const DATABASE = [
-            { id: "slovensko", name: "Slovensko", url: "https://stream.stv.livebox.sk/slovensko_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png", style: "background:#00547E;", category: "Verejnoprávne" },
+            { id: "slovensko", name: "Slovensko", url: "https://icecast.stv.livebox.sk/slovensko_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png", style: "background:#00547E;", category: "Verejnoprávne" },
             { id: "fm", name: "Rádio_FM", url: "https://icecast.stv.livebox.sk/fm_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioFM.png", style: "background:#111;", category: "Verejnoprávne" },
             { id: "regina", name: "Regina", url: "https://icecast.stv.livebox.sk/regina-ba_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioReginaZ.png", style: "background:#111;", category: "Verejnoprávne" },
             { id: "devin", name: "Devín", url: "https://icecast.stv.livebox.sk/devin_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioDevin.png", style: "background:#111;", category: "Verejnoprávne" },
@@ -1011,43 +1011,16 @@
                     const ikonkaW = aktualnaTeplotaText.split(' ')[0] || "☀️";
 
                     // ZÁPIS DO NOČNÉHO RIADKA: Dátum a rádio majú farbu noci, teplota má svoju vlastnú podľa počasia
-                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}  •  ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>${radioNocturnalText}`;
-                }
-            } else {
-                bodyEl.classList.remove('full-night-mode');
-                // Ak kód zhodil nočný režim (napr. prešiel čas noci), vynulujeme aj manuálny príznak
-                if (!jeNocnyCas) manualnaNocAktivna = false;
-            }
-                // --- INTEGRÁCIA AUDIO WATCHDOGU ---
-                if (currentPlayingType !== "" && currentPlayingType !== "none" && !audio.paused) {
-                
-                // Ak sa čas streamu rovná tomu z predchádzajúcej sekundy
-                if (audio.currentTime === watchdogPoslednyCas) {
-                    watchdogPocitadloZaseknutia++;
-                    
-                // Ak zásek trvá už 4 sekundy, ideme reštartovať
-                if (watchdogPocitadloZaseknutia >= 4) {
-                        console.log("Watchdog: Detekovaný zásek streamu. Reštartujem...");                        
-                        const aktualnaUrl = audio.src;
-                        
-                        // Tvrdý reštart sieťového prenosu
-                        audio.pause();
-                        audio.src = "";
-                        audio.load();
-                        
-                        watchdogPocitadloZaseknutia = 0;
-                    }
-                } else {
-                    // Stream žije a čas beží, resetujeme počítadlo hrozieb
-                    watchdogPoslednyCas = audio.currentTime;
-                    watchdogPocitadloZaseknutia = 0;
-                }
-            } else {
-                // Rádio je vypnuté alebo pozastavené, strážny pes odpočíva
-                watchdogPoslednyCas = -1;
-                watchdogPocitadloZaseknutia = 0;
-            }
+            bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}   •  ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>${radioNocturnalText}`;
         }
+    } else {
+        bodyEl.classList.remove('full-night-mode');
+        // Ak kód zhodil nočný režim (napr. prešiel čas noci), vynulujeme aj manuálny príznak
+        if (!jeNocnyCas) manualnaNocAktivna = false;
+    }
+    
+    // SEKCOV WATCHDOGU SME ÚPLNE VYMAZALI
+}
         // --- PREPÍNANIE HODÍN A DETAILNÉHO POČASIA ---
         function toggleWeatherView() {
             if (isSettingsModeActive) toggleSettingsMode();
