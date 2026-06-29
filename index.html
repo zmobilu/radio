@@ -274,7 +274,7 @@
                 justify-content: space-evenly !important;
                 padding-bottom: 20px;
             }
-        } /* <--- TÁTO DRUHÁ ZÁTVORKA TU CHÝBALA! Ukončí @media režim na výšku */
+        } 
 
         /* --- OCHRANA PROTI VYPAĽOVANIU (PIXEL SHIFTING) --- */
         @keyframes antiBurnIn {
@@ -660,9 +660,11 @@
                         document.getElementById('weatherMainCityClick').onclick = (e) => { e.stopPropagation(); window.open(mapaUrl, '_blank'); };
 
                         if (data.daily) {
-                            // Slnko (Východ / Západ) do grafu
-                            document.getElementById('sunRiseValNew').textContent = data.daily.sunrise[0].split('T')[1];
-                            document.getElementById('sunSetValNew').textContent = data.daily.sunset[0].split('T')[1];
+                            // Pridaná poistka – zápis sa vykoná, len ak prvky v HTML existujú
+                            const sunRiseEl = document.getElementById('sunRiseValNew');
+                            const sunSetEl = document.getElementById('sunSetValNew');
+                            if (sunRiseEl) sunRiseEl.textContent = data.daily.sunrise[0].split('T')[1];
+                            if (sunSetEl) sunSetEl.textContent = data.daily.sunset[0].split('T')[1];
 
                             // Dnes mini vľavo
                             const dMax = Math.round(data.daily.temperature_2m_max[0]);
@@ -1055,12 +1057,12 @@
             const btn = document.getElementById('settingsToggleBtn');
             const placeholder = document.getElementById('rightPlaceholder');
             const gridView = document.getElementById('settingsGridView');
-            const weatherView = document.getElementById('weatherDetailView'); // Pridané
+            const weatherView = document.getElementById('weatherRightGraphArea'); // OPRAVENÉ ID
 
             if (isSettingsModeActive) {
                 btn.classList.add('active');
                 placeholder.style.display = 'none';
-                weatherView.style.display = 'none'; // Počasie musíme schovať, ak ideme do nastavení
+                if (weatherView) weatherView.style.display = 'none'; // Doplnená poistka existencie
                 gridView.style.display = 'grid';
                 renderSettingsGrid();
                 resetSettingsTimer(); 
@@ -1069,10 +1071,9 @@
                 btn.classList.remove('active');
                 placeholder.style.display = 'flex';
                 gridView.style.display = 'none';
-                weatherView.style.display = 'none';
+                if (weatherView) weatherView.style.display = 'none';
             }
         }
-
         function handleFavCardClick(item) {
     if (isSettingsModeActive) return;
     if (item.url) {
