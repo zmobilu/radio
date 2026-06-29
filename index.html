@@ -1136,8 +1136,7 @@
                 document.body.classList.remove('full-night-mode');
             }
         }
-
-        // --- ENGINE HODÍN, KALENDÁRA A KONTROLY NOČNÉHO REŽIMU ---
+// --- ENGINE HODÍN, KALENDÁRA A KONTROLY NOČNÉHO REŽIMU ---
         function runClockEngine() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -1167,37 +1166,25 @@
             const bodyEl = document.getElementById('mainBody');
             const bottomInfoEl = document.getElementById('nightBottomInfo');
 
-            // UPRAVENÁ PODMIENKA: Režim noci sa aktivuje, ak je nocný čas ALEBO ak bola zapnutá manuálne
+            // REŽIM NOCI: Aktivuje sa, ak je nočný čas ALEBO ak bola zapnutá manuálne
             if ((jeNocnyCas || manualnaNocAktivna) && terazMili > nocnyRezimSnoozeDo && !isSettingsModeActive) {
                 bodyEl.classList.add('full-night-mode');
                 
                 let radioNocturnalText = "";
                 if (currentPlayingType && currentPlayingType !== "none") {
-                    radioNocturnalText = `  •  📻 ${currentPlayingType.toUpperCase()}`;
+                    radioNocturnalText = `   •   📻 ${currentPlayingType.toUpperCase()}`;
                 }
                 
-                let meninyNocturnalText = dnesneMeno ? `${dnesneMeno}  •  ` : "";
+                // OPRAVA: Odstránenie grafických ikon (srdiečka, hviezdičky...) z mien pre nočný riadok
+                let meninyNocturnalText = dnesneMeno ? `${dnesneMeno.replace(/[❤️⭐🎓💼]/g, '').trim()}   •   ` : "";
                 
                 if (bottomInfoEl) {
-                    // Vytiahneme čisté číslo teploty z premennej (odstránime ikonku a text °C)
+                    // Vytiahneme čisté číslo teploty z premennej
                     const lenCisloTeploty = parseInt(aktualnaTeplotaText.replace(/[^0-9.-]/g, ''));
-                    
-                    // Znovu použijeme tvoj farebný kľúč pre nočné zobrazenie
-                    function getTempColor(t) {
-                        if (isNaN(t)) return cfgFarbaNoci; // Poistka, ak by dáta zlyhali
-                        if (t < 0) return '#00bfff';
-                        if (t < 10) return '#87CEEB';
-                        if (t < 22) return '#98FB98';
-                        if (t < 28) return '#ffa500';
-                        return '#ff4500';
-                    }
-                    const tColorNoc = getTempColor(lenCisloTeploty);
+                    const zobrazenieTeploty = isNaN(lenCisloTeploty) ? "" : `   •   ${lenCisloTeploty}°C`;
 
-                    // Rozdelíme text teploty na ikonku a zafarbené číslo
-                    const ikonkaW = aktualnaTeplotaText.split(' ')[0] || "☀️";
-
-                    // ZÁPIS DO NOČNÉHO RIADKA: Dátum a rádio majú farbu noci, teplota má svoju vlastnú podľa počasia
-            bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}   •  ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>${radioNocturnalText}`;
+                    // ZÁPIS DO NOČNÉHO RIADKA: Čistý text preberá farbu hodín, žiadne extra farby ani ikony počasia
+                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}.${zobrazenieTeploty}${radioNocturnalText}`;
                 }
             } else {
                 bodyEl.classList.remove('full-night-mode');
