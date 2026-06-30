@@ -105,6 +105,55 @@
         .big-clock-nameday {
             font-size: 2.2vw; font-weight: 400; color: #ff9f0a; letter-spacing: 0.5px; margin-top: 2px;
         }
+        /* --- OPRAVA METEOSTANICE PRE REŽIM NA ŠÍRKU --- */
+        .main-weather-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 1vh;
+        }
+        .weather-city-line {
+            font-size: 2vw;
+            font-weight: bold;
+            color: #ff9f0a;
+            text-transform: uppercase;
+            border-bottom: 1px dashed #ff9f0a;
+            padding-bottom: 2px;
+            margin-bottom: 1vh;
+            text-align: center;
+        }
+        .weather-core-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .weather-sub-row {
+            font-size: 3vw;
+            font-weight: 300;
+            margin-top: -0.5vh;
+        }
+        .main-mini-strip {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            width: 80%;
+            border-top: 1px solid #222;
+            margin-top: 1.5vh;
+            padding-top: 1vh;
+        }
+        .mini-day-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 45%;
+        }
+        .mini-label {
+            font-size: 1.5vw;
+            color: #aaa;
+            margin-bottom: 2px;
+        }
 
         /* --- ZÚŽENÝ EXTRA KOMPAKTNÝ PANEL BEZ TEXTOV --- */
         .settings-night-panel {
@@ -273,23 +322,62 @@
 .big-clock-date { font-size: 2.2vw; color: #888; text-transform: uppercase; }
 .big-clock-nameday { font-size: 2vw; color: #ff9f0a; margin-top: 5px; }
 
-/* Nové štýly pre integrované meteo */
-.main-weather-container {
-    display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 2vh;
-}
-.weather-city-line {
-    font-size: 2vw; font-weight: bold; color: #ff9f0a; text-transform: uppercase;
-    border-bottom: 1px dashed #ff9f0a; padding-bottom: 2px; margin-bottom: 1vh;
-}
-.weather-core-row { display: flex; align-items: center; justify-content: center; gap: 15px; }
-.weather-sub-row { font-size: 4vw; font-weight: 300; margin-top: -1vh; }
-
-.main-mini-strip {
-    display: flex; justify-content: space-around; width: 80%; border-top: 1px solid #222; 
-    margin-top: 2vh; padding-top: 1vh;
-}
-.mini-day-box { display: flex; flex-direction: column; align-items: center; width: 45%; }
-.mini-label { font-size: 1.5vw; color: #aaa; margin-bottom: 2px; }
+/* Nové štýly pre integrované meteo v režime na výšku */
+        .main-weather-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 3vh;
+        }
+        .weather-city-line {
+            font-size: 4.5vw !important; /* Výrazne väčšie na výšku */
+            font-weight: bold;
+            color: #ff9f0a;
+            text-transform: uppercase;
+            border-bottom: 1px dashed #ff9f0a;
+            padding-bottom: 4px;
+            margin-bottom: 2vh;
+        }
+        .weather-core-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+        }
+        .weather-sub-row {
+            font-size: 6vw !important; /* Väčšia pocitová teplota a vlhkosť */
+            font-weight: 300;
+            margin-top: -1vh;
+        }
+        .main-mini-strip {
+            display: flex !important;
+            flex-direction: row !important; /* Istota, že zostanú vedľa seba */
+            justify-content: space-around;
+            width: 90%;
+            border-top: 1px solid #222;
+            margin-top: 4vh;
+            padding-top: 2vh;
+        }
+        .mini-day-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 45%;
+        }
+        .mini-label {
+            font-size: 3.5vw !important;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+        /* Oprava veľkosti emoji ikon a textov v spodnom páse pre výšku */
+        #mainFc0Icon, #mainFc1Icon {
+            font-size: 8vw !important;
+            margin: 5px 0;
+        }
+        #mainFc0Temp, #mainFc1Temp {
+            font-size: 5vw !important;
+        }
             .favorites-sidebar { padding-bottom: calc(65px + env(safe-area-inset-bottom)) !important; }
             .settings-grid-view { padding-bottom: calc(130px + env(safe-area-inset-bottom)) !important; }
             .placeholder-view { justify-content: space-evenly !important; padding-bottom: 20px; }
@@ -685,7 +773,6 @@
                         `;
                         extendedContainer.appendChild(dayBox);
                     }
-                    runClockEngine();
                 }
             } catch (e) {
                 console.log("Chyba pri načítaní počasia:", e);
