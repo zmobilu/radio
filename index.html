@@ -1242,6 +1242,15 @@
                 bodyEl.classList.remove('full-night-mode');
                 if (!jeNocnyCas) manualnaNocAktivna = false;
             }
+            // --- AKTUALIZÁCIA HLAVIČKY STRÁNKY (TITLE) ---
+        let stavRadia = "Rádio";
+        if (currentPlayingType && currentPlayingType !== "") {
+            const hrajuceRadio = DATABASE.find(d => d.id === currentPlayingType);
+            stavRadia = hrajuceRadio ? hrajuceRadio.name : currentPlayingType.toUpperCase();
+        }
+        
+        // Spojí počasie (napr. "☀️ 24°C") s názvom rádia (napr. "Fun Radio") alebo predvoleným názvom
+        document.title = `${aktualnaTeplotaText} | ${stavRadia}`;
         }
 
         async function fetchNamedayData() {
