@@ -268,9 +268,28 @@
                 padding-right: calc(8px + env(safe-area-inset-right));
             }
             .main-content-area { width: 100vw; flex: 1; order: 1; }
-            .big-clock-time { font-size: 26vw; }
-            .big-clock-date { font-size: 4.5vw; }
-            .big-clock-nameday { font-size: 4vw; }
+            /* Úprava existujúcich hodín, aby boli kompaktnejšie */
+.big-clock-time { font-size: 14vw; line-height: 0.8; }
+.big-clock-date { font-size: 2.2vw; color: #888; text-transform: uppercase; }
+.big-clock-nameday { font-size: 2vw; color: #ff9f0a; margin-top: 5px; }
+
+/* Nové štýly pre integrované meteo */
+.main-weather-container {
+    display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 2vh;
+}
+.weather-city-line {
+    font-size: 2vw; font-weight: bold; color: #ff9f0a; text-transform: uppercase;
+    border-bottom: 1px dashed #ff9f0a; padding-bottom: 2px; margin-bottom: 1vh;
+}
+.weather-core-row { display: flex; align-items: center; justify-content: center; gap: 15px; }
+.weather-sub-row { font-size: 4vw; font-weight: 300; margin-top: -1vh; }
+
+.main-mini-strip {
+    display: flex; justify-content: space-around; width: 80%; border-top: 1px solid #222; 
+    margin-top: 2vh; padding-top: 1vh;
+}
+.mini-day-box { display: flex; flex-direction: column; align-items: center; width: 45%; }
+.mini-label { font-size: 1.5vw; color: #aaa; margin-bottom: 2px; }
             .favorites-sidebar { padding-bottom: calc(65px + env(safe-area-inset-bottom)) !important; }
             .settings-grid-view { padding-bottom: calc(130px + env(safe-area-inset-bottom)) !important; }
             .placeholder-view { justify-content: space-evenly !important; padding-bottom: 20px; }
@@ -325,18 +344,40 @@
                     <span class="big-clock-minutes" id="bigMinutes">00</span>
                 </div>
                 <div class="big-clock-date-wrapper">
-                    <span class="big-clock-date" id="bigDate">Pondelok, 1.1.</span>
-                    <span class="big-clock-nameday" id="bigNameday">Dnes má meniny: ---</span>
+                    <div class="big-clock-date" id="bigDate">---</div>
+                    <div class="big-clock-nameday" id="bigNameday">---</div>
                 </div>
                 
-                <div id="mainWeatherWidget" onclick="toggleWeatherView(); event.stopPropagation();" style="margin-top: 12px; font-size: 3.5vw; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                    <span id="mainWeatherIcon">☀️</span>
-                    <span id="mainWeatherTemp">--°C</span>
+                <div class="main-weather-container">
+                    <div class="weather-city-line" id="mainCityLine">---</div>
+                    
+                    <div class="weather-core-row">
+                        <span id="mainBigIcon" style="font-size: 10vw;">☀️</span>
+                        <span id="mainBigTemp" style="font-size: 12vw; font-weight: 300;">--°C</span>
+                    </div>
+                    
+                    <div class="weather-sub-row">
+                        <span id="mainApparent" style="color: #ffa500;">--°</span>
+                        <span id="mainHumidity" style="color: #666; margin-left: 15px;">--%</span>
+                    </div>
+
+                    <div class="main-mini-strip">
+                        <div class="mini-day-box">
+                            <span class="mini-label">DNES</span>
+                            <span id="mainFc0Icon" style="font-size: 4vw;">--</span>
+                            <span id="mainFc0Temp">-- / --</span>
+                        </div>
+                        <div class="mini-day-box">
+                            <span class="mini-label">ZAJTRA</span>
+                            <span id="mainFc1Icon" style="font-size: 4vw;">--</span>
+                            <span id="mainFc1Temp">-- / --</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="nightBottomInfo"></div>
             </div>
-
+            
             <div class="settings-grid-view" id="settingsGridView" onclick="resetSettingsTimer()">                
                 <div class="settings-night-panel" style="grid-column: 1 / -1;" onclick="resetSettingsTimer()">
                     <div class="settings-night-row">
@@ -553,23 +594,65 @@
                     document.getElementById('apparent-temp').textContent = `${appTemp}°`;
                     document.getElementById('apparent-temp').style.color = appColor;
                     document.getElementById('outdoor-hum').textContent = `${humidity}%`;
+                    // --- EXISTUJÚCI RIADOK PRED ZMENOU (nechaj ho tam, pomôže ti s orientáciou) ---
+                    document.getElementById('outdoor-hum').textContent = `${humidity}%`;
 
-                    const mainIconEl = document.getElementById('weather-icon-main');
-                    if(mainIconEl) {
-                        mainIconEl.className = 'fas ' + (WEATHER_CODES[code] || 'fa-cloud') + ' meteo-icon-large';
-                        mainIconEl.style.color = WEATHER_COLORS[code] || '#aaa';
+                    // ==================== TU VYMEŇ KÓD ODTOĽTO ====================
+                    // Naplnenie novej hlavnej meteostanice
+                    const mainCityEl = document.getElementById('mainCityLine');
+                    if (mainCityEl) mainCityEl.textContent = cfgMestoNazov.toUpperCase();
+                    
+                    const mainBigIconEl = document.getElementById('mainBigIcon');
+                    if (mainBigIconEl) mainBigIconEl.textContent = icon;
+                    
+                    const mainBigTempEl = document.getElementById('mainBigTemp');
+                    if (mainBigTempEl) {
+                        mainBigTempEl.textContent = `${temp}°C`;
+                        mainBigTempEl.style.color = tColor;
                     }
+                    
+                    const mainApparentEl = document.getElementById('mainApparent');
+                    if (mainApparentEl) {
+                        mainApparentEl.textContent = `${appTemp}°`;
+                        mainApparentEl.style.color = appColor;
+                    }
+                    
+                    const mainHumidityEl = document.getElementById('mainHumidity');
+                    if (mainHumidityEl) mainHumidityEl.textContent = `${humidity}%`;
 
+                    // SPOLOČNÝ CYKLUS PRE DNES A ZAJTRA (plní hlavnú plochu aj skrytý detail)
                     for (let i = 0; i <= 1; i++) {
                         const dCode = data.daily.weather_code[i];
-                        const max = data.daily.temperature_2m_max[i];
+                        const max = Math.round(data.daily.temperature_2m_max[i]);
                         const min = Math.round(data.daily.temperature_2m_min[i]);
-                        document.getElementById(`fc${i}-temp`).innerHTML = `<span style="color:${getTempColor(max)}">${Math.round(max)}°</span> <span style="color:#aaa; font-size:0.8em">/ ${min}°</span>`;
-                        const iconEl = document.getElementById(`fc${i}-icon`);
-                        iconEl.className = 'fas ' + (WEATHER_CODES[dCode] || 'fa-cloud') + ' mini-icon';
-                        iconEl.style.color = WEATHER_COLORS[dCode] || '#aaa';
+                        
+                        // Plnenie novej hlavnej obrazovky (Emoji)
+                        const mIcon = document.getElementById(`mainFc${i}Icon`);
+                        if (mIcon) mIcon.textContent = getWeatherIcon(dCode);
+                        
+                        const mTemp = document.getElementById(`mainFc${i}Temp`);
+                        if (mTemp) mTemp.innerHTML = `<span style="color:${getTempColor(max)}">${max}°</span> / <span style="color:#aaa">${min}°</span>`;
+                        
+                        // Plnenie starého detailného okna (FontAwesome triedy)
+                        const oldTemp = document.getElementById(`fc${i}-temp`);
+                        if (oldTemp) oldTemp.innerHTML = `<span style="color:${getTempColor(max)}">${max}°</span> <span style="color:#aaa; font-size:0.8em">/ ${min}°</span>`;
+                        
+                        const oldIcon = document.getElementById(`fc${i}-icon`);
+                        if (oldIcon) {
+                            oldIcon.className = 'fas ' + (WEATHER_CODES[dCode] || 'fa-cloud') + ' mini-icon';
+                            oldIcon.style.color = WEATHER_COLORS[dCode] || '#aaa';
+                        }
                     }
 
+                    // Oprava ikony aktuálneho počasia pre starý detail
+                    const oldMainIcon = document.getElementById('weather-icon-main');
+                    if (oldMainIcon) {
+                        oldMainIcon.className = 'fas ' + (WEATHER_CODES[code] || 'fa-cloud') + ' meteo-icon-large';
+                        oldMainIcon.style.color = WEATHER_COLORS[code] || '#aaa';
+                    }
+                    // ==================== PO TENTO RIADOK VÝMENA KONČÍ ====================
+
+                    // --- EXISTUJÚCI RIADOK ZA ZMENOU (tento riadok už v kóde nechaj) ---
                     vykresliGraf(null);
 
                     const extendedContainer = document.getElementById('extended-forecast-container');
