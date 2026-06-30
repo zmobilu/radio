@@ -39,7 +39,7 @@
             position: absolute !important;
             top: 10px !important;
             right: 15px !important;
-            z-index: 9999 !important;
+            z-index: 999999 !important;
             background: #111 !important; 
             border: 1px solid #222 !important; 
             color: #666; 
@@ -56,6 +56,12 @@
         }
         .btn-settings.active { color: #ff9f0a; border-color: #ff9f0a; background: #1a1a1a; }
         #fullscreenToggleBtn.active { color: #ff9f0a; border-color: #ff9f0a; background: #1a1a1a; }
+        #fullscreenToggleBtn {
+            position: absolute !important;
+            top: 60px !important;
+            right: 15px !important;
+            z-index: 999999 !important;
+        }
 
         /* --- HLAVNÁ ROZDELENÁ PLOCHA --- */
         .workspace-container { display: flex; flex: 1; width: 100vw; overflow: hidden; position: relative; }
@@ -223,8 +229,7 @@
         /* --- NOČNÝ REŽIM --- */
         body.full-night-mode .favorites-sidebar,
         body.full-night-mode .big-clock-date-wrapper,
-        body.full-night-mode .btn-settings, 
-        body.full-night-mode #fullscreenToggleBtn,
+        body.full-night-mode #settingsToggleBtn, /* SEM DAME ID PRE NASTAVENIA */
         body.full-night-mode .main-weather-container { 
             display: none !important;
         }
@@ -380,6 +385,12 @@
             100% { transform: translate(0, 0); }
         }
         body.full-night-mode .placeholder-view { animation: antiBurnIn 300s infinite linear; }
+        /* Pridajte toto nové pravidlo na koniec <style>, aby malo tlačidlo v nočnej farbe správny tón */
+        body.full-night-mode #fullscreenToggleBtn {
+            background: #000 !important;
+            border-color: var(--night-color) !important;
+            color: var(--night-color) !important;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
@@ -391,13 +402,7 @@
         <aside class="favorites-sidebar" id="favSidebarContainer"></aside>
 
         <main class="main-content-area">
-            <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
-                <i class="fa-solid fa-gear"></i>
-            </button>
-            <button class="btn-settings" id="fullscreenToggleBtn" onclick="toggleFullscreenMode(); event.stopPropagation();" title="Celá obrazovka" style="right: 70px !important;">
-                <i class="fa-solid fa-expand" id="fullscreenIcon"></i>
-            </button>
-            
+                       
             <div class="placeholder-view" id="rightPlaceholder" onclick="toggleWeatherView(event)">
                 <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();">
                     <span class="big-clock-hours" id="bigHours">00</span>
@@ -499,6 +504,12 @@
 
         <div id="extended-forecast-container"></div>
     </div>
+            <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+            <button class="btn-settings" id="fullscreenToggleBtn" onclick="toggleFullscreenMode(); event.stopPropagation();" title="Celá obrazovka">
+                <i class="fa-solid fa-expand" id="fullscreenIcon"></i>
+            </button>
     
     <script>
         let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v2')) || ["slovensko", "funchill", "rock", "blanik", "fun", "spotify"];
@@ -797,7 +808,9 @@
         }
 
         function toggleWeatherView(e) {
-            if (e && e.target.closest('#weather-location-main')) return;
+            // Ak kliknete na ikonu nastavení alebo fullscreenu, ignoruj prepnutie grafu
+            if (e && (e.target.closest('#weather-location-main') || e.target.closest('#settingsToggleBtn') || e.target.closest('#fullscreenToggleBtn'))) return;
+            
             if (isSettingsModeActive) toggleSettingsMode();
             
             const weatherView = document.getElementById('weatherDetailView');
