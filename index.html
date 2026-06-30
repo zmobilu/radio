@@ -143,9 +143,9 @@
             text-align: center;
         }
         
-        /* Ľavá polovica: Aktuálne počasie */
+        /* Ľavá polovica: Aktuálne počasie (dostane 65%) */
         .weather-left-side {
-            width: 50%;
+            width: 65%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -153,6 +153,20 @@
             height: 100%;
             border-right: 1px solid #151515;
             box-sizing: border-box;
+        }
+        
+        /* Pravá polovica: Predpoveď Dnes / Zajtra (dostane 35%) */
+        .main-mini-strip {
+            width: 35%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            border-top: none;
+            margin-top: 0;
+            padding-top: 0;
+            gap: 2vh;
         }
         .weather-core-row {
             display: flex;
@@ -165,18 +179,6 @@
         .weather-sub-row { font-size: 3.5vmin; font-weight: 300; margin-top: 0.5vh; }
         
         /* Pravá polovica: Predpoveď Dnes / Zajtra vertikálne pod sebou */
-        .mini-day-box {
-            display: flex;
-            flex-direction: column; 
-            align-items: center;
-            justify-content: center;
-            width: 85%;
-            background: #080808;
-            border: 1px solid #111;
-            padding: 1vh 4vw;
-            border-radius: 12px;
-            box-sizing: border-box;
-        }
         .mini-day-box {
             display: flex;
             flex-direction: column; /* Zmenené z row na column */
@@ -336,39 +338,59 @@
         .forecast-day-icon { font-size: 6vmin !important; margin: 6px 0 !important; }
         .forecast-day-temp { font-size: 2.6vmin !important; font-weight: 600 !important; white-space: nowrap !important; line-height: 1.1 !important; }
 
-        /* --- AUTOMATICKÉ PREKRESLENIE PRE REŽIM NA VÝŠKU --- */
         @media (orientation: portrait) {
-            .workspace-container { flex-direction: column; }
-            .favorites-sidebar {
-                width: 100vw; height: auto; flex-shrink: 0; order: 2;
-                grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);
-                border-right: none; border-top: 1px solid #111; gap: 8px; padding: 8px;
-                padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
-                padding-left: calc(8px + env(safe-area-inset-left));
-                padding-right: calc(8px + env(safe-area-inset-right));
-                margin-bottom: 0 !important;
-            }
-            .main-content-area { width: 100vw; flex: 1; order: 1; }
-            
-            .placeholder-view { padding: 1.5vh 3vw; justify-content: space-between !important; }
-            .big-clock-time { font-size: 24vmin; line-height: 0.75; margin-top: 1vh; width: 100%; justify-content: center; }
-            .big-clock-date-wrapper { margin-top: 0; padding-bottom: 1vh; width: 100%; }
-            .big-clock-date { font-size: 3.5vmin; color: #fff; }
-            .big-clock-nameday { font-size: 3vmin; margin-top: 3px; }
+    .workspace-container { flex-direction: column; }
+    .favorites-sidebar {
+        width: 100vw; height: auto; flex-shrink: 0; order: 2;
+        grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);
+        border-right: none; border-top: 1px solid #111; gap: 8px; padding: 8px;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+        padding-left: calc(8px + env(safe-area-inset-left));
+        padding-right: calc(8px + env(safe-area-inset-right));
+        margin-bottom: 0 !important;
+    }
+    .main-content-area { width: 100vw; flex: 1; order: 1; }
+    
+    /* OPRAVENÉ: Hodiny nepoletia nahor */
+    .placeholder-view { 
+        padding: 2vh 3vw; 
+        justify-content: center !important; 
+        gap: 2vh;
+    }
+    /* OPRAVENÉ: Masívnejšie hodiny s lepším posunom */
+    .big-clock-time { 
+        font-size: 26vmin; 
+        line-height: 0.8; 
+        margin-top: 2vh; 
+        width: 100%; 
+        display: flex;
+        justify-content: center; 
+    }
+    .big-clock-date-wrapper { margin-top: 0; padding-bottom: 1vh; width: 100%; }
+    .big-clock-date { font-size: 3.5vmin; color: #fff; }
+    .big-clock-nameday { font-size: 3vmin; margin-top: 3px; }
 
-            .main-weather-container { flex-direction: row !important; height: 25vh !important; margin-top: 0.5vh; margin-bottom: 1vh; width: 100%; }
-            .weather-left-side { width: 50% !important; border-right: 1px solid #151515 !important; }
-            #mainBigIcon { font-size: 11vmin !important; }
-            #mainBigTemp { font-size: 10vmin !important; font-weight: 700; }
-            .weather-city-line { font-size: 3vmin !important; margin-bottom: 0.5vh; }
-            .weather-sub-row { font-size: 3.8vmin !important; margin-top: 0; }
+    /* Počasie na celú šírku obrazovky pri zobrazení na výšku */
+    .main-weather-container { flex-direction: row !important; height: 25vh !important; margin-top: 0.5vh; margin-bottom: 1vh; width: 100%; }
+    .weather-left-side { width: 50% !important; border-right: 1px solid #151515 !important; }
+    #mainBigIcon { font-size: 11vmin !important; }
+    #mainBigTemp { font-size: 10vmin !important; font-weight: 700; }
+    .weather-city-line { font-size: 3vmin !important; margin-bottom: 0.5vh; }
+    .weather-sub-row { font-size: 3.8vmin !important; margin-top: 0; }
 
-            .main-mini-strip { width: 50% !important; flex-direction: column !important; gap: 1vh !important; padding-left: 2vw; box-sizing: border-box; }
+    /* Na výšku zostane strip široký */
+    .main-mini-strip { width: 50% !important; flex-direction: column !important; gap: 1vh !important; padding-left: 2vw; box-sizing: border-box; }
             .mini-day-box { width: 100% !important; padding: 1vh 3vw !important; border-radius: 8px; }
             .mini-label { font-size: 3vmin !important; width: 100%; text-align: center; }
             #mainFc0Icon, #mainFc1Icon { font-size: 5.5vmin !important; }
-            #mainFc0Temp, #mainFc1Temp { font-size: 3vmin !important; }
-            
+            #mainFc0Temp, #mainFc1Temp { 
+                font-size: 3.2vmin !important; 
+                font-weight: 600; 
+                width: 100%; 
+                text-align: center; 
+                white-space: nowrap !important; /* Toto prinúti teploty ostať v jednom riadku */
+            }
+                        
             /* Prispôsobenie nového podrobného počasia na výšku mobilu */
             .weather-detail-view { padding: 15px 10px; justify-content: space-between; }
             #weather-location-main { font-size: 4vmin; }
@@ -1126,7 +1148,7 @@
                     vypniRadio();
                 } else {
                     if (item.icon && (item.id === 'spotify' || item.id === 'applemusic' || item.id === 'youtube' || item.id === 'tidal')) {
-                        triggerExternalApp(url, item.id);
+                        triggerExternalApp(item.url, item.id);
                     } else {
                         playRadio(item.url, item.id);
                     }
