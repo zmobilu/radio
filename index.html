@@ -11,7 +11,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
 
-    <title>Tvoje radio</title>
+    <title>Radio-nový dizajn</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>">
@@ -55,6 +55,7 @@
             transition: color 0.2s, background 0.2s, border-color 0.2s; 
         }
         .btn-settings.active { color: #ff9f0a; border-color: #ff9f0a; background: #1a1a1a; }
+        #fullscreenToggleBtn.active { color: #ff9f0a; border-color: #ff9f0a; background: #1a1a1a; }
 
         /* --- HLAVNÁ ROZDELENÁ PLOCHA --- */
         .workspace-container { display: flex; flex: 1; width: 100vw; overflow: hidden; position: relative; }
@@ -378,8 +379,14 @@
         #mainFc0Temp, #mainFc1Temp {
             font-size: 5vw !important;
         }
-            .favorites-sidebar { padding-bottom: calc(65px + env(safe-area-inset-bottom)) !important; }
-            .settings-grid-view { padding-bottom: calc(130px + env(safe-area-inset-bottom)) !important; }
+            /* --- ODSTRÁNENIE ZBYTOČNÉHO ODSADENIA OD SPODKU --- */
+        .favorites-sidebar { 
+            padding-bottom: calc(6px + env(safe-area-inset-bottom)) !important; 
+            margin-bottom: 0 !important;
+        }
+        .settings-grid-view { 
+            padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important; 
+        }
             .placeholder-view { justify-content: space-evenly !important; padding-bottom: 20px; }
             
             /* Prispôsobenie starého počasia na výšku */
@@ -424,6 +431,9 @@
         <main class="main-content-area">
             <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
                 <i class="fa-solid fa-gear"></i>
+            </button>
+            <button class="btn-settings" id="fullscreenToggleBtn" onclick="toggleFullscreenMode(); event.stopPropagation();" title="Celá obrazovka" style="right: 70px !important;">
+                <i class="fa-solid fa-expand" id="fullscreenIcon"></i>
             </button>
             
             <div class="placeholder-view" id="rightPlaceholder">
@@ -1106,7 +1116,38 @@
             renderSettingsGrid();
             resetSettingsTimer();
         }
+        function toggleFullscreenMode() {
+            const doc = window.document;
+            const docEl = doc.documentElement;
 
+            const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+            const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+            const fsBtn = document.getElementById('fullscreenToggleBtn');
+            const fsIcon = document.getElementById('fullscreenIcon');
+
+            if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+                // Zapíname Fullscreen
+                if (requestFullScreen) {
+                    requestFullScreen.call(docEl);
+                    if (fsBtn) fsBtn.classList.add('active');
+                    if (fsIcon) {
+                        fsIcon.classList.remove('fa-expand');
+                        fsIcon.classList.add('fa-compress');
+                    }
+                }
+            } else {
+                // Vypíname Fullscreen (návrat späť)
+                if (cancelFullScreen) {
+                    cancelFullScreen.call(doc);
+                    if (fsBtn) fsBtn.classList.remove('active');
+                    if (fsIcon) {
+                        fsIcon.classList.remove('fa-compress');
+                        fsIcon.classList.add('fa-expand');
+                    }
+                }
+            }
+        }
         function toggleSettingsMode() {
             isSettingsModeActive = !isSettingsModeActive;
             const btn = document.getElementById('settingsToggleBtn');
