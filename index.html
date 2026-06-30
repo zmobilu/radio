@@ -115,29 +115,38 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            margin-top: 1vh;
+            margin-top: 2vh;
             margin-bottom: auto;
         }
         .weather-city-line {
-            font-size: 2vmin;
+            font-size: 3vmin;
             font-weight: bold;
             color: #ff9f0a;
             text-transform: uppercase;
             border-bottom: 1px dashed #ff9f0a;
-            padding-bottom: 2px;
-            margin-bottom: 1vh;
+            padding-bottom: 4px;
+            margin-bottom: 2vh;
             text-align: center;
+            letter-spacing: 1px;
         }
         .weather-core-row {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
+            gap: 25px;
+        }
+        /* Cielenie priamo na veľkú emoji ikonu a text hlavnej teploty */
+        #mainBigIcon {
+            font-size: 16vmin !important; /* Zväčšené z 10vmin */
+        }
+        #mainBigTemp {
+            font-size: 16vmin !important; /* Zväčšené z 12vmin */
+            font-weight: 300;
         }
         .weather-sub-row {
-            font-size: 2.5vmin;
+            font-size: 4vmin;
             font-weight: 300;
-            margin-top: -0.5vh;
+            margin-top: 1vh;
         }
         .main-mini-strip {
             display: flex;
@@ -146,7 +155,7 @@
             width: 85%;
             border-top: 1px solid #222;
             margin-top: 1vh;
-            padding-top: 0.5vh;
+            padding-top: 1.5vh;
         }
         .mini-day-box {
             display: flex;
@@ -155,9 +164,19 @@
             width: 45%;
         }
         .mini-label {
-            font-size: 1.5vmin;
+            font-size: 2.2vmin; /* Zväčšené z 1.5vmin (texty DNES / ZAJTRA) */
             color: #aaa;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+        /* Cielenie na mini ikony a texty pod nimi v spodnom páse */
+        #mainFc0Icon, #mainFc1Icon {
+            font-size: 7vmin !important; /* Zväčšené zo 4vmin */
+            margin: 5px 0;
+        }
+        #mainFc0Temp, #mainFc1Temp {
+            font-size: 3.5vmin !important; /* Výrazne zväčšený text teplôt predpovede */
+            font-weight: 400;
         }
 
         /* --- ZÚŽENÝ EXTRA KOMPAKTNÝ PANEL BEZ TEXTOV --- */
@@ -336,6 +355,13 @@
             .main-weather-container {
                 margin-top: 2vh;
                 margin-bottom: 2vh;
+            }
+            /* TOTO PRIDÁVAME: Skrotenie veľkej ikony a teploty na mobile */
+            #mainBigIcon {
+                font-size: 11vmin !important; 
+            }
+            #mainBigTemp {
+                font-size: 12vmin !important;
             }
             .weather-city-line {
                 font-size: 3.5vmin !important;
