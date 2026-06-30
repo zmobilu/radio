@@ -108,12 +108,13 @@
         .big-clock-hours { color: #fff; }
         .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
         
-        /* SPOJENÝ A ZVÄČŠENÝ RIADOK PRE DÁTUM A MENINY */
+        /* SPOJENÝ A ZVÄČŠENÝ RIADOK PRE MESTO, DÁTUM A MENINY */
         .big-clock-date-wrapper {
-            display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px; 
+            display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; 
             width: 100%; border-bottom: 1px dashed #333; padding-bottom: 1.5vh; margin-top: -0.5vh;
-            font-size: 3.6vmin; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
+            font-size: 3.4vmin; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
         }
+        .big-clock-city { color: #ff9f0a; font-weight: bold; letter-spacing: 2px; }
         .big-clock-date { color: #fff; }
         .big-clock-nameday { color: #ff9f0a; }
 
@@ -129,18 +130,7 @@
             margin-bottom: 0;
         }
         
-        .weather-city-line {
-            display: block;
-            font-size: 2.5vmin;
-            font-weight: bold;
-            color: #ff9f0a;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 1vh;
-            text-align: center;
-        }
-        
-        /* Ľavá polovica: Aktuálne počasie (60%) */
+        /* Ľavá polovica: Aktuálne počasie (60%) s obrovským textom */
         .weather-left-side {
             width: 60%;
             display: flex;
@@ -169,11 +159,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
+            gap: 25px;
+            margin-bottom: 1vh;
         }
-        #mainBigIcon { font-size: 15vmin !important; }
-        #mainBigTemp { font-size: 13vmin !important; font-weight: 700; }
-        .weather-sub-row { font-size: 3.5vmin; font-weight: 300; margin-top: 0.5vh; }
+        #mainBigIcon { font-size: 20vmin !important; line-height: 1; }
+        #mainBigTemp { font-size: 18vmin !important; font-weight: 800; line-height: 1; }
+        
+        /* Výrazný zväčšený riadok pre pocitovú teplotu a vlhkosť priamo pod hlavnou teplotou */
+        .weather-sub-row { 
+            font-size: 4.8vmin !important; 
+            font-weight: 400; 
+            margin-top: 1vh; 
+            display: flex;
+            gap: 25px;
+        }
         
         /* Pravá polovica: Predpoveď Dnes / Zajtra vertikálne pod sebou */
         .mini-day-box {
@@ -250,7 +249,7 @@
     
         #nightBottomInfo { display: none; }
 
-        /* --- NOČNÝ REŽIM (UPRAVENÝ VERTIKÁLNY POSUN S SCALE Y) --- */
+        /* --- NOČNÝ REŽIM --- */
         body.full-night-mode .favorites-sidebar,
         body.full-night-mode .big-clock-date-wrapper,
         body.full-night-mode #settingsToggleBtn, 
@@ -259,7 +258,6 @@
         }
         body.full-night-mode .workspace-container, body.full-night-mode .main-content-area { width: 100vw; height: 100vh; }
         
-        /* Posunutie celej plochy hodín trochu vyššie nad stred (translateY znížený z -4dvh na -7dvh) */
         body.full-night-mode .placeholder-view { 
             width: 100vw !important; 
             height: 100vh !important; 
@@ -269,7 +267,6 @@
             padding: 0 !important; 
         }
         
-        /* Hodiny sú natiahnuté na výšku a posunuté jemne nahor, aby mali od spodku rezervu */
         body.full-night-mode .big-clock-time { 
             font-size: 28vw !important; 
             letter-spacing: 0px !important; 
@@ -354,6 +351,7 @@
         .forecast-day-icon { font-size: 6vmin !important; margin: 6px 0 !important; }
         .forecast-day-temp { font-size: 2.6vmin !important; font-weight: 600 !important; white-space: nowrap !important; line-height: 1.1 !important; }
 
+        /* PORTRAIT RESPONSIVITA (MOBIL NA VÝŠKU) */
         @media (orientation: portrait) {
             .workspace-container { flex-direction: column; }
             .favorites-sidebar {
@@ -380,16 +378,15 @@
                 display: flex;
                 justify-content: center; 
             }
-            .big-clock-date-wrapper { margin-top: 0; padding-bottom: 1vh; width: 100%; font-size: 4vmin; flex-wrap: wrap; }
+            .big-clock-date-wrapper { margin-top: 0; padding-bottom: 1vh; width: 100%; font-size: 3.8vmin; flex-wrap: wrap; justify-content: center; }
             .big-clock-date { color: #fff; }
             .big-clock-nameday { margin-top: 0; }
         
             .main-weather-container { flex-direction: row !important; height: 25vh !important; margin-top: 0.5vh; margin-bottom: 1vh; width: 100%; }
             .weather-left-side { width: 50% !important; border-right: 1px solid #151515 !important; }
-            #mainBigIcon { font-size: 11vmin !important; }
-            #mainBigTemp { font-size: 10vmin !important; font-weight: 700; }
-            .weather-city-line { font-size: 3vmin !important; margin-bottom: 0.5vh; }
-            .weather-sub-row { font-size: 3.8vmin !important; margin-top: 0; }
+            #mainBigIcon { font-size: 15vmin !important; }
+            #mainBigTemp { font-size: 14vmin !important; }
+            .weather-sub-row { font-size: 4.5vmin !important; gap: 15px; margin-top: 0.5vh; }
         
             .main-mini-strip { width: 50% !important; flex-direction: column !important; gap: 1vh !important; padding-left: 2vw; box-sizing: border-box; }
             .mini-day-box { width: 100% !important; padding: 1vh 3vw !important; border-radius: 8px; }
@@ -402,7 +399,7 @@
                 text-align: center; 
                 white-space: nowrap !important; 
             }
-                                
+                                        
             .weather-detail-view { padding: 15px 10px; justify-content: space-between; }
             #weather-location-main { font-size: 4vmin; }
             #weather-details-top-inline { height: 45vh; }
@@ -452,14 +449,17 @@
         <aside class="favorites-sidebar" id="favSidebarContainer"></aside>
 
         <main class="main-content-area">
-                               
+                                   
             <div class="placeholder-view" id="rightPlaceholder" onclick="toggleWeatherView(event)">
                 <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();">
                     <span class="big-clock-hours" id="bigHours">00</span>
                     <span class="big-clock-minutes" id="bigMinutes">00</span>
                 </div>
                 
+                <!-- SPOJENÝ A PREHĽADNÝ RIADOK: MESTO • DÁTUM • MENINY -->
                 <div class="big-clock-date-wrapper">
+                    <span class="big-clock-city" id="bigClockCity">---</span>
+                    <span style="color: #444;">•</span>
                     <span class="big-clock-date" id="bigDate">---</span>
                     <span style="color: #444;" id="dateSeparator">•</span>
                     <span class="big-clock-nameday" id="bigNameday">---</span>
@@ -467,14 +467,15 @@
                 
                 <div class="main-weather-container">
                     <div class="weather-left-side">
-                        <div class="weather-city-line" id="mainCityLine">---</div>
+                        <!-- MASÍVNE HLAVNÉ POČASIE -->
                         <div class="weather-core-row">
                             <span id="mainBigIcon">☀️</span>
                             <span id="mainBigTemp">--°C</span>
                         </div>
+                        <!-- VÝRAZNÉ POD-ÚDAJE: POCIT A VLHKOSŤ -->
                         <div class="weather-sub-row">
-                            <span id="mainApparent" style="color: #ffa500;">--°</span>
-                            <span id="mainHumidity" style="color: #666; margin-left: 15px;">--%</span>
+                            <span style="color: #ffa500;"><i class="fa-solid fa-temperature-half" style="font-size:0.9em; margin-right:4px;"></i><span id="mainApparent">--°</span></span>
+                            <span style="color: #4dabff;"><i class="fa-solid fa-droplet" style="font-size:0.9em; margin-right:4px;"></i><span id="mainHumidity">--%</span></span>
                         </div>
                     </div>
                 
@@ -686,8 +687,9 @@
                         locMain.innerHTML = `<span onpointerdown="event.stopPropagation(); window.open('${mapaUrl}', '_blank');" style="color: #ff9f0a; text-decoration: none; font-weight: bold; cursor: pointer;">${cfgMestoNazov.toUpperCase()}</span>`;
                     }
 
-                    const mainCityEl = document.getElementById('mainCityLine');
-                    if (mainCityEl) mainCityEl.textContent = cfgMestoNazov.toUpperCase();
+                    // Naplnenie nového elementu mesta hore pri dátume
+                    const bigCityEl = document.getElementById('bigClockCity');
+                    if (bigCityEl) bigCityEl.textContent = cfgMestoNazov.toUpperCase();
                     
                     const mainBigIconEl = document.getElementById('mainBigIcon');
                     if (mainBigIconEl) mainBigIconEl.textContent = icon;
