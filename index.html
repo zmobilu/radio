@@ -389,12 +389,12 @@
             </div>
   
             <div id="mini-forecast-strip">
-                <div class="mini-item" onpointerdown="prepniDenGrafu(event, 0)">
+                <div class="mini-item" onclick="prepniDenGrafu(event, 0)">
                     <span id="fc0-day" class="forecast-day-label">Dnes</span>
                     <i id="fc0-icon" class="fas fa-cloud mini-icon"></i>
                     <span id="fc0-temp" class="mini-temp">-- / --</span>
                 </div>
-                <div class="mini-item" onpointerdown="prepniDenGrafu(event, 1)">
+                <div class="mini-item" onclick="prepniDenGrafu(event, 1)">
                     <span id="fc1-day" class="forecast-day-label">Zajtra</span>
                     <i id="fc1-icon" class="fas fa-cloud mini-icon"></i>
                     <span id="fc1-temp" class="mini-temp">-- / --</span>
@@ -590,7 +590,7 @@
                         const dayBox = document.createElement('div');
                         dayBox.className = 'forecast-day-box';
                         dayBox.setAttribute('data-index', i);
-                        dayBox.setAttribute('onpointerdown', `prepniDenGrafu(event, ${i})`);
+                        dayBox.setAttribute('onclick', `prepniDenGrafu(event, ${i})`);
                         
                         dayBox.innerHTML = `
                             <span class="forecast-day-label" style="color: #fff; text-transform: uppercase;">${nazovDna}</span>
