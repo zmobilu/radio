@@ -229,8 +229,9 @@
         /* --- STYLING PRE FILTROVANIE CELOOBRAZOVKOVÉHO NOČNÉHO REŽIMU --- */
         body.full-night-mode .favorites-sidebar,
         body.full-night-mode .big-clock-date-wrapper,
-        body.full-night-mode .btn-settings 
-        body.full-night-mode #mainWeatherWidget { 
+        body.full-night-mode .btn-settings, /* <- TU MUSÍ BYŤ TÁTO ČIARKA! */
+        body.full-night-mode #fullscreenToggleBtn, /* Pridané pre istotu, nech ti schová aj druhé tlačidlo */
+        body.full-night-mode .main-weather-container { /* Opravený názov tvojho kontajnera, v HTML máš main-weather-container, nie #mainWeatherWidget */
             display: none !important;
         }
         body.full-night-mode .workspace-container { width: 100vw; height: 100vh; }
