@@ -85,98 +85,132 @@
         /* Pravá sekcia: Hlavný obsah alebo nastavenia (65%) */
         .main-content-area { width: 65%; background: #000; position: relative; overflow: hidden; }
         
-        /* --- PROFI DIZAJN VEĽKÝCH HODÍN (ZMENŠENÉ A FLEXIBILNÉ) --- */
+        /* --- PROFI DIZAJN EXTRA VYRAZNÝCH HODÍN A POČASIA (ZAKLAD PRE MONITOR) --- */
         .placeholder-view {
             display: flex; width: 100%; height: 100%; flex-direction: column;
-            align-items: center; justify-content: center; background: #000; box-sizing: border-box;
-            padding: 10px; padding-right: calc(10px + env(safe-area-inset-right));
+            align-items: center; justify-content: space-between; background: #000; box-sizing: border-box;
+            padding: 2vh 3vw; padding-right: calc(3vw + env(safe-area-inset-right));
             overflow: hidden;
         }
+        
+        /* Hodiny na celú šírku pravého bloku */
         .big-clock-time {
-            font-size: 13vmin; font-weight: 700; line-height: 0.9; letter-spacing: -2px;
-            display: flex; align-items: baseline; transform: scaleY(1.05); cursor: pointer;
-            margin-top: auto;
+            font-size: 23vw; font-weight: 800; line-height: 0.75; letter-spacing: -4px;
+            display: flex; justify-content: center; align-items: center; width: 100%;
+            transform: scaleY(1.05); cursor: pointer; margin-top: 0;
         }
-        .big-clock-hours { color: #fff; font-weight: 700; }
-        .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 2px; }
+        .big-clock-hours { color: #fff; }
+        .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
+        
+        /* Stredový informačný predel */
         .big-clock-date-wrapper {
-            display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 5px;
+            display: flex; flex-direction: column; align-items: center; gap: 2px; 
+            width: 100%; border-bottom: 1px dashed #333; padding-bottom: 1.5vh; margin-top: -1vh;
         }
         .big-clock-date {
-            font-size: 2.5vmin; font-weight: 300; color: #ccc; text-transform: uppercase; letter-spacing: 1px;
+            font-size: 3vmin; font-weight: 400; color: #fff; text-transform: uppercase; letter-spacing: 2px;
         }
         .big-clock-nameday {
-            font-size: 2vmin; font-weight: 400; color: #ff9f0a; letter-spacing: 0.5px; margin-top: 2px;
+            font-size: 2.5vmin; font-weight: 500; color: #ff9f0a; letter-spacing: 1px; margin-top: 2px;
         }
 
-        /* --- OPTIMALIZOVANÁ METEOSTANICA PRE VŠETKY PLOCHY --- */
+        /* Spodný masívny meteo container rozdelený 50/50 horizontálne */
         .main-weather-container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            flex-direction: row;
             width: 100%;
-            margin-top: 2vh;
-            margin-bottom: auto;
+            height: 38vh;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1vh;
+            margin-bottom: 0;
         }
+        
+        /* Mesto zobrazené diskrétne alebo nad aktuálnym stavom */
         .weather-city-line {
-            font-size: 3vmin;
+            display: block;
+            font-size: 2.5vmin;
             font-weight: bold;
             color: #ff9f0a;
             text-transform: uppercase;
-            border-bottom: 1px dashed #ff9f0a;
-            padding-bottom: 4px;
-            margin-bottom: 2vh;
+            letter-spacing: 2px;
+            margin-bottom: 1vh;
             text-align: center;
-            letter-spacing: 1px;
+        }
+        
+        /* Ľavá polovica: Aktuálne počasie */
+        .weather-left-side {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            border-right: 1px solid #151515;
+            box-sizing: border-box;
         }
         .weather-core-row {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 25px;
+            gap: 20px;
         }
-        /* Cielenie priamo na veľkú emoji ikonu a text hlavnej teploty */
         #mainBigIcon {
-            font-size: 16vmin !important; /* Zväčšené z 10vmin */
+            font-size: 15vmin !important;
         }
         #mainBigTemp {
-            font-size: 16vmin !important; /* Zväčšené z 12vmin */
-            font-weight: 300;
+            font-size: 13vmin !important;
+            font-weight: 700;
         }
         .weather-sub-row {
-            font-size: 4vmin;
+            font-size: 3.5vmin;
             font-weight: 300;
-            margin-top: 1vh;
+            margin-top: 0.5vh;
         }
+        
+        /* Pravá polovica: Predpoveď Dnes / Zajtra vertikálne pod sebou */
         .main-mini-strip {
+            width: 50%;
             display: flex;
-            flex-direction: row;
-            justify-content: space-around;
-            width: 85%;
-            border-top: 1px solid #222;
-            margin-top: 1vh;
-            padding-top: 1.5vh;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            border-top: none;
+            margin-top: 0;
+            padding-top: 0;
+            gap: 2vh;
         }
         .mini-day-box {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            width: 45%;
+            justify-content: space-between;
+            width: 85%;
+            background: #080808;
+            border: 1px solid #111;
+            padding: 1.5vh 4vw;
+            border-radius: 12px;
+            box-sizing: border-box;
         }
         .mini-label {
-            font-size: 2.2vmin; /* Zväčšené z 1.5vmin (texty DNES / ZAJTRA) */
+            font-size: 2.8vmin;
             color: #aaa;
-            margin-bottom: 4px;
+            font-weight: bold;
             letter-spacing: 1px;
+            width: 25%;
+            text-align: left;
         }
-        /* Cielenie na mini ikony a texty pod nimi v spodnom páse */
         #mainFc0Icon, #mainFc1Icon {
-            font-size: 7vmin !important; /* Zväčšené zo 4vmin */
-            margin: 5px 0;
+            font-size: 6vmin !important;
+            width: 30%;
+            text-align: center;
         }
         #mainFc0Temp, #mainFc1Temp {
-            font-size: 3.5vmin !important; /* Výrazne zväčšený text teplôt predpovede */
-            font-weight: 400;
+            font-size: 3.2vmin !important;
+            font-weight: 600;
+            width: 45%;
+            text-align: right;
         }
 
         /* --- ZÚŽENÝ EXTRA KOMPAKTNÝ PANEL BEZ TEXTOV --- */
@@ -278,7 +312,7 @@
             left: 0;
         }
 
-        /* --- SKUTOČNÉ CELOOBRAZOVKOVÉ PREKRYTIE STARÉHO POČASIA (OVERLAY) --- */
+        /* --- CELOOBRAZOVKOVÉ PREKRYTIE DETAILU POČASIA --- */
         .weather-detail-view {
             display: none; 
             position: absolute;
@@ -332,7 +366,7 @@
             .color-dot { width: 22px; height: 22px; }
         }
 
-        /* --- AUTOMATICKÉ PREKRESLENIE PRE REŽIM NA VÝŠKU --- */
+        /* --- AUTOMATICKÉ PREKRESLENIE PRE REŽIM NA VÝŠKU (IPHONE DISPLEJ) --- */
         @media (orientation: portrait) {
             .workspace-container { flex-direction: column; }
             .favorites-sidebar {
@@ -346,52 +380,54 @@
             }
             .main-content-area { width: 100vw; flex: 1; order: 1; }
             
-            /* Úprava hodín pre režim na výšku */
-            .big-clock-time { font-size: 18vmin; line-height: 0.8; margin-top: 2vh; }
-            .big-clock-date { font-size: 3.2vmin; color: #888; }
-            .big-clock-nameday { font-size: 2.8vmin; margin-top: 5px; }
+            /* Pravá plocha widgetu na mobile */
+            .placeholder-view {
+                padding: 1.5vh 3vw;
+                justify-content: space-between !important;
+            }
 
-            /* Nové štýly pre integrované meteo v režime na výšku */
+            /* Hodiny na celú šírku aj na výšku */
+            .big-clock-time { font-size: 24vmin; line-height: 0.75; margin-top: 1vh; width: 100%; justify-content: center; }
+            .big-clock-date-wrapper { margin-top: 0; padding-bottom: 1vh; width: 100%; }
+            .big-clock-date { font-size: 3.5vmin; color: #fff; }
+            .big-clock-nameday { font-size: 3vmin; margin-top: 3px; }
+
+            /* Meteo panel si zachováva fixné delenie 50/50 vedľa seba aj na mobile! */
             .main-weather-container {
-                margin-top: 2vh;
-                margin-bottom: 2vh;
+                flex-direction: row !important;
+                height: 25vh !important;
+                margin-top: 0.5vh;
+                margin-bottom: 1vh;
+                width: 100%;
             }
-            /* TOTO PRIDÁVAME: Skrotenie veľkej ikony a teploty na mobile */
-            #mainBigIcon {
-                font-size: 11vmin !important; 
-            }
-            #mainBigTemp {
-                font-size: 12vmin !important;
-            }
-            .weather-city-line {
-                font-size: 3.5vmin !important;
-                margin-bottom: 1.5vh;
-            }
-            .weather-core-row {
-                gap: 20px;
-            }
-            .weather-sub-row {
-                font-size: 4.5vmin !important;
-                margin-top: -0.5vh;
-            }
-            .main-mini-strip {
-                width: 90%;
-                margin-top: 2vh;
-                padding-top: 1.5vh;
-            }
-            .mini-label {
-                font-size: 2.5vmin !important;
-            }
-            /* Oprava veľkosti emoji ikon a textov v spodnom páse pre výšku */
-            #mainFc0Icon, #mainFc1Icon {
-                font-size: 6vmin !important;
-            }
-            #mainFc0Temp, #mainFc1Temp {
-                font-size: 3.5vmin !important;
-            }
-            .placeholder-view { justify-content: space-between !important; padding-bottom: 10px; }
             
-            /* Prispôsobenie starého počasia na výšku */
+            .weather-left-side {
+                width: 50% !important;
+                border-right: 1px solid #151515 !important;
+            }
+            #mainBigIcon { font-size: 11vmin !important; }
+            #mainBigTemp { font-size: 10vmin !important; font-weight: 700; }
+            .weather-city-line { font-size: 3vmin !important; margin-bottom: 0.5vh; }
+            .weather-sub-row { font-size: 3.8vmin !important; margin-top: 0; }
+
+            /* Pravá strana s predpoveďou na mobile */
+            .main-mini-strip {
+                width: 50% !important;
+                flex-direction: column !important;
+                gap: 1vh !important;
+                padding-left: 2vw;
+                box-sizing: border-box;
+            }
+            .mini-day-box {
+                width: 100% !important;
+                padding: 1vh 3vw !important;
+                border-radius: 8px;
+            }
+            .mini-label { font-size: 3vmin !important; width: 30%; }
+            #mainFc0Icon, #mainFc1Icon { font-size: 5.5vmin !important; width: 30%; }
+            #mainFc0Temp, #mainFc1Temp { font-size: 3vmin !important; width: 40%; }
+            
+            /* Prispôsobenie starého podrobného počasia na výšku */
             .weather-detail-view { flex-direction: column; overflow-y: hidden; padding: 10px; }
             .weather-left-column { width: 100%; height: auto; flex-direction: row; justify-content: space-around; border-bottom: 1px solid #1a1a1a; padding-bottom: 10px; }
             .weather-right-column { width: 100%; flex: 1; border-left: none; padding-top: 10px; padding-left: 0; display: flex; flex-direction: column; justify-content: space-between; }
@@ -450,40 +486,44 @@
             </button>
             
             <div class="placeholder-view" id="rightPlaceholder" onclick="toggleWeatherView(event)">
+                
                 <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();">
                     <span class="big-clock-hours" id="bigHours">00</span>
                     <span class="big-clock-minutes" id="bigMinutes">00</span>
                 </div>
+                
                 <div class="big-clock-date-wrapper">
                     <div class="big-clock-date" id="bigDate">---</div>
                     <div class="big-clock-nameday" id="bigNameday">---</div>
                 </div>
                 
                 <div class="main-weather-container">
-                    <div class="weather-city-line" id="mainCityLine">---</div>
                     
-                    <div class="weather-core-row">
-                        <span id="mainBigIcon" style="font-size: 10vmin;">☀️</span>
-                        <span id="mainBigTemp" style="font-size: 12vmin; font-weight: 300;">--°C</span>
+                    <div class="weather-left-side">
+                        <div class="weather-city-line" id="mainCityLine">---</div>
+                        <div class="weather-core-row">
+                            <span id="mainBigIcon">☀️</span>
+                            <span id="mainBigTemp">--°C</span>
+                        </div>
+                        <div class="weather-sub-row">
+                            <span id="mainApparent" style="color: #ffa500;">--°</span>
+                            <span id="mainHumidity" style="color: #666; margin-left: 15px;">--%</span>
+                        </div>
                     </div>
                     
-                    <div class="weather-sub-row">
-                        <span id="mainApparent" style="color: #ffa500;">--°</span>
-                        <span id="mainHumidity" style="color: #666; margin-left: 15px;">--%</span>
-                    </div>
-
                     <div class="main-mini-strip">
                         <div class="mini-day-box">
                             <span class="mini-label">DNES</span>
-                            <span id="mainFc0Icon" style="font-size: 4vmin;">--</span>
+                            <span id="mainFc0Icon">--</span>
                             <span id="mainFc0Temp">-- / --</span>
                         </div>
                         <div class="mini-day-box">
                             <span class="mini-label">ZAJTRA</span>
-                            <span id="mainFc1Icon" style="font-size: 4vmin;">--</span>
+                            <span id="mainFc1Icon">--</span>
                             <span id="mainFc1Temp">-- / --</span>
                         </div>
                     </div>
+                    
                 </div>
 
                 <div id="nightBottomInfo"></div>
@@ -1268,15 +1308,14 @@
                 bodyEl.classList.remove('full-night-mode');
                 if (!jeNocnyCas) manualnaNocAktivna = false;
             }
-            // --- AKTUALIZÁCIA HLAVIČKY STRÁNKY (TITLE) ---
-        let stavRadia = "Rádio";
-        if (currentPlayingType && currentPlayingType !== "") {
-            const hrajuceRadio = DATABASE.find(d => d.id === currentPlayingType);
-            stavRadia = hrajuceRadio ? hrajuceRadio.name : currentPlayingType.toUpperCase();
-        }
-        
-        // Spojí počasie (napr. "☀️ 24°C") s názvom rádia (napr. "Fun Radio") alebo predvoleným názvom
-        document.title = `${aktualnaTeplotaText} | ${stavRadia}`;
+            
+            let stavRadia = "Rádio";
+            if (currentPlayingType && currentPlayingType !== "") {
+                const hrajuceRadio = DATABASE.find(d => d.id === currentPlayingType);
+                stavRadia = hrajuceRadio ? hrajuceRadio.name : currentPlayingType.toUpperCase();
+            }
+            
+            document.title = `${aktualnaTeplotaText} | ${stavRadia}`;
         }
 
         async function fetchNamedayData() {
