@@ -486,7 +486,7 @@
 </head>
 <body id="mainBody">
 
-    <audio id="audioPlayer" preload="none" playsinline></audio>
+    <audio id="audioPlayer" preload="none" playsinline fetchpriority="high"></audio>
 
     <div class="workspace-container">
         <aside class="favorites-sidebar" id="favSidebarContainer"></aside>
@@ -1440,7 +1440,31 @@ function inicializujPlochuNastaveni() {
         document.addEventListener('DOMContentLoaded', () => {
             const sep = document.getElementById('dateSeparator');
             if(sep) sep.style.display = "none";
+        // --- ANTI-STALL LOGIKA PRE ŽIVÝ STREAM ---
+        let stallTimeout = null;
 
+        // Prehliadač hlási, že mu došli dáta v bufferi a čaká
+        audio.addEventListener('waiting', () => {
+            if (currentPlayingType && currentPlayingType !== "") {
+                clearTimeout(stallTimeout);
+                // Ak načítavanie trvá viac ako 2500ms (2.5s), reštartujeme prúd
+                stallTimeout = setTimeout(() => {
+                    console.log("Detekovaný výpadok bufferu, reštartujem stream...");
+                    const currentUrl = audio.src;
+                    if (currentUrl) {
+                        audio.pause();
+                        audio.load(); // Vyčistí starý zaseknutý buffer
+                        audio.play().catch(e => console.log("Chyba auto-reštartu:", e));
+                    }
+                }, 2500); 
+            }
+        });
+
+        // Akonáhle prúd dát opäť plynule nabehne, časovač zrušíme
+        audio.addEventListener('playing', () => {
+            clearTimeout(stallTimeout);
+        });
+            
             fetchWeatherData();
             setInterval(fetchWeatherData, 15 * 60 * 1000);
             runClockEngine();
