@@ -141,6 +141,7 @@
             border-right: 1px solid #151515;
             box-sizing: border-box;
             cursor: pointer;
+            padding: 0 10px; /* Pridaný vnútorný okraj ako ochrana pred krajom */
         }
         
         /* Pravá polovica: Predpoveď Dnes / Zajtra (40%) */
@@ -165,8 +166,8 @@
         .weather-core-row {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 25px;
+            justify-content: center; /* Zabezpečí vycentrovanie celého bloku */
+            gap: 10px; /* Zmenšené z 25px – ikona a teplota budú hneď vedľa seba */
         }
         #mainBigIcon { font-size: 19vmin !important; line-height: 1; }
         #mainBigTemp { font-size: 17vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
@@ -430,16 +431,216 @@
             #mainWeatherDesc { font-size: 2.5vmin !important; }
             .weather-sub-row { font-size: 4vmin !important; gap: 12px; margin-top: 0.5vh; }
         
-            .main-mini-strip { width: 50% !important; flex-direction: column !important; gap: 1vh !important; padding-left: 2vw; box-sizing: border-box; }
-            .mini-day-box { width: 100% !important; padding: 1vh 3vw !important; border-radius: 8px; }
-            .mini-label { font-size: 3vmin !important; width: 100%; text-align: center; }
-            #mainFc0Icon, #mainFc1Icon { font-size: 5.5vmin !important; }
-            #mainFc0Temp, #mainFc1Temp { 
+            /* --- UPRAVENÁ PRAVÁ STRANA: DNES / ZAJTRA NA VÝŠKU --- */
+            .main-mini-strip { 
+                width: 50% !important; 
+                flex-direction: column !important; 
+                gap: 1.5vh !important; /* Mierne zväčšená medzera medzi boxmi */
+                padding-left: 2vw; 
+                height: 100%; /* Natiahnutie celého kontajnera na plnú výšku */
+                justify-content: center;
+                box-sizing: border-box; 
+            }
+            
+            .mini-day-box { 
+                width: 100% !important; 
+                height: 44%; /* Presné vertikálne roztiahnutie boxov */
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between; /* Pekne rozloží label hore a dáta pod neho */
+                padding: 1.5vh 2vw !important; 
+                border-radius: 12px; /* Zjednotenie zaoblenia s hlavnými kartami */
+                box-sizing: border-box;
+            }
+            
+            .mini-label { 
                 font-size: 3.2vmin !important; 
-                font-weight: 600; 
                 width: 100%; 
                 text-align: center; 
+                letter-spacing: 1.5px;
+                margin-bottom: 2px;
+            }
+            
+            /* REŠTRUKTURALIZÁCIA NA STĹPEC (IKONA NAD TEPLOTOU) */
+            .mini-data-row {
+                flex-direction: column !important;
+                gap: 4px !important;
+                justify-content: center;
+                align-items: center;
+                flex: 1; /* Vyžije zvyšok boxu */
+            }
+            
+            #mainFc0Icon, #mainFc1Icon { 
+                font-size: 7vmin !important; /* Výraznejšia ikona noci/dňa */
+                text-align: center !important; 
+                line-height: 1;
+            }
+            
+            #mainFc0Temp, #mainFc1Temp { 
+                font-size: 3.6vmin !important; /* Zväčšené písmo pre teploty */
+                font-weight: 700; 
+                width: 100%; 
+                text-align: center !important; 
                 white-space: nowrap !important; 
+                line-height: 1.1;
+            }/* --- UPRAVENÁ PRAVÁ STRANA: DNES / ZAJTRA NA VÝŠKU --- */
+            .main-mini-strip { 
+                width: 50% !important; 
+                flex-direction: column !important; 
+                gap: 1.5vh !important; /* Mierne zväčšená medzera medzi boxmi */
+                padding-left: 2vw; 
+                height: 100%; /* Natiahnutie celého kontajnera na plnú výšku */
+                justify-content: center;
+                box-sizing: border-box; 
+            }
+            
+            .mini-day-box { 
+                width: 100% !important; 
+                height: 44%; /* Presné vertikálne roztiahnutie boxov */
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between; /* Pekne rozloží label hore a dáta pod neho */
+                padding: 1.5vh 2vw !important; 
+                border-radius: 12px; /* Zjednotenie zaoblenia s hlavnými kartami */
+                box-sizing: border-box;
+            }
+            
+            .mini-label { 
+                font-size: 3.2vmin !important; 
+                width: 100%; 
+                text-align: center; 
+                letter-spacing: 1.5px;
+                margin-bottom: 2px;
+            }
+            
+            /* REŠTRUKTURALIZÁCIA NA STĹPEC (IKONA NAD TEPLOTOU) */
+            .mini-data-row {
+                flex-direction: column !important;
+                gap: 4px !important;
+                justify-content: center;
+                align-items: center;
+                flex: 1; /* Vyžije zvyšok boxu */
+            }
+            
+            #mainFc0Icon, #mainFc1Icon { 
+                font-size: 7vmin !important; /* Výraznejšia ikona noci/dňa */
+                text-align: center !important; 
+                line-height: 1;
+            }
+            
+            #mainFc0Temp, #mainFc1Temp { 
+                font-size: 3.6vmin !important; /* Zväčšené písmo pre teploty */
+                font-weight: 700; 
+                width: 100%; 
+                text-align: center !important; 
+                white-space: nowrap !important; 
+                line-height: 1.1;
+            }/* --- UPRAVENÁ PRAVÁ STRANA: DNES / ZAJTRA NA VÝŠKU --- */
+            .main-mini-strip { 
+                width: 50% !important; 
+                flex-direction: column !important; 
+                gap: 1.5vh !important; /* Mierne zväčšená medzera medzi boxmi */
+                padding-left: 2vw; 
+                height: 100%; /* Natiahnutie celého kontajnera na plnú výšku */
+                justify-content: center;
+                box-sizing: border-box; 
+            }
+            
+            .mini-day-box { 
+                width: 100% !important; 
+                height: 44%; /* Presné vertikálne roztiahnutie boxov */
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between; /* Pekne rozloží label hore a dáta pod neho */
+                padding: 1.5vh 2vw !important; 
+                border-radius: 12px; /* Zjednotenie zaoblenia s hlavnými kartami */
+                box-sizing: border-box;
+            }
+            
+            .mini-label { 
+                font-size: 3.2vmin !important; 
+                width: 100%; 
+                text-align: center; 
+                letter-spacing: 1.5px;
+                margin-bottom: 2px;
+            }
+            
+            /* REŠTRUKTURALIZÁCIA NA STĹPEC (IKONA NAD TEPLOTOU) */
+            .mini-data-row {
+                flex-direction: column !important;
+                gap: 4px !important;
+                justify-content: center;
+                align-items: center;
+                flex: 1; /* Vyžije zvyšok boxu */
+            }
+            
+            #mainFc0Icon, #mainFc1Icon { 
+                font-size: 7vmin !important; /* Výraznejšia ikona noci/dňa */
+                text-align: center !important; 
+                line-height: 1;
+            }
+            
+            #mainFc0Temp, #mainFc1Temp { 
+                font-size: 3.6vmin !important; /* Zväčšené písmo pre teploty */
+                font-weight: 700; 
+                width: 100%; 
+                text-align: center !important; 
+                white-space: nowrap !important; 
+                line-height: 1.1;
+            }
+            
+            /* --- UPRAVENÁ PRAVÁ STRANA: DNES / ZAJTRA NA VÝŠKU --- */
+            .main-mini-strip { 
+                width: 50% !important; 
+                flex-direction: column !important; 
+                gap: 1.5vh !important; /* Mierne zväčšená medzera medzi boxmi */
+                padding-left: 2vw; 
+                height: 100%; /* Natiahnutie celého kontajnera na plnú výšku */
+                justify-content: center;
+                box-sizing: border-box; 
+            }
+            
+            .mini-day-box { 
+                width: 100% !important; 
+                height: 44%; /* Presné vertikálne roztiahnutie boxov */
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between; /* Pekne rozloží label hore a dáta pod neho */
+                padding: 1.5vh 2vw !important; 
+                border-radius: 12px; /* Zjednotenie zaoblenia s hlavnými kartami */
+                box-sizing: border-box;
+            }
+            
+            .mini-label { 
+                font-size: 3.2vmin !important; 
+                width: 100%; 
+                text-align: center; 
+                letter-spacing: 1.5px;
+                margin-bottom: 2px;
+            }
+            
+            /* REŠTRUKTURALIZÁCIA NA STĹPEC (IKONA NAD TEPLOTOU) */
+            .mini-data-row {
+                flex-direction: column !important;
+                gap: 4px !important;
+                justify-content: center;
+                align-items: center;
+                flex: 1; /* Vyžije zvyšok boxu */
+            }
+            
+            #mainFc0Icon, #mainFc1Icon { 
+                font-size: 7vmin !important; /* Výraznejšia ikona noci/dňa */
+                text-align: center !important; 
+                line-height: 1;
+            }
+            
+            #mainFc0Temp, #mainFc1Temp { 
+                font-size: 3.6vmin !important; /* Zväčšené písmo pre teploty */
+                font-weight: 700; 
+                width: 100%; 
+                text-align: center !important; 
+                white-space: nowrap !important; 
+                line-height: 1.1;
             }
                                         
             .weather-detail-view { padding: 15px 10px; justify-content: space-between; }
