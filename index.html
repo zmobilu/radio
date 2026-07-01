@@ -100,31 +100,54 @@
             justify-content: flex-start;
         }
 
-        /* VRCHNÁ ZÓNA (HODINY + DÁTUM) */
+        /* VRCHNÁ ZÓNA PRE HODINY A INFO (Tlačí hodiny úplne hore) */
         .clock-top-zone {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Zmena z center na flex-start - tlačí všetko nahor */
             width: 100%;
-            flex: 1.2;
+            flex: 1;
             min-height: 0;
+            padding-top: 0; /* Úplne vynulovanie horného okraja */
+            margin-top: -1vh; /* Mierny posun úplne k hornému okraju obrazovky */
         }
         
-        /* Hodiny na celú šírku pravého bloku */
+        /* HODINY - masívne, na celú šírku s upraveným vertikálnym natiahnutím */
         .big-clock-time {
-            font-size: 22vw; font-weight: 800; line-height: 0.75; letter-spacing: -4px;
-            display: flex; justify-content: center; align-items: center; width: 100%;
-            transform: scaleY(1.15); cursor: pointer; margin-top: 0;
+            font-size: 23vw; 
+            font-weight: 800; 
+            line-height: 0.72; /* Mierne stiahnuté, aby riadok sedel hneď pod číslami */
+            letter-spacing: -4px;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            width: 100%;
+            transform: scaleY(1.15); /* Upravené z 1.05 na 1.15 podľa požiadavky */
+            cursor: pointer;
         }
         .big-clock-hours { color: #fff; }
         .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
         
-        /* SPOJENÝ A ZVÄČŠENÝ RIADOK PRE MESTO, DÁTUM A MENINY */
+        /* INFORIADOK NATVRDO UKOTVENÝ NASSPODOK HODÍN */
         .big-clock-date-wrapper {
-            display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; 
-            width: 100%; border-bottom: 1px dashed #333; padding-bottom: 1.5vh; margin-top: -0.5vh;
-            font-size: 3.6vmin; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
+            display: flex; 
+            flex-direction: row; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            width: 100%; 
+            border-bottom: 1px dashed #333; 
+            padding-bottom: 1.5vh; 
+            
+            /* Tieto dva riadky zabezpečia ukotvenie tesne pod natiahnuté hodiny */
+            margin-top: 1.5vh; 
+            position: relative;
+            
+            font-size: 3.4vmin; 
+            font-weight: 500; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
         }
         .big-clock-city { color: #ff9f0a; font-weight: bold; letter-spacing: 2px; }
         .big-clock-date { color: #fff; }
@@ -330,7 +353,7 @@
         .night-btn:active { transform: scale(0.9); }
         .night-btn.btn-playpause { font-size: 9vw; }
 
-        /* --- NOČNÝ REŽIM BLOKOVANIE / REŠTRUKTURALIZÁCIA --- */
+        /* --- NOČNÝ REŽIM (Zostáva nezmenený, len istíme pôvodný vizuál) --- */
         body.full-night-mode .favorites-sidebar,
         body.full-night-mode .big-clock-date-wrapper,
         body.full-night-mode #settingsToggleBtn, 
@@ -342,30 +365,20 @@
         body.full-night-mode .placeholder-view { 
             width: 100vw !important; 
             height: 100vh !important; 
-            transform: translateY(-4dvh) !important; 
+            transform: translateY(-7dvh) !important; 
             justify-content: center !important; 
             align-items: center !important; 
-            padding: 0 4vw !important; 
+            padding: 0 !important; 
         }
         
         body.full-night-mode .big-clock-time { 
             font-size: 28vw !important; 
             letter-spacing: 0px !important; 
             margin: 0 !important; 
-            transform: scaleY(1.20) translateY(-0.5vh) !important; 
-            flex: none !important;
+            transform: scaleY(1.20) translateY(-1.5vh) !important; /* Pôvodné nočné natiahnutie */
         }
         body.full-night-mode .big-clock-hours, body.full-night-mode .big-clock-minutes, body.full-night-mode #nightBottomInfo { color: var(--night-color) !important; }
-        
-        body.full-night-mode #nightBottomInfo { 
-            display: block !important; 
-            font-size: 4.2vw !important; 
-            font-weight: 500; 
-            letter-spacing: 1px; 
-            text-align: center; 
-            width: 100%; 
-            margin-top: 1vh;
-        }
+        body.full-night-mode #nightBottomInfo { display: block !important; position: absolute !important; bottom: 5vh !important; padding-bottom: env(safe-area-inset-bottom) !important; font-size: 4.5vw !important; font-weight: 500; letter-spacing: 1px; opacity: 1; text-align: center; width: 100%; left: 0; }
 
         body.full-night-mode .night-player-container.active-playing {
             display: flex !important;
@@ -503,15 +516,20 @@
                 justify-content: center !important; 
                 gap: 2vh;
             }
+            
+            .clock-top-zone {
+                margin-top: 1vh; /* Na výšku jemný posun dole kvôli hornému pretekaniu */
+            }
             .big-clock-time { 
                 font-size: 26vmin; 
-                line-height: 0.8; 
-                margin-top: 2vh; 
-                width: 100%; 
-                display: flex;
-                justify-content: center; 
+                line-height: 0.75;
+                transform: scaleY(1.15); /* Zachované natiahnutie aj na výšku */
             }
-            .big-clock-date-wrapper { margin-top: 0; padding-bottom: 1vh; width: 100%; font-size: 3.8vmin; flex-wrap: wrap; justify-content: center; }
+            .big-clock-date-wrapper { 
+                margin-top: 2vh;
+                font-size: 3.8vmin; 
+            }
+        }
             .big-clock-date { color: #fff; }
             .big-clock-nameday { margin-top: 0; }
         
