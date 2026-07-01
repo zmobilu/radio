@@ -107,15 +107,15 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            flex: 1;
-            flex-shrink: 0;
+            flex: 1.2;
+            min-height: 0;
         }
         
         /* Hodiny na celú šírku pravého bloku */
         .big-clock-time {
-            font-size: 23vw; font-weight: 800; line-height: 0.75; letter-spacing: -4px;
+            font-size: 22vw; font-weight: 800; line-height: 0.75; letter-spacing: -4px;
             display: flex; justify-content: center; align-items: center; width: 100%;
-            transform: scaleY(1.05); cursor: pointer; margin-top: 0;
+            transform: scaleY(1.15); cursor: pointer; margin-top: 0;
         }
         .big-clock-hours { color: #fff; }
         .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
@@ -124,7 +124,7 @@
         .big-clock-date-wrapper {
             display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; 
             width: 100%; border-bottom: 1px dashed #333; padding-bottom: 1.5vh; margin-top: -0.5vh;
-            font-size: 3.4vmin; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
+            font-size: 3.6vmin; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
         }
         .big-clock-city { color: #ff9f0a; font-weight: bold; letter-spacing: 2px; }
         .big-clock-date { color: #fff; }
