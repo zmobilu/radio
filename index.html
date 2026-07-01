@@ -1444,17 +1444,17 @@
         }
 
         function aktualizujZamknutuObrazovku(idRadia) {
-            if ('mediaSession' in navigator) {
-                const hrajuceRadio = DATABASE.find(d => d.id === idRadia);
-                const nazovRadia = hrajuceRadio ? hrajuceRadio.name : idRadia.toUpperCase();
-                const ikonaRadia = hrajuceRadio && hrajuceRadio.img ? hrajuceRadio.img : "https://raw.githubusercontent.com/zmobilu/assets/main/kiosk-ikona.png";
+    if ('mediaSession' in navigator) {
+        const hrajuceRadio = DATABASE.find(d => d.id === idRadia);
+        const nazovRadia = hrajuceRadio ? hrajuceRadio.name : idRadia.toUpperCase();
+        const ikonaRadia = hrajuceRadio && hrajuceRadio.img ? hrajuceRadio.img : "https://raw.githubusercontent.com/zmobilu/assets/main/kiosk-ikona.png";
 
-                navigator.mediaSession.metadata = new MediaMetadata({
-                    title: nazovRadia,
-                    artist: 'Živé vysielanie',
-                    album: 'Kuchynský Kiosk 📻',
-                    artwork: [ { src: ikonaRadia, sizes: '512x512', type: 'image/png' } ]
-                });
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: nazovRadia,
+            artist: 'Živé vysielanie',
+            album: 'Kiosk', // SEM DAJ PRÁZDNE ÚVODZOVKY PRE ODSTRÁNENIE, ALEBO NOVÝ TEXT
+            artwork: [ { src: ikonaRadia, sizes: '512x512', type: 'image/png' } ]
+        });
 
                 navigator.mediaSession.setActionHandler('play', () => { audio.play(); });
                 navigator.mediaSession.setActionHandler('pause', () => { audio.pause(); });
