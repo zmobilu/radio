@@ -94,9 +94,21 @@
         /* --- PROFI DIZAJN EXTRA VÝRAZNÝCH HODÍN A POČASIA --- */
         .placeholder-view {
             display: flex; width: 100%; height: 100%; flex-direction: column;
-            align-items: center; justify-content: space-between; background: #000; box-sizing: border-box;
+            align-items: center; background: #000; box-sizing: border-box;
             padding: 2vh 3vw; padding-right: calc(3vw + env(safe-area-inset-right));
             overflow: hidden;
+            justify-content: flex-start;
+        }
+
+        /* VRCHNÁ ZÓNA (HODINY + DÁTUM) */
+        .clock-top-zone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            flex: 1;
+            flex-shrink: 0;
         }
         
         /* Hodiny na celú šírku pravého bloku */
@@ -118,16 +130,19 @@
         .big-clock-date { color: #fff; }
         .big-clock-nameday { color: #ff9f0a; }
 
-        /* Spodný masívny meteo container rozdelený 60/40 horizontálne */
+        /* Spodný masívny meteo container rozdelený 60/40 horizontálne s Flexbox poistkami */
         .main-weather-container {
             display: flex;
             flex-direction: row;
             width: 100%;
-            height: 38vh;
+            flex: 1;
+            flex-shrink: 0;
+            min-height: 140px;
             align-items: center;
             justify-content: space-between;
-            margin-top: 1vh;
+            margin-top: 0;
             margin-bottom: 0;
+            box-sizing: border-box;
         }
         
         /* Ľavá polovica: Aktuálne počasie (60%) */
@@ -141,7 +156,7 @@
             border-right: 1px solid #151515;
             box-sizing: border-box;
             cursor: pointer;
-            padding: 0 10px; /* Pridaný vnútorný okraj ako ochrana pred krajom */
+            padding: 0 10px;
         }
         
         /* Pravá polovica: Predpoveď Dnes / Zajtra (40%) */
@@ -166,8 +181,8 @@
         .weather-core-row {
             display: flex;
             align-items: center;
-            justify-content: center; /* Zabezpečí vycentrovanie celého bloku */
-            gap: 10px; /* Zmenšené z 25px – ikona a teplota budú hneď vedľa seba */
+            justify-content: center;
+            gap: 10px;
         }
         #mainBigIcon { font-size: 19vmin !important; line-height: 1; }
         #mainBigTemp { font-size: 17vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
@@ -268,7 +283,54 @@
     
         #nightBottomInfo { display: none; }
 
-        /* --- NOČNÝ REŽIM --- */
+        /* --- NOVÝ INTEGROVANÝ NOČNÝ PREHRÁVAČ --- */
+        .night-player-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            color: var(--night-color);
+            margin-top: 1.5vh;
+        }
+        .night-player-station {
+            font-size: 5.5vw;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1vh;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .night-player-station img {
+            height: 6vw;
+            width: auto;
+            object-fit: contain;
+            filter: grayscale(1) brightness(1.5);
+        }
+        .night-player-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8vw;
+        }
+        .night-btn {
+            background: transparent;
+            border: none;
+            color: var(--night-color);
+            font-size: 7vw;
+            cursor: pointer;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+        .night-btn:active { transform: scale(0.9); }
+        .night-btn.btn-playpause { font-size: 9vw; }
+
+        /* --- NOČNÝ REŽIM BLOKOVANIE / REŠTRUKTURALIZÁCIA --- */
         body.full-night-mode .favorites-sidebar,
         body.full-night-mode .big-clock-date-wrapper,
         body.full-night-mode #settingsToggleBtn, 
@@ -280,20 +342,61 @@
         body.full-night-mode .placeholder-view { 
             width: 100vw !important; 
             height: 100vh !important; 
-            transform: translateY(-7dvh) !important; 
+            transform: translateY(-4dvh) !important; 
             justify-content: center !important; 
             align-items: center !important; 
-            padding: 0 !important; 
+            padding: 0 4vw !important; 
         }
         
         body.full-night-mode .big-clock-time { 
             font-size: 28vw !important; 
             letter-spacing: 0px !important; 
             margin: 0 !important; 
-            transform: scaleY(1.20) translateY(-1.5vh) !important; 
+            transform: scaleY(1.20) translateY(-0.5vh) !important; 
+            flex: none !important;
         }
         body.full-night-mode .big-clock-hours, body.full-night-mode .big-clock-minutes, body.full-night-mode #nightBottomInfo { color: var(--night-color) !important; }
-        body.full-night-mode #nightBottomInfo { display: block !important; position: absolute !important; bottom: 5vh !important; padding-bottom: env(safe-area-inset-bottom) !important; font-size: 4.5vw !important; font-weight: 500; letter-spacing: 1px; opacity: 1; text-align: center; width: 100%; left: 0; }
+        
+        body.full-night-mode #nightBottomInfo { 
+            display: block !important; 
+            font-size: 4.2vw !important; 
+            font-weight: 500; 
+            letter-spacing: 1px; 
+            text-align: center; 
+            width: 100%; 
+            margin-top: 1vh;
+        }
+
+        body.full-night-mode .night-player-container.active-playing {
+            display: flex !important;
+        }
+
+        /* Špecifické úpravy pre nočný režim na šírku */
+        @media (orientation: landscape) {
+            body.full-night-mode .placeholder-view {
+                transform: translateY(-2dvh) !important;
+            }
+            body.full-night-mode #nightBottomInfo {
+                width: auto !important;
+                display: inline-block !important;
+                margin-top: 0;
+            }
+            body.full-night-mode .night-player-container {
+                flex-direction: row !important;
+                gap: 4vw !important;
+                margin-top: 0.5vh;
+            }
+            body.full-night-mode .night-player-station {
+                font-size: 3.5vw !important;
+                margin-bottom: 0 !important;
+                border-right: 1px solid rgba(255,255,255,0.15);
+                padding-right: 4vw;
+            }
+            body.full-night-mode .night-player-station img { height: 4vw !important; }
+            body.full-night-mode .night-player-controls { gap: 5vw !important; }
+            body.full-night-mode .night-btn { font-size: 4.5vw !important; padding: 5px; }
+            body.full-night-mode .night-btn.btn-playpause { font-size: 5.5vw !important; }
+        }
 
         /* --- CELOOBRAZOVKOVÉ DETAILNÉ ZOBRAZENIE GRAFU --- */
         .weather-detail-view {
@@ -311,14 +414,12 @@
             justify-content: space-between;
         }
         
-        /* UPRAVENÝ RIADOK NAD GRAFOM PRE MESTO, DÁTUM A ČAS */
-        /* UPRAVENÝ RIADOK NAD GRAFOM S VYCENTROVANÝM OBSAHOM */
         #weather-location-container-top {
             width: 100%;
             display: flex;
-            justify-content: center; /* Zmena zo space-between na stred */
+            justify-content: center; 
             align-items: center;
-            gap: 10px; /* Medzera medzi dátumom, mestom a časom */
+            gap: 10px; 
             margin-bottom: 1vh;
             border-bottom: 1px dashed #ff9f0a;
             padding-bottom: 1vh;
@@ -426,7 +527,7 @@
             #mainBigIcon { font-size: 11vmin !important; line-height: 1; }
             #mainBigTemp { 
                 font-size: 10vmin !important; 
-                white-space: nowrap !important; /* Zabráni rozdeleniu čísla a °C */
+                white-space: nowrap !important; 
             }
             #mainWeatherDesc { font-size: 2.5vmin !important; }
             .weather-sub-row { font-size: 4vmin !important; gap: 12px; margin-top: 0.5vh; }
@@ -435,21 +536,21 @@
             .main-mini-strip { 
                 width: 50% !important; 
                 flex-direction: column !important; 
-                gap: 1.5vh !important; /* Mierne zväčšená medzera medzi boxmi */
+                gap: 1.5vh !important; 
                 padding-left: 2vw; 
-                height: 100%; /* Natiahnutie celého kontajnera na plnú výšku */
+                height: 100%; 
                 justify-content: center;
                 box-sizing: border-box; 
             }
             
             .mini-day-box { 
                 width: 100% !important; 
-                height: 44%; /* Presné vertikálne roztiahnutie boxov */
+                height: 44%; 
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between; /* Pekne rozloží label hore a dáta pod neho */
+                justify-content: space-between; 
                 padding: 1.5vh 2vw !important; 
-                border-radius: 12px; /* Zjednotenie zaoblenia s hlavnými kartami */
+                border-radius: 12px; 
                 box-sizing: border-box;
             }
             
@@ -461,186 +562,35 @@
                 margin-bottom: 2px;
             }
             
-            /* REŠTRUKTURALIZÁCIA NA STĹPEC (IKONA NAD TEPLOTOU) */
             .mini-data-row {
                 flex-direction: column !important;
                 gap: 4px !important;
                 justify-content: center;
                 align-items: center;
-                flex: 1; /* Vyžije zvyšok boxu */
+                flex: 1; 
             }
             
             #mainFc0Icon, #mainFc1Icon { 
-                font-size: 7vmin !important; /* Výraznejšia ikona noci/dňa */
+                font-size: 7vmin !important; 
                 text-align: center !important; 
                 line-height: 1;
             }
             
             #mainFc0Temp, #mainFc1Temp { 
-                font-size: 3.6vmin !important; /* Zväčšené písmo pre teploty */
-                font-weight: 700; 
-                width: 100%; 
-                text-align: center !important; 
-                white-space: nowrap !important; 
-                line-height: 1.1;
-            }/* --- UPRAVENÁ PRAVÁ STRANA: DNES / ZAJTRA NA VÝŠKU --- */
-            .main-mini-strip { 
-                width: 50% !important; 
-                flex-direction: column !important; 
-                gap: 1.5vh !important; /* Mierne zväčšená medzera medzi boxmi */
-                padding-left: 2vw; 
-                height: 100%; /* Natiahnutie celého kontajnera na plnú výšku */
-                justify-content: center;
-                box-sizing: border-box; 
-            }
-            
-            .mini-day-box { 
-                width: 100% !important; 
-                height: 44%; /* Presné vertikálne roztiahnutie boxov */
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between; /* Pekne rozloží label hore a dáta pod neho */
-                padding: 1.5vh 2vw !important; 
-                border-radius: 12px; /* Zjednotenie zaoblenia s hlavnými kartami */
-                box-sizing: border-box;
-            }
-            
-            .mini-label { 
-                font-size: 3.2vmin !important; 
-                width: 100%; 
-                text-align: center; 
-                letter-spacing: 1.5px;
-                margin-bottom: 2px;
-            }
-            
-            /* REŠTRUKTURALIZÁCIA NA STĹPEC (IKONA NAD TEPLOTOU) */
-            .mini-data-row {
-                flex-direction: column !important;
-                gap: 4px !important;
-                justify-content: center;
-                align-items: center;
-                flex: 1; /* Vyžije zvyšok boxu */
-            }
-            
-            #mainFc0Icon, #mainFc1Icon { 
-                font-size: 7vmin !important; /* Výraznejšia ikona noci/dňa */
-                text-align: center !important; 
-                line-height: 1;
-            }
-            
-            #mainFc0Temp, #mainFc1Temp { 
-                font-size: 3.6vmin !important; /* Zväčšené písmo pre teploty */
-                font-weight: 700; 
-                width: 100%; 
-                text-align: center !important; 
-                white-space: nowrap !important; 
-                line-height: 1.1;
-            }/* --- UPRAVENÁ PRAVÁ STRANA: DNES / ZAJTRA NA VÝŠKU --- */
-            .main-mini-strip { 
-                width: 50% !important; 
-                flex-direction: column !important; 
-                gap: 1.5vh !important; /* Mierne zväčšená medzera medzi boxmi */
-                padding-left: 2vw; 
-                height: 100%; /* Natiahnutie celého kontajnera na plnú výšku */
-                justify-content: center;
-                box-sizing: border-box; 
-            }
-            
-            .mini-day-box { 
-                width: 100% !important; 
-                height: 44%; /* Presné vertikálne roztiahnutie boxov */
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between; /* Pekne rozloží label hore a dáta pod neho */
-                padding: 1.5vh 2vw !important; 
-                border-radius: 12px; /* Zjednotenie zaoblenia s hlavnými kartami */
-                box-sizing: border-box;
-            }
-            
-            .mini-label { 
-                font-size: 3.2vmin !important; 
-                width: 100%; 
-                text-align: center; 
-                letter-spacing: 1.5px;
-                margin-bottom: 2px;
-            }
-            
-            /* REŠTRUKTURALIZÁCIA NA STĹPEC (IKONA NAD TEPLOTOU) */
-            .mini-data-row {
-                flex-direction: column !important;
-                gap: 4px !important;
-                justify-content: center;
-                align-items: center;
-                flex: 1; /* Vyžije zvyšok boxu */
-            }
-            
-            #mainFc0Icon, #mainFc1Icon { 
-                font-size: 7vmin !important; /* Výraznejšia ikona noci/dňa */
-                text-align: center !important; 
-                line-height: 1;
-            }
-            
-            #mainFc0Temp, #mainFc1Temp { 
-                font-size: 3.6vmin !important; /* Zväčšené písmo pre teploty */
+                font-size: 3.6vmin !important; 
                 font-weight: 700; 
                 width: 100%; 
                 text-align: center !important; 
                 white-space: nowrap !important; 
                 line-height: 1.1;
             }
-            
-            /* --- UPRAVENÁ PRAVÁ STRANA: DNES / ZAJTRA NA VÝŠKU --- */
-            .main-mini-strip { 
-                width: 50% !important; 
-                flex-direction: column !important; 
-                gap: 1.5vh !important; /* Mierne zväčšená medzera medzi boxmi */
-                padding-left: 2vw; 
-                height: 100%; /* Natiahnutie celého kontajnera na plnú výšku */
-                justify-content: center;
-                box-sizing: border-box; 
+
+            /* Nočný režim na výšku: Prehrávač pod inforiadkom */
+            body.full-night-mode .placeholder-view {
+                justify-content: center !important;
             }
-            
-            .mini-day-box { 
-                width: 100% !important; 
-                height: 44%; /* Presné vertikálne roztiahnutie boxov */
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between; /* Pekne rozloží label hore a dáta pod neho */
-                padding: 1.5vh 2vw !important; 
-                border-radius: 12px; /* Zjednotenie zaoblenia s hlavnými kartami */
-                box-sizing: border-box;
-            }
-            
-            .mini-label { 
-                font-size: 3.2vmin !important; 
-                width: 100%; 
-                text-align: center; 
-                letter-spacing: 1.5px;
-                margin-bottom: 2px;
-            }
-            
-            /* REŠTRUKTURALIZÁCIA NA STĹPEC (IKONA NAD TEPLOTOU) */
-            .mini-data-row {
-                flex-direction: column !important;
-                gap: 4px !important;
-                justify-content: center;
-                align-items: center;
-                flex: 1; /* Vyžije zvyšok boxu */
-            }
-            
-            #mainFc0Icon, #mainFc1Icon { 
-                font-size: 7vmin !important; /* Výraznejšia ikona noci/dňa */
-                text-align: center !important; 
-                line-height: 1;
-            }
-            
-            #mainFc0Temp, #mainFc1Temp { 
-                font-size: 3.6vmin !important; /* Zväčšené písmo pre teploty */
-                font-weight: 700; 
-                width: 100%; 
-                text-align: center !important; 
-                white-space: nowrap !important; 
-                line-height: 1.1;
+            body.full-night-mode .night-player-container {
+                margin-top: 3vh !important;
             }
                                         
             .weather-detail-view { padding: 15px 10px; justify-content: space-between; }
@@ -693,31 +643,31 @@
         <aside class="favorites-sidebar" id="favSidebarContainer"></aside>
 
         <main class="main-content-area">
-                                   
+                                            
             <div class="placeholder-view" id="rightPlaceholder">
-                <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();">
-                    <span class="big-clock-hours" id="bigHours">00</span>
-                    <span class="big-clock-minutes" id="bigMinutes">00</span>
-                </div>
                 
-                <!-- SPOJENÝ RIADOK: MESTO • DÁTUM • MENINY -->
-                <div class="big-clock-date-wrapper">
-                    <span class="big-clock-city" id="bigClockCity">---</span>
-                    <span style="color: #444;">•</span>
-                    <span class="big-clock-date" id="bigDate">---</span>
-                    <span style="color: #444;" id="dateSeparator">•</span>
-                    <span class="big-clock-nameday" id="bigNameday">---</span>
+                <div class="clock-top-zone">
+                    <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();">
+                        <span class="big-clock-hours" id="bigHours">00</span>
+                        <span class="big-clock-minutes" id="bigMinutes">00</span>
+                    </div>
+                    
+                    <div class="big-clock-date-wrapper">
+                        <span class="big-clock-city" id="bigClockCity">---</span>
+                        <span style="color: #444;">•</span>
+                        <span class="big-clock-date" id="bigDate">---</span>
+                        <span style="color: #444;" id="dateSeparator">•</span>
+                        <span class="big-clock-nameday" id="bigNameday">---</span>
+                    </div>
                 </div>
                 
                 <div class="main-weather-container">
                     <div class="weather-left-side" onclick="toggleWeatherView(event)">
-                        <!-- ZABALENÉ KVÔLI TEXTOVÉMU POPISU POD TÝM -->
                         <div class="weather-wrapper-block">
                             <div class="weather-core-row">
                                 <span id="mainBigIcon">☀️</span>
                                 <span id="mainBigTemp">--°C</span>
                             </div>
-                            <!-- TU SA ZOBRAZÍ TEXTOVÝ STAV POČASIA -->
                             <div id="mainWeatherDesc">------</div>
                         </div>
                         <div class="weather-sub-row">
@@ -745,6 +695,18 @@
                 </div>
 
                 <div id="nightBottomInfo"></div>
+
+                <div class="night-player-container" id="nightPlayer">
+                    <div class="night-player-station" id="nightStationInfo">
+                        <i class="fa-solid fa-radio"></i> <span id="nightStationName">OFFLINE</span>
+                    </div>
+                    <div class="night-player-controls">
+                        <button class="night-btn" onclick="spustiDalsieRadio('vzad'); event.stopPropagation();"><i class="fa-solid fa-backward-step"></i></button>
+                        <button class="night-btn btn-playpause" onclick="toggleNightPlayPause(); event.stopPropagation();" id="nightPlayPauseBtn"><i class="fa-solid fa-circle-pause"></i></button>
+                        <button class="night-btn" onclick="spustiDalsieRadio('vpred'); event.stopPropagation();"><i class="fa-solid fa-forward-step"></i></button>
+                    </div>
+                </div>
+
             </div>
             
             <div class="settings-grid-view" id="settingsGridView" onclick="resetSettingsTimer()">                
@@ -784,7 +746,6 @@
          </main>
     </div>
 
-    <!-- DETAILNÝ GRAF S NOVOU LIŠTOU HORE -->
     <div class="weather-detail-view" id="weatherDetailView" onclick="toggleWeatherView(event)">
         <div id="weather-location-container-top">
             <div id="weather-location-date">--.--.----</div>
@@ -845,41 +806,25 @@
         let aktualnaTeplotaText = "--°C";
         let weatherDataBackup = null;
 
+        // GLOBÁLNY SLEDNÝ ČASOVAČ PRE PAUSE -> HARD STOP (300000ms = 5 minút)
+        let globalPauseToStopTimeout = null;
+        const CAS_PRE_HARD_STOP = 5 * 60 * 1000; 
+
         const WEATHER_CODES = { 0: 'fa-sun', 1: 'fa-cloud-sun', 2: 'fa-cloud-sun', 3: 'fa-cloud', 45: 'fa-smog', 48: 'fa-smog', 51: 'fa-cloud-rain', 61: 'fa-cloud-showers-heavy', 71: 'fa-snowflake', 95: 'fa-bolt' };
         const WEATHER_COLORS = { 0: '#ffcc00', 1: '#ffdb58', 2: '#aaa', 3: '#888', 45: '#777', 51: '#4dabff', 61: '#007bff', 71: '#fff', 95: '#ffeb3b' };
 
-        // PREKLADOVÝ SLOVNÍK PRE WMO KÓDY DO SLOVENČINY (ZODPOVEDÁ OBRAZKU)
         const WEATHER_TEXTS_SK = {
-            0: 'Jasná obloha',
-            1: 'Prevážne jasno',
-            2: 'Polojasno',
-            3: 'Zamračené',
-            45: 'Hmla',
-            48: 'Námraza',
-            51: 'Mrholenie',
-            53: 'Mrholenie',
-            55: 'Husté mrholenie',
-            61: 'Slabý dážď',
-            63: 'Mierny dážď',
-            65: 'Intenzívny dážď',
-            71: 'Slabé sneženie',
-            73: 'Mierny sneženie',
-            75: 'Husté sneženie',
-            80: 'Slabé prehánky',
-            81: 'Mierne prehánky',
-            82: 'Silné prehánky',
-            95: 'Búrka',
-            96: 'Búrka s krupobitím'
+            0: 'Jasná obloha', 1: 'Prevážne jasno', 2: 'Polojasno', 3: 'Zamračené',
+            45: 'Hmla', 48: 'Námraza', 51: 'Mrholenie', 53: 'Mrholenie', 55: 'Husté mrholenie',
+            61: 'Slabý dážď', 63: 'Mierny dážď', 65: 'Intenzívny dážď', 71: 'Slabé sneženie',
+            73: 'Mierny sneženie', 75: 'Husté sneženie', 80: 'Slabé prehánky', 81: 'Mierne prehánky',
+            82: 'Silné prehánky', 95: 'Búrka', 96: 'Búrka s krupobitím'
         };
 
-        function getWeatherText(wCode) {
-            return WEATHER_TEXTS_SK[wCode] || 'Premenlivé';
-        }
+        function getWeatherText(wCode) { return WEATHER_TEXTS_SK[wCode] || 'Premenlivé'; }
 
         document.addEventListener('click', function enableNoSleep() {
-            noSleep.enable().then(() => {
-                console.log("WakeLock aktivovaný.");
-            }).catch(e => console.log("Čakám na gesto:", e));
+            noSleep.enable().then(() => { console.log("WakeLock aktivovaný."); }).catch(e => console.log("Čakám na gesto:", e));
             document.removeEventListener('click', enableNoSleep);
         }, false);
 
@@ -975,7 +920,6 @@
                         mainBigTempEl.style.color = tColor;
                     }
 
-                    // ZÁPIS TEXTOVÉHO POPISU POČASIA POD TEPLOTU NA ÚVODE
                     const mainDescEl = document.getElementById('mainWeatherDesc');
                     if (mainDescEl) mainDescEl.textContent = getWeatherText(code);
                     
@@ -1117,17 +1061,13 @@
 
         function toggleWeatherView(e) {
             if (e && (e.target.closest('#settingsToggleBtn') || e.target.closest('#fullscreenToggleBtn'))) return;
-            
             if (isSettingsModeActive) toggleSettingsMode();
             
             const weatherView = document.getElementById('weatherDetailView');
             
             if (weatherView.style.display === 'none' || weatherView.style.display === '') {
                 weatherView.style.display = 'flex';
-                
-                // Vygeneruje spodné dni s číslom dátumu
                 vygenerujSpodnuListuDni();
-                
                 prepniDenGrafu(null, 'teraz');
             } else {
                 clearTimeout(pocasieTimer);
@@ -1135,7 +1075,6 @@
             }
         }
 
-        // GENERUJE LIŠTU S DÁTUMAMI PODĽA OBRAZKA (NAPR. "PIATOK 3", "SOBOTA 4")
         function vygenerujSpodnuListuDni() {
             const extendedContainer = document.getElementById('extended-forecast-container');
             if (!extendedContainer || !weatherDataBackup) return;
@@ -1162,7 +1101,6 @@
                 const buduciDen = new Date(dnes);
                 buduciDen.setDate(dnes.getDate() + i);
                 
-                // Pridanie čísla dňa k popisku (Dnes a Zajtra bez čísla, ostatné dni s číslom podľa vzoru)
                 let nazovDna = "";
                 if (i === 0) nazovDna = "Dnes";
                 else if (i === 1) nazovDna = "Zajtra";
@@ -1184,7 +1122,8 @@
                 extendedContainer.appendChild(dayBox);
             }
         }
-function inicializujPlochuNastaveni() {
+
+        function inicializujPlochuNastaveni() {
             const elFrom = document.getElementById('set-night-from');
             const elTo = document.getElementById('set-night-to');
             const elSnooze = document.getElementById('set-snooze-time');
@@ -1195,7 +1134,6 @@ function inicializujPlochuNastaveni() {
             
             document.documentElement.style.setProperty('--night-color', cfgFarbaNoci);
             
-            // Pomocná funkcia na prevod rgb(x,y,z) na #hex
             function rgbToHex(rgb) {
                 if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb.toLowerCase();
                 const match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
@@ -1207,12 +1145,8 @@ function inicializujPlochuNastaveni() {
 
             document.querySelectorAll('.color-dot').forEach(dot => {
                 dot.classList.remove('active-color');
-                
-                // Získame aktuálnu farbu kolieska a prevedieme ju na hex podobu
                 let bgStyle = dot.style.backgroundColor;
                 let currentDotHex = rgbToHex(bgStyle);
-
-                // Porovnáme s uloženou farbou noci
                 if (currentDotHex === cfgFarbaNoci.toLowerCase()) {
                     dot.classList.add('active-color');
                 }
@@ -1245,13 +1179,9 @@ function inicializujPlochuNastaveni() {
         function nastavFarbuNoci(hexFarba, element) {
             cfgFarbaNoci = hexFarba;
             localStorage.setItem('cfg_night_color', hexFarba);
-            
             document.documentElement.style.setProperty('--night-color', hexFarba);
-            
-            // Okamžite aktualizuje aktívnu triedu na kolieskach
             document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active-color'));
             if(element) element.classList.add('active-color');
-            
             runClockEngine();
             resetSettingsTimer();
         }
@@ -1283,7 +1213,6 @@ function inicializujPlochuNastaveni() {
                         if (cfgHistoriaMest.length > 3) cfgHistoriaMest.pop();
                         localStorage.setItem('cfg_weather_history', JSON.stringify(cfgHistoriaMest));
                         
-                        text_area = document.getElementById('set-weather-coords');
                         aktualizujTlacidloMesta();
                         fetchWeatherData();
                     } else {
@@ -1419,10 +1348,8 @@ function inicializujPlochuNastaveni() {
         function toggleFullscreenMode() {
             const doc = window.document;
             const docEl = doc.documentElement;
-
             const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
             const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
-
             const fsBtn = document.getElementById('fullscreenToggleBtn');
             const fsIcon = document.getElementById('fullscreenIcon');
 
@@ -1430,19 +1357,13 @@ function inicializujPlochuNastaveni() {
                 if (requestFullScreen) {
                     requestFullScreen.call(docEl);
                     if (fsBtn) fsBtn.classList.add('active');
-                    if (fsIcon) {
-                        fsIcon.classList.remove('fa-expand');
-                        fsIcon.classList.add('fa-compress');
-                    }
+                    if (fsIcon) { fsIcon.classList.remove('fa-expand'); fsIcon.classList.add('fa-compress'); }
                 }
             } else {
                 if (cancelFullScreen) {
                     cancelFullScreen.call(doc);
                     if (fsBtn) fsBtn.classList.remove('active');
-                    if (fsIcon) {
-                        fsIcon.classList.remove('fa-compress');
-                        fsIcon.classList.add('fa-expand');
-                    }
+                    if (fsIcon) { fsIcon.classList.remove('fa-compress'); fsIcon.classList.add('fa-expand'); }
                 }
             }
         }
@@ -1474,7 +1395,7 @@ function inicializujPlochuNastaveni() {
             if (isSettingsModeActive) return;
             if (item.url) {
                 if (currentPlayingType === item.id) {
-                    vypniRadio();
+                    audio.pause(); // Spustí spoločný event handler
                 } else {
                     if (item.icon && (item.id === 'spotify' || item.id === 'applemusic' || item.id === 'youtube' || item.id === 'tidal')) {
                         triggerExternalApp(item.url, item.id);
@@ -1483,6 +1404,43 @@ function inicializujPlochuNastaveni() {
                     }
                 }
             }
+        }
+
+        // NOČNÝ PLAY / PAUSE MANAŽMENT
+        function toggleNightPlayPause() {
+            if (!currentPlayingType || currentPlayingType === "") return;
+            if (audio.paused) {
+                audio.play().catch(e => console.log("Chyba nočného prebudenia prúdu:", e));
+            } else {
+                audio.pause();
+            }
+        }
+
+        // AKTUALIZÁCIA GRAFIKY INTEGROVANÉHO NOČNÉHO PREHRÁVAČA
+        function aktualizujNochnyPrehravacVizual() {
+            const pBox = document.getElementById('nightPlayer');
+            const pInfo = document.getElementById('nightStationInfo');
+            const pBtn = document.getElementById('nightPlayPauseBtn');
+            
+            if (!pBox) return;
+
+            if (currentPlayingType && currentPlayingType !== "") {
+                const item = DATABASE.find(d => d.id === currentPlayingType);
+                if (item && item.url && !item.url.includes('googleusercontent.com')) {
+                    pBox.classList.add('active-playing');
+                    
+                    let imgHtml = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}"></i>`;
+                    pInfo.innerHTML = `${imgHtml} <span>${item.name}</span>`;
+                    
+                    if (audio.paused) {
+                        pBtn.innerHTML = `<i class="fa-solid fa-circle-play"></i>`;
+                    } else {
+                        pBtn.innerHTML = `<i class="fa-solid fa-circle-pause"></i>`;
+                    }
+                    return;
+                }
+            }
+            pBox.classList.remove('active-playing');
         }
 
         function aktualizujZamknutuObrazovku(idRadia) {
@@ -1495,75 +1453,42 @@ function inicializujPlochuNastaveni() {
                     title: nazovRadia,
                     artist: 'Živé vysielanie',
                     album: 'Kuchynský Kiosk 📻',
-                    artwork: [
-                        { src: ikonaRadia, sizes: '512x512', type: 'image/png' }
-                    ]
+                    artwork: [ { src: ikonaRadia, sizes: '512x512', type: 'image/png' } ]
                 });
 
-                // Tlačidlo PLAY na zamknutej obrazovke
-                navigator.mediaSession.setActionHandler('play', () => {
-                    if (audio.src) {
-                        audio.play();
-                        navigator.mediaSession.playbackState = "playing";
-                    }
-                });
-
-                // Tlačidlo PAUSE na zamknutej obrazovke
-                navigator.mediaSession.setActionHandler('pause', () => {
-                    audio.pause();
-                    navigator.mediaSession.playbackState = "paused";
-                });
-
-                // TU SÚ NOVÉ HANDLERY PRE TLAČIDLÁ DOPREDU / DOZADU:
-                navigator.mediaSession.setActionHandler('nexttrack', () => {
-                    spustiDalsieRadio('vpred');
-                });
-
-                navigator.mediaSession.setActionHandler('previoustrack', () => {
-                    spustiDalsieRadio('vzad');
-                });
+                navigator.mediaSession.setActionHandler('play', () => { audio.play(); });
+                navigator.mediaSession.setActionHandler('pause', () => { audio.pause(); });
+                navigator.mediaSession.setActionHandler('nexttrack', () => { spustiDalsieRadio('vpred'); });
+                navigator.mediaSession.setActionHandler('previoustrack', () => { spustiDalsieRadio('vzad'); });
             }
         }
-
         
         function spustiDalsieRadio(smer) {
             if (!currentPlayingType || currentPlayingType === "") return;
-            
-            // Nájdeme aktuálnu pozíciu v obľúbených (0 až 5)
             let currentIndex = slotFavorites.indexOf(currentPlayingType);
             if (currentIndex === -1) return;
 
             let novyIndex = currentIndex;
             let najdeneRadio = null;
 
-            // Prejdeme pole (maximálne 6-krát, aby sme neskončili v nekonečnej slučke)
             for (let i = 0; i < 6; i++) {
-                if (smer === 'vpred') {
-                    novyIndex = (novyIndex + 1) % 6; // Na konci skočí na 0
-                } else {
-                    novyIndex = (novyIndex - 1 + 6) % 6; // Na začiatku skočí na 5
-                }
-
+                novyIndex = (smer === 'vpred') ? (novyIndex + 1) % 6 : (novyIndex - 1 + 6) % 6;
                 const idKandidata = slotFavorites[novyIndex];
-                if (!idKandidata) continue; // Preskoč prázdny slot
+                if (!idKandidata) continue;
 
                 const item = DATABASE.find(d => d.id === idKandidata);
-                
-                // POISTKA: Kontrola, či rádio existuje, má reálnu streamovaciu URL a nie je to externá appka
                 if (item && item.url && !item.url.includes('googleusercontent.com') && !item.url.includes('music.apple.com') && !item.url.includes('music.youtube.com') && !item.url.includes('tidal.com') && !item.url.includes('soundcloud.com')) {
                     najdeneRadio = item;
                     break;
                 }
             }
 
-            // Ak sme našli vhodné rádio, bleskovo ho spustíme
             if (najdeneRadio) {
                 playRadio(najdeneRadio.url, najdeneRadio.id);
             }
         }
         
         function playRadio(url, id) {
-            audio.pause();
             audio.src = url;
             audio.load();
             currentPlayingType = id;
@@ -1578,26 +1503,15 @@ function inicializujPlochuNastaveni() {
                 renderSidebarFavorites();
                 runClockEngine(); 
                 aktualizujZamknutuObrazovku(id);
+                aktualizujNochnyPrehravacVizual();
             })
             .catch((e) => console.log("Stream offline", e));
         }
 
-        function vypniRadio() {
-            audio.pause();
-            audio.src = "";
-            audio.load();
-            currentPlayingType = "";
-            renderSidebarFavorites();
-            runClockEngine();
-            
-            // RIADOK (vyčistí widget na zamknutej obrazovke):
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.metadata = null;
-            }
-        }
-
         function triggerExternalApp(url, id) {
-            audio.pause(); audio.src = ""; currentPlayingType = id;
+            audio.pause(); 
+            audio.src = ""; 
+            currentPlayingType = id;
             renderSidebarFavorites();
             setTimeout(() => { window.location.href = url; }, 300);
         }
@@ -1655,10 +1569,6 @@ function inicializujPlochuNastaveni() {
             if ((jeNocnyCas || manualnaNocAktivna) && terazMili > nocnyRezimSnoozeDo && !isSettingsModeActive) {
                 bodyEl.classList.add('full-night-mode');
                 
-                let radioNocturnalText = "";
-                if (currentPlayingType && currentPlayingType !== "none") {
-                    radioNocturnalText = `    •    📻 ${currentPlayingType.toUpperCase()}`;
-                }
                 let meninyNocturnalText = dnesneMeno ? `${dnesneMeno}    •    ` : "";
                 
                 if (bottomInfoEl) {
@@ -1666,7 +1576,7 @@ function inicializujPlochuNastaveni() {
                     const tColorNoc = getTempColor(lenCisloTeploty);
                     const ikonkaW = aktualnaTeplotaText.split(' ')[0] || "☀️";
 
-                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}    •    ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>${radioNocturnalText}`;
+                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}    •    ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>`;
                 }
             } else {
                 bodyEl.classList.remove('full-night-mode');
@@ -1724,31 +1634,56 @@ function inicializujPlochuNastaveni() {
         document.addEventListener('DOMContentLoaded', () => {
             const sep = document.getElementById('dateSeparator');
             if(sep) sep.style.display = "none";
-        // --- ANTI-STALL LOGIKA PRE ŽIVÝ STREAM ---
-        let stallTimeout = null;
-
-        // Prehliadač hlási, že mu došli dáta v bufferi a čaká
-        audio.addEventListener('waiting', () => {
-            if (currentPlayingType && currentPlayingType !== "") {
-                clearTimeout(stallTimeout);
-                // Ak načítavanie trvá viac ako 2500ms (2.5s), reštartujeme prúd
-                stallTimeout = setTimeout(() => {
-                    console.log("Detekovaný výpadok bufferu, reštartujem stream...");
-                    const currentUrl = audio.src;
-                    if (currentUrl) {
-                        audio.pause();
-                        audio.load(); // Vyčistí starý zaseknutý buffer
-                        audio.play().catch(e => console.log("Chyba auto-reštartu:", e));
-                    }
-                }, 2500); 
-            }
-        });
-
-        // Akonáhle prúd dát opäť plynule nabehne, časovač zrušíme
-        audio.addEventListener('playing', () => {
-            clearTimeout(stallTimeout);
-        });
             
+            // --- CENTRÁLNY AUDIO EVENT MANAŽMENT PRE STOP/PAUSE S ČASOVAČOM ---
+            audio.addEventListener('play', () => {
+                clearTimeout(globalPauseToStopTimeout); // Zrušenie stop časovača
+                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
+                renderSidebarFavorites();
+                aktualizujNochnyPrehravacVizual();
+            });
+
+            audio.addEventListener('pause', () => {
+                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
+                renderSidebarFavorites();
+                aktualizujNochnyPrehravacVizual();
+
+                // SPUSŤ 5-MINÚTOVÝ ČASOVAČ DO TVRDEHO STOPU
+                clearTimeout(globalPauseToStopTimeout);
+                console.log("Audio pozastavené, spúšťam 5-minútový limit pre automatický STOP...");
+                globalPauseToStopTimeout = setTimeout(() => {
+                    console.log("Limit vypršal: Vykonávam automatický HARD STOP na uvoľnenie streamu.");
+                    audio.src = "";
+                    audio.load();
+                    currentPlayingType = "";
+                    if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
+                    renderSidebarFavorites();
+                    runClockEngine();
+                    aktualizujNochnyPrehravacVizual();
+                }, CAS_PRE_HARD_STOP);
+            });
+
+            // --- ANTI-STALL LOGIKA ---
+            let stallTimeout = null;
+            audio.addEventListener('waiting', () => {
+                if (currentPlayingType && currentPlayingType !== "") {
+                    clearTimeout(stallTimeout);
+                    stallTimeout = setTimeout(() => {
+                        console.log("Detekovaný výpadok bufferu, reštartujem stream...");
+                        const currentUrl = audio.src;
+                        if (currentUrl) {
+                            audio.pause();
+                            audio.load();
+                            audio.play().catch(e => console.log("Chyba auto-reštartu:", e));
+                        }
+                    }, 2500); 
+                }
+            });
+
+            audio.addEventListener('playing', () => {
+                clearTimeout(stallTimeout);
+            });
+                
             fetchWeatherData();
             setInterval(fetchWeatherData, 15 * 60 * 1000);
             runClockEngine();
