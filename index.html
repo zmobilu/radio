@@ -169,7 +169,7 @@
             gap: 25px;
         }
         #mainBigIcon { font-size: 19vmin !important; line-height: 1; }
-        #mainBigTemp { font-size: 17vmin !important; font-weight: 800; line-height: 1; }
+        #mainBigTemp { font-size: 17vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
         
         /* Nový textový popis aktuálneho stavu počasia pod teplotou */
         #mainWeatherDesc {
@@ -413,12 +413,22 @@
             .big-clock-date { color: #fff; }
             .big-clock-nameday { margin-top: 0; }
         
+            /* UPRAVENÝ METEO CONTAINER NA VÝŠKU */
             .main-weather-container { flex-direction: row !important; height: 25vh !important; margin-top: 0.5vh; margin-bottom: 1vh; width: 100%; }
-            .weather-left-side { width: 50% !important; border-right: 1px solid #151515 !important; }
-            #mainBigIcon { font-size: 15vmin !important; }
-            #mainBigTemp { font-size: 14vmin !important; }
-            #mainWeatherDesc { font-size: 2.8vmin !important; }
-            .weather-sub-row { font-size: 4.5vmin !important; gap: 15px; margin-top: 0.5vh; }
+            .weather-left-side { width: 50% !important; border-right: 1px solid #151515 !important; padding: 0 4px; box-sizing: border-box; }
+            
+            /* IKONA NAD TEPLOTOU */
+            .weather-core-row { 
+                flex-direction: column !important; 
+                gap: 4px !important; 
+            }
+            #mainBigIcon { font-size: 11vmin !important; line-height: 1; }
+            #mainBigTemp { 
+                font-size: 10vmin !important; 
+                white-space: nowrap !important; /* Zabráni rozdeleniu čísla a °C */
+            }
+            #mainWeatherDesc { font-size: 2.5vmin !important; }
+            .weather-sub-row { font-size: 4vmin !important; gap: 12px; margin-top: 0.5vh; }
         
             .main-mini-strip { width: 50% !important; flex-direction: column !important; gap: 1vh !important; padding-left: 2vw; box-sizing: border-box; }
             .mini-day-box { width: 100% !important; padding: 1vh 3vw !important; border-radius: 8px; }
