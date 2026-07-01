@@ -973,8 +973,7 @@
                 extendedContainer.appendChild(dayBox);
             }
         }
-
-        function inicializujPlochuNastaveni() {
+function inicializujPlochuNastaveni() {
             const elFrom = document.getElementById('set-night-from');
             const elTo = document.getElementById('set-night-to');
             const elSnooze = document.getElementById('set-snooze-time');
@@ -985,16 +984,25 @@
             
             document.documentElement.style.setProperty('--night-color', cfgFarbaNoci);
             
+            // Pomocná funkcia na prevod rgb(x,y,z) na #hex
+            function rgbToHex(rgb) {
+                if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb.toLowerCase();
+                const match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+                if (!match) return rgb;
+                return "#" + ("0" + parseInt(match[1],10).toString(16)).slice(-2) +
+                             ("0" + parseInt(match[2],10).toString(16)).slice(-2) +
+                             ("0" + parseInt(match[3],10).toString(16)).slice(-2);
+            }
+
             document.querySelectorAll('.color-dot').forEach(dot => {
                 dot.classList.remove('active-color');
-                let bg = dot.style.backgroundColor;
-                if (bg === 'yellow') bg = '#ffff00';
-                if (bg === 'red') bg = '#eb0028';
-                if (bg === 'orange') bg = '#ffa500';
-                if (bg === 'limegreen') bg = '#32cd32';
-                if (bg === 'white') bg = '#ffffff';
+                
+                // Získame aktuálnu farbu kolieska a prevedieme ju na hex podobu
+                let bgStyle = dot.style.backgroundColor;
+                let currentDotHex = rgbToHex(bgStyle);
 
-                if (bg === cfgFarbaNoci || dot.style.backgroundColor === cfgFarbaNoci) {
+                // Porovnáme s uloženou farbou noci
+                if (currentDotHex === cfgFarbaNoci.toLowerCase()) {
                     dot.classList.add('active-color');
                 }
             });
@@ -1026,9 +1034,13 @@
         function nastavFarbuNoci(hexFarba, element) {
             cfgFarbaNoci = hexFarba;
             localStorage.setItem('cfg_night_color', hexFarba);
+            
+            document.documentElement.style.setProperty('--night-color', hexFarba);
+            
+            // Okamžite aktualizuje aktívnu triedu na kolieskach
             document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active-color'));
             if(element) element.classList.add('active-color');
-            document.documentElement.style.setProperty('--night-color', hexFarba);
+            
             runClockEngine();
             resetSettingsTimer();
         }
