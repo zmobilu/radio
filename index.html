@@ -156,21 +156,38 @@
             padding-top: 0;
             gap: 1.5vh;
         }
+        .weather-wrapper-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
         .weather-core-row {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 25px;
-            margin-bottom: 1vh;
         }
-        #mainBigIcon { font-size: 20vmin !important; line-height: 1; }
-        #mainBigTemp { font-size: 18vmin !important; font-weight: 800; line-height: 1; }
+        #mainBigIcon { font-size: 19vmin !important; line-height: 1; }
+        #mainBigTemp { font-size: 17vmin !important; font-weight: 800; line-height: 1; }
+        
+        /* Nový textový popis aktuálneho stavu počasia pod teplotou */
+        #mainWeatherDesc {
+            font-size: 3vmin;
+            font-weight: bold;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0.2vh;
+            text-align: center;
+            width: 100%;
+        }
         
         /* Výrazný riadok pre pocitovú teplotu a vlhkosť */
         .weather-sub-row { 
             font-size: 4.8vmin !important; 
             font-weight: 400; 
-            margin-top: 1vh; 
+            margin-top: 1.2vh; 
             display: flex;
             gap: 25px;
         }
@@ -398,6 +415,7 @@
             .weather-left-side { width: 50% !important; border-right: 1px solid #151515 !important; }
             #mainBigIcon { font-size: 15vmin !important; }
             #mainBigTemp { font-size: 14vmin !important; }
+            #mainWeatherDesc { font-size: 2.8vmin !important; }
             .weather-sub-row { font-size: 4.5vmin !important; gap: 15px; margin-top: 0.5vh; }
         
             .main-mini-strip { width: 50% !important; flex-direction: column !important; gap: 1vh !important; padding-left: 2vw; box-sizing: border-box; }
@@ -479,11 +497,15 @@
                 </div>
                 
                 <div class="main-weather-container">
-                    <!-- KLIKNUTÍM SEM SA PREPNE DO GRAFU (MÓD: TERAZ) -->
                     <div class="weather-left-side" onclick="toggleWeatherView(event)">
-                        <div class="weather-core-row">
-                            <span id="mainBigIcon">☀️</span>
-                            <span id="mainBigTemp">--°C</span>
+                        <!-- ZABALENÉ KVÔLI TEXTOVÉMU POPISU POD TÝM -->
+                        <div class="weather-wrapper-block">
+                            <div class="weather-core-row">
+                                <span id="mainBigIcon">☀️</span>
+                                <span id="mainBigTemp">--°C</span>
+                            </div>
+                            <!-- TU SA ZOBRAZÍ TEXTOVÝ STAV POČASIA -->
+                            <div id="mainWeatherDesc">------</div>
                         </div>
                         <div class="weather-sub-row">
                             <span style="color: #ffa500;"><i class="fa-solid fa-temperature-half" style="font-size:0.9em; margin-right:4px;"></i><span id="mainApparent">--°</span></span>
@@ -591,7 +613,7 @@
         let dnesneMeno = "";
         let settingsTimeout = null;
         let pocasieTimer = null;
-        let aktualnyGrafMod = "teraz"; // 'teraz' alebo ciselny index dňa
+        let aktualnyGrafMod = "teraz"; 
 
         let cfgNocOd = localStorage.getItem('cfg_night_from') || "20:00";
         let cfgNocDo = localStorage.getItem('cfg_night_to') || "05:20";
@@ -610,6 +632,34 @@
 
         const WEATHER_CODES = { 0: 'fa-sun', 1: 'fa-cloud-sun', 2: 'fa-cloud-sun', 3: 'fa-cloud', 45: 'fa-smog', 48: 'fa-smog', 51: 'fa-cloud-rain', 61: 'fa-cloud-showers-heavy', 71: 'fa-snowflake', 95: 'fa-bolt' };
         const WEATHER_COLORS = { 0: '#ffcc00', 1: '#ffdb58', 2: '#aaa', 3: '#888', 45: '#777', 51: '#4dabff', 61: '#007bff', 71: '#fff', 95: '#ffeb3b' };
+
+        // PREKLADOVÝ SLOVNÍK PRE WMO KÓDY DO SLOVENČINY (ZODPOVEDÁ OBRAZKU)
+        const WEATHER_TEXTS_SK = {
+            0: 'Jasná obloha',
+            1: 'Prevážne jasno',
+            2: 'Polojasno',
+            3: 'Zamračené',
+            45: 'Hmla',
+            48: 'Námraza',
+            51: 'Mrholenie',
+            53: 'Mrholenie',
+            55: 'Husté mrholenie',
+            61: 'Slabý dážď',
+            63: 'Mierny dážď',
+            65: 'Intenzívny dážď',
+            71: 'Slabé sneženie',
+            73: 'Mierny sneženie',
+            75: 'Husté sneženie',
+            80: 'Slabé prehánky',
+            81: 'Mierne prehánky',
+            82: 'Silné prehánky',
+            95: 'Búrka',
+            96: 'Búrka s krupobitím'
+        };
+
+        function getWeatherText(wCode) {
+            return WEATHER_TEXTS_SK[wCode] || 'Premenlivé';
+        }
 
         document.addEventListener('click', function enableNoSleep() {
             noSleep.enable().then(() => {
@@ -709,6 +759,10 @@
                         mainBigTempEl.textContent = `${temp}°C`;
                         mainBigTempEl.style.color = tColor;
                     }
+
+                    // ZÁPIS TEXTOVÉHO POPISU POČASIA POD TEPLOTU NA ÚVODE
+                    const mainDescEl = document.getElementById('mainWeatherDesc');
+                    if (mainDescEl) mainDescEl.textContent = getWeatherText(code);
                     
                     const mainApparentEl = document.getElementById('mainApparent');
                     if (mainApparentEl) {
@@ -731,7 +785,6 @@
                         if (mTemp) mTemp.innerHTML = `<span style="color:${getTempColor(max)}">${max}°</span> / <span style="color:#aaa">${min}°</span>`;
                     }
 
-                    // Prekreslenie grafu za behu, ak je otvorený
                     const weatherView = document.getElementById('weatherDetailView');
                     if (weatherView && weatherView.style.display === 'flex') {
                         vykresliGraf(aktualnyGrafMod);
@@ -742,7 +795,6 @@
             }
         }
 
-        // UNIVERZÁLNY GRAF ENGINE
         function vykresliGraf(mod) {
             const chartContainer = document.getElementById('hourly-chart-container');
             if (!chartContainer || !weatherDataBackup) return;
@@ -756,7 +808,6 @@
                 document.getElementById('sun-set-val').textContent = weatherDataBackup.daily.sunset[dayIdx].split('T')[1];   
             }
 
-            // REŽIM A: "Teraz" - 12 hodín dopredu po 1 hodine
             if (mod === 'teraz') {
                 const currentHourIndex = new Date().getHours();
                 temps = weatherDataBackup.hourly.temperature_2m.slice(currentHourIndex, currentHourIndex + 12);
@@ -769,7 +820,6 @@
                     labels.push(idx === 0 ? 'Teraz' : String((currentHourIndex + idx) % 24) + ':00');
                 }
             } 
-            // REŽIM B: Konkrétny celý deň (00:00 - 22:00 po 2 hodinách)
             else {
                 const startHourOfTargetDay = dayIdx * 24;
                 for (let step = 0; step < 12; step++) {
@@ -837,12 +887,10 @@
             aktualnyGrafMod = dayIndex;
             vykresliGraf(dayIndex);
             
-            // Odoberie orámovanie zo všetkých spodných boxov
             document.querySelectorAll('.forecast-day-box').forEach(box => {
                 box.classList.remove('day-box-active');
             });
             
-            // Orámuje box iba ak sme klikli na plnohodnotný deň (0, 1, 2...)
             if (dayIndex !== 'teraz') {
                 const activeBox = document.querySelector(`.forecast-day-box[data-index="${dayIndex}"]`);
                 if (activeBox) activeBox.classList.add('day-box-active');
@@ -862,10 +910,9 @@
             if (weatherView.style.display === 'none' || weatherView.style.display === '') {
                 weatherView.style.display = 'flex';
                 
-                // Vygeneruje čistú spodnú lištu bez akéhokoľvek orámovania
+                // Vygeneruje spodné dni s číslom dátumu
                 vygenerujSpodnuListuDni();
                 
-                // Otvorí graf v základnom stave: "Teraz" (neorámované nič)
                 prepniDenGrafu(null, 'teraz');
             } else {
                 clearTimeout(pocasieTimer);
@@ -873,7 +920,7 @@
             }
         }
 
-        // ČISTÉ GENEROVANIE DNI (0 = DNES, 1 = ZAJTRA...) BEZ ORÁMOVANIA PRI ŠTARTE
+        // GENERUJE LIŠTU S DÁTUMAMI PODĽA OBRAZKA (NAPR. "PIATOK 3", "SOBOTA 4")
         function vygenerujSpodnuListuDni() {
             const extendedContainer = document.getElementById('extended-forecast-container');
             if (!extendedContainer || !weatherDataBackup) return;
@@ -900,13 +947,14 @@
                 const buduciDen = new Date(dnes);
                 buduciDen.setDate(dnes.getDate() + i);
                 
+                // Pridanie čísla dňa k popisku (Dnes a Zajtra bez čísla, ostatné dni s číslom podľa vzoru)
                 let nazovDna = "";
                 if (i === 0) nazovDna = "Dnes";
                 else if (i === 1) nazovDna = "Zajtra";
-                else nazovDna = dniVTyzdni[buduciDen.getDay()];
+                else nazovDna = `${dniVTyzdni[buduciDen.getDay()]} ${buduciDen.getDate()}`;
 
                 const dayBox = document.createElement('div');
-                dayBox.className = 'forecast-day-box'; // Žiadna active trieda natvrdo
+                dayBox.className = 'forecast-day-box'; 
                 dayBox.setAttribute('data-index', i);
                 dayBox.setAttribute('onclick', `prepniDenGrafu(event, ${i})`);
                 
@@ -1275,7 +1323,6 @@
             const bigDateEl = document.getElementById('bigDate');
             if(bigDateEl) bigDateEl.textContent = aktFullDateString;
 
-            // Update hodnôt v hornej lište detailného grafu počasia
             const topDateEl = document.getElementById('weather-location-date');
             const topTimeEl = document.getElementById('weather-location-time');
             if (topDateEl) topDateEl.textContent = aktDatumString;
