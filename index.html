@@ -141,7 +141,7 @@
             border-right: 1px solid #151515;
             box-sizing: border-box;
             cursor: pointer;
-            padding: 0 10px; /* Pridaný vnútorný okraj ako ochrana pred krajom */
+            padding: 0 10px;
         }
         
         /* Pravá polovica: Predpoveď Dnes / Zajtra (40%) */
@@ -166,8 +166,8 @@
         .weather-core-row {
             display: flex;
             align-items: center;
-            justify-content: center; /* Zabezpečí vycentrovanie celého bloku */
-            gap: 10px; /* Zmenšené z 25px – ikona a teplota budú hneď vedľa seba */
+            justify-content: center;
+            gap: 10px;
         }
         #mainBigIcon { font-size: 19vmin !important; line-height: 1; }
         #mainBigTemp { font-size: 17vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
@@ -268,6 +268,54 @@
     
         #nightBottomInfo { display: none; }
 
+        /* --- INTEGROVANÝ NOČNÝ PREHRÁVAČ --- */
+        .night-player-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            color: var(--night-color);
+            margin-top: 1.5vh;
+        }
+        .night-player-station {
+            font-size: 5.5vw;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .night-player-station img {
+            height: 6vw;
+            width: auto;
+            object-fit: contain;
+            filter: grayscale(1) brightness(1.5);
+        }
+        .night-player-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8vw;
+        }
+        .night-btn {
+            background: transparent;
+            border: none;
+            color: var(--night-color);
+            font-size: 7vw;
+            cursor: pointer;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+        .night-btn:active { transform: scale(0.9); }
+        .night-btn.btn-playpause { font-size: 9vw; }
+
         /* --- NOČNÝ REŽIM --- */
         body.full-night-mode .favorites-sidebar,
         body.full-night-mode .big-clock-date-wrapper,
@@ -280,20 +328,81 @@
         body.full-night-mode .placeholder-view { 
             width: 100vw !important; 
             height: 100vh !important; 
-            transform: translateY(-7dvh) !important; 
+            transform: translateY(-4dvh) !important; 
             justify-content: center !important; 
             align-items: center !important; 
             padding: 0 !important; 
+            position: relative !important;
         }
         
         body.full-night-mode .big-clock-time { 
             font-size: 28vw !important; 
             letter-spacing: 0px !important; 
             margin: 0 !important; 
-            transform: scaleY(1.20) translateY(-1.5vh) !important; 
+            transform: scaleY(1.20) !important; 
         }
         body.full-night-mode .big-clock-hours, body.full-night-mode .big-clock-minutes, body.full-night-mode #nightBottomInfo { color: var(--night-color) !important; }
-        body.full-night-mode #nightBottomInfo { display: block !important; position: absolute !important; bottom: 5vh !important; padding-bottom: env(safe-area-inset-bottom) !important; font-size: 4.5vw !important; font-weight: 500; letter-spacing: 1px; opacity: 1; text-align: center; width: 100%; left: 0; }
+        
+        body.full-night-mode #nightBottomInfo { 
+            display: block !important; 
+            position: absolute !important; 
+            bottom: 5vh !important; 
+            padding-bottom: env(safe-area-inset-bottom) !important; 
+            font-size: 4.5vw !important; 
+            font-weight: 500; 
+            letter-spacing: 1px; 
+            opacity: 1; 
+            text-align: center; 
+            width: 100%; 
+            left: 0; 
+            z-index: 10;
+        }
+
+        body.full-night-mode .night-player-container.active-playing {
+            display: flex !important;
+        }
+
+        /* Špecifické úpravy pre nočný režim na šírku (LANDSCAPE) */
+        @media (orientation: landscape) {
+            body.full-night-mode .placeholder-view {
+                transform: translateY(0) !important;
+            }
+            body.full-night-mode .big-clock-time {
+                transform: scaleY(1.20) translateY(-4vh) !important;
+            }
+            body.full-night-mode .night-player-container {
+                flex-direction: row !important;
+                gap: 4vw !important;
+                position: absolute !important;
+                bottom: 18vh;
+                width: auto !important;
+            }
+            body.full-night-mode .night-player-station {
+                font-size: 3.5vw !important;
+                margin-bottom: 0 !important;
+                border-right: 1px solid rgba(255,255,255,0.15);
+                padding-right: 4vw;
+            }
+            body.full-night-mode .night-player-station img { height: 4vw !important; }
+            body.full-night-mode .night-player-controls { gap: 5vw !important; }
+            body.full-night-mode .night-btn { font-size: 4.5vw !important; padding: 5px; }
+            body.full-night-mode .night-btn.btn-playpause { font-size: 5.5vw !important; }
+            body.full-night-mode #nightBottomInfo {
+                font-size: 3.2vw !important;
+            }
+        }
+
+        /* Špecifické úpravy pre nočný režim na výšku (PORTRAIT) */
+        @media (orientation: portrait) {
+            body.full-night-mode .big-clock-time {
+                transform: scaleY(1.20) translateY(-8vh) !important;
+            }
+            body.full-night-mode .night-player-container {
+                position: absolute !important;
+                bottom: 22vh;
+                width: 100% !important;
+            }
+        }
 
         /* --- CELOOBRAZOVKOVÉ DETAILNÉ ZOBRAZENIE GRAFU --- */
         .weather-detail-view {
@@ -311,14 +420,12 @@
             justify-content: space-between;
         }
         
-        /* UPRAVENÝ RIADOK NAD GRAFOM PRE MESTO, DÁTUM A ČAS */
-        /* UPRAVENÝ RIADOK NAD GRAFOM S VYCENTROVANÝM OBSAHOM */
         #weather-location-container-top {
             width: 100%;
             display: flex;
-            justify-content: center; /* Zmena zo space-between na stred */
+            justify-content: center; 
             align-items: center;
-            gap: 10px; /* Medzera medzi dátumom, mestom a časom */
+            gap: 10px; 
             margin-bottom: 1vh;
             border-bottom: 1px dashed #ff9f0a;
             padding-bottom: 1vh;
@@ -383,7 +490,7 @@
         .forecast-day-icon { font-size: 6vmin !important; margin: 6px 0 !important; }
         .forecast-day-temp { font-size: 2.6vmin !important; font-weight: 600 !important; white-space: nowrap !important; line-height: 1.1 !important; }
 
-        /* PORTRAIT RESPONSIVITA (MOBIL NA VÝŠKU) */
+        /* PORTRAIT RESPONSIVITA (MOBIL NA VÝŠKU) FOR MAIN DASHBOARD */
         @media (orientation: portrait) {
             .workspace-container { flex-direction: column; }
             .favorites-sidebar {
@@ -414,11 +521,9 @@
             .big-clock-date { color: #fff; }
             .big-clock-nameday { margin-top: 0; }
         
-            /* UPRAVENÝ METEO CONTAINER NA VÝŠKU */
             .main-weather-container { flex-direction: row !important; height: 25vh !important; margin-top: 0.5vh; margin-bottom: 1vh; width: 100%; }
             .weather-left-side { width: 50% !important; border-right: 1px solid #151515 !important; padding: 0 4px; box-sizing: border-box; }
             
-            /* IKONA NAD TEPLOTOU */
             .weather-core-row { 
                 flex-direction: column !important; 
                 gap: 4px !important; 
@@ -426,30 +531,29 @@
             #mainBigIcon { font-size: 11vmin !important; line-height: 1; }
             #mainBigTemp { 
                 font-size: 10vmin !important; 
-                white-space: nowrap !important; /* Zabráni rozdeleniu čísla a °C */
+                white-space: nowrap !important;
             }
             #mainWeatherDesc { font-size: 2.5vmin !important; }
             .weather-sub-row { font-size: 4vmin !important; gap: 12px; margin-top: 0.5vh; }
         
-            /* --- UPRAVENÁ PRAVÁ STRANA: DNES / ZAJTRA NA VÝŠKU --- */
             .main-mini-strip { 
                 width: 50% !important; 
                 flex-direction: column !important; 
-                gap: 1.5vh !important; /* Mierne zväčšená medzera medzi boxmi */
+                gap: 1.5vh !important; 
                 padding-left: 2vw; 
-                height: 100%; /* Natiahnutie celého kontajnera na plnú výšku */
+                height: 100%; 
                 justify-content: center;
                 box-sizing: border-box; 
             }
             
             .mini-day-box { 
                 width: 100% !important; 
-                height: 44%; /* Presné vertikálne roztiahnutie boxov */
+                height: 44%; 
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between; /* Pekne rozloží label hore a dáta pod neho */
+                justify-content: space-between; 
                 padding: 1.5vh 2vw !important; 
-                border-radius: 12px; /* Zjednotenie zaoblenia s hlavnými kartami */
+                border-radius: 12px; 
                 box-sizing: border-box;
             }
             
@@ -461,188 +565,29 @@
                 margin-bottom: 2px;
             }
             
-            /* REŠTRUKTURALIZÁCIA NA STĹPEC (IKONA NAD TEPLOTOU) */
             .mini-data-row {
                 flex-direction: column !important;
                 gap: 4px !important;
                 justify-content: center;
                 align-items: center;
-                flex: 1; /* Vyžije zvyšok boxu */
+                flex: 1; 
             }
             
             #mainFc0Icon, #mainFc1Icon { 
-                font-size: 7vmin !important; /* Výraznejšia ikona noci/dňa */
+                font-size: 7vmin !important; 
                 text-align: center !important; 
                 line-height: 1;
             }
             
             #mainFc0Temp, #mainFc1Temp { 
-                font-size: 3.6vmin !important; /* Zväčšené písmo pre teploty */
-                font-weight: 700; 
-                width: 100%; 
-                text-align: center !important; 
-                white-space: nowrap !important; 
-                line-height: 1.1;
-            }/* --- UPRAVENÁ PRAVÁ STRANA: DNES / ZAJTRA NA VÝŠKU --- */
-            .main-mini-strip { 
-                width: 50% !important; 
-                flex-direction: column !important; 
-                gap: 1.5vh !important; /* Mierne zväčšená medzera medzi boxmi */
-                padding-left: 2vw; 
-                height: 100%; /* Natiahnutie celého kontajnera na plnú výšku */
-                justify-content: center;
-                box-sizing: border-box; 
-            }
-            
-            .mini-day-box { 
-                width: 100% !important; 
-                height: 44%; /* Presné vertikálne roztiahnutie boxov */
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between; /* Pekne rozloží label hore a dáta pod neho */
-                padding: 1.5vh 2vw !important; 
-                border-radius: 12px; /* Zjednotenie zaoblenia s hlavnými kartami */
-                box-sizing: border-box;
-            }
-            
-            .mini-label { 
-                font-size: 3.2vmin !important; 
-                width: 100%; 
-                text-align: center; 
-                letter-spacing: 1.5px;
-                margin-bottom: 2px;
-            }
-            
-            /* REŠTRUKTURALIZÁCIA NA STĹPEC (IKONA NAD TEPLOTOU) */
-            .mini-data-row {
-                flex-direction: column !important;
-                gap: 4px !important;
-                justify-content: center;
-                align-items: center;
-                flex: 1; /* Vyžije zvyšok boxu */
-            }
-            
-            #mainFc0Icon, #mainFc1Icon { 
-                font-size: 7vmin !important; /* Výraznejšia ikona noci/dňa */
-                text-align: center !important; 
-                line-height: 1;
-            }
-            
-            #mainFc0Temp, #mainFc1Temp { 
-                font-size: 3.6vmin !important; /* Zväčšené písmo pre teploty */
-                font-weight: 700; 
-                width: 100%; 
-                text-align: center !important; 
-                white-space: nowrap !important; 
-                line-height: 1.1;
-            }/* --- UPRAVENÁ PRAVÁ STRANA: DNES / ZAJTRA NA VÝŠKU --- */
-            .main-mini-strip { 
-                width: 50% !important; 
-                flex-direction: column !important; 
-                gap: 1.5vh !important; /* Mierne zväčšená medzera medzi boxmi */
-                padding-left: 2vw; 
-                height: 100%; /* Natiahnutie celého kontajnera na plnú výšku */
-                justify-content: center;
-                box-sizing: border-box; 
-            }
-            
-            .mini-day-box { 
-                width: 100% !important; 
-                height: 44%; /* Presné vertikálne roztiahnutie boxov */
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between; /* Pekne rozloží label hore a dáta pod neho */
-                padding: 1.5vh 2vw !important; 
-                border-radius: 12px; /* Zjednotenie zaoblenia s hlavnými kartami */
-                box-sizing: border-box;
-            }
-            
-            .mini-label { 
-                font-size: 3.2vmin !important; 
-                width: 100%; 
-                text-align: center; 
-                letter-spacing: 1.5px;
-                margin-bottom: 2px;
-            }
-            
-            /* REŠTRUKTURALIZÁCIA NA STĹPEC (IKONA NAD TEPLOTOU) */
-            .mini-data-row {
-                flex-direction: column !important;
-                gap: 4px !important;
-                justify-content: center;
-                align-items: center;
-                flex: 1; /* Vyžije zvyšok boxu */
-            }
-            
-            #mainFc0Icon, #mainFc1Icon { 
-                font-size: 7vmin !important; /* Výraznejšia ikona noci/dňa */
-                text-align: center !important; 
-                line-height: 1;
-            }
-            
-            #mainFc0Temp, #mainFc1Temp { 
-                font-size: 3.6vmin !important; /* Zväčšené písmo pre teploty */
+                font-size: 3.6vmin !important; 
                 font-weight: 700; 
                 width: 100%; 
                 text-align: center !important; 
                 white-space: nowrap !important; 
                 line-height: 1.1;
             }
-            
-            /* --- UPRAVENÁ PRAVÁ STRANA: DNES / ZAJTRA NA VÝŠKU --- */
-            .main-mini-strip { 
-                width: 50% !important; 
-                flex-direction: column !important; 
-                gap: 1.5vh !important; /* Mierne zväčšená medzera medzi boxmi */
-                padding-left: 2vw; 
-                height: 100%; /* Natiahnutie celého kontajnera na plnú výšku */
-                justify-content: center;
-                box-sizing: border-box; 
-            }
-            
-            .mini-day-box { 
-                width: 100% !important; 
-                height: 44%; /* Presné vertikálne roztiahnutie boxov */
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between; /* Pekne rozloží label hore a dáta pod neho */
-                padding: 1.5vh 2vw !important; 
-                border-radius: 12px; /* Zjednotenie zaoblenia s hlavnými kartami */
-                box-sizing: border-box;
-            }
-            
-            .mini-label { 
-                font-size: 3.2vmin !important; 
-                width: 100%; 
-                text-align: center; 
-                letter-spacing: 1.5px;
-                margin-bottom: 2px;
-            }
-            
-            /* REŠTRUKTURALIZÁCIA NA STĹPEC (IKONA NAD TEPLOTOU) */
-            .mini-data-row {
-                flex-direction: column !important;
-                gap: 4px !important;
-                justify-content: center;
-                align-items: center;
-                flex: 1; /* Vyžije zvyšok boxu */
-            }
-            
-            #mainFc0Icon, #mainFc1Icon { 
-                font-size: 7vmin !important; /* Výraznejšia ikona noci/dňa */
-                text-align: center !important; 
-                line-height: 1;
-            }
-            
-            #mainFc0Temp, #mainFc1Temp { 
-                font-size: 3.6vmin !important; /* Zväčšené písmo pre teploty */
-                font-weight: 700; 
-                width: 100%; 
-                text-align: center !important; 
-                white-space: nowrap !important; 
-                line-height: 1.1;
-            }
-                                        
+                                            
             .weather-detail-view { padding: 15px 10px; justify-content: space-between; }
             #weather-location-main { font-size: 4vmin; }
             #weather-location-date, #weather-location-time { font-size: 4vmin; }
@@ -693,14 +638,13 @@
         <aside class="favorites-sidebar" id="favSidebarContainer"></aside>
 
         <main class="main-content-area">
-                                   
+                                                                    
             <div class="placeholder-view" id="rightPlaceholder">
                 <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();">
                     <span class="big-clock-hours" id="bigHours">00</span>
                     <span class="big-clock-minutes" id="bigMinutes">00</span>
                 </div>
                 
-                <!-- SPOJENÝ RIADOK: MESTO • DÁTUM • MENINY -->
                 <div class="big-clock-date-wrapper">
                     <span class="big-clock-city" id="bigClockCity">---</span>
                     <span style="color: #444;">•</span>
@@ -711,13 +655,11 @@
                 
                 <div class="main-weather-container">
                     <div class="weather-left-side" onclick="toggleWeatherView(event)">
-                        <!-- ZABALENÉ KVÔLI TEXTOVÉMU POPISU POD TÝM -->
                         <div class="weather-wrapper-block">
                             <div class="weather-core-row">
                                 <span id="mainBigIcon">☀️</span>
                                 <span id="mainBigTemp">--°C</span>
                             </div>
-                            <!-- TU SA ZOBRAZÍ TEXTOVÝ STAV POČASIA -->
                             <div id="mainWeatherDesc">------</div>
                         </div>
                         <div class="weather-sub-row">
@@ -745,6 +687,18 @@
                 </div>
 
                 <div id="nightBottomInfo"></div>
+
+                <div class="night-player-container" id="nightPlayer">
+                    <div class="night-player-station" id="nightStationInfo">
+                        <i class="fa-solid fa-radio"></i> <span id="nightStationName">OFFLINE</span>
+                    </div>
+                    <div class="night-player-controls">
+                        <button class="night-btn" onclick="spustiDalsieRadio('vzad'); event.stopPropagation();"><i class="fa-solid fa-backward-step"></i></button>
+                        <button class="night-btn btn-playpause" onclick="toggleNightPlayPause(); event.stopPropagation();" id="nightPlayPauseBtn"><i class="fa-solid fa-circle-pause"></i></button>
+                        <button class="night-btn" onclick="spustiDalsieRadio('vpred'); event.stopPropagation();"><i class="fa-solid fa-forward-step"></i></button>
+                    </div>
+                </div>
+
             </div>
             
             <div class="settings-grid-view" id="settingsGridView" onclick="resetSettingsTimer()">                
@@ -784,7 +738,6 @@
          </main>
     </div>
 
-    <!-- DETAILNÝ GRAF S NOVOU LIŠTOU HORE -->
     <div class="weather-detail-view" id="weatherDetailView" onclick="toggleWeatherView(event)">
         <div id="weather-location-container-top">
             <div id="weather-location-date">--.--.----</div>
@@ -1434,7 +1387,7 @@
             if (isSettingsModeActive) return;
             if (item.url) {
                 if (currentPlayingType === item.id) {
-                    audio.pause(); // Vyvolá spoločný event listener, ktorý sa postará o zastavenie / Hard Stop
+                    audio.pause(); 
                 } else {
                     if (item.icon && (item.id === 'spotify' || item.id === 'applemusic' || item.id === 'youtube' || item.id === 'tidal')) {
                         triggerExternalApp(item.url, item.id);
@@ -1445,7 +1398,6 @@
             }
         }
 
-        // NOVÝ NOČNÝ PLAY / PAUSE MANAŽMENT
         function toggleNightPlayPause() {
             if (!currentPlayingType || currentPlayingType === "") return;
             if (audio.paused) {
@@ -1455,7 +1407,6 @@
             }
         }
 
-        // GRAFICKÁ AKTUALIZÁCIA KONTROLIEK V NOCNOM PREHRÁVAČI
         function aktualizujNochnyPrehravacVizual() {
             const pBox = document.getElementById('nightPlayer');
             const pInfo = document.getElementById('nightStationInfo');
