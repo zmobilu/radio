@@ -1491,7 +1491,6 @@ function inicializujPlochuNastaveni() {
                 const nazovRadia = hrajuceRadio ? hrajuceRadio.name : idRadia.toUpperCase();
                 const ikonaRadia = hrajuceRadio && hrajuceRadio.img ? hrajuceRadio.img : "https://raw.githubusercontent.com/zmobilu/assets/main/kiosk-ikona.png";
 
-                // Nastavenie metadát pre widget na uzamknutej obrazovke
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: nazovRadia,
                     artist: 'Živé vysielanie',
@@ -1501,17 +1500,65 @@ function inicializujPlochuNastaveni() {
                     ]
                 });
 
-                // Prepojenie tlačidiel zo zamknutej obrazovky na tvoje funkcie v kóde
+                // Tlačidlo PLAY na zamknutej obrazovke
                 navigator.mediaSession.setActionHandler('play', () => {
                     if (audio.src) {
                         audio.play();
                         navigator.mediaSession.playbackState = "playing";
                     }
                 });
+
+                // Tlačidlo PAUSE na zamknutej obrazovke
                 navigator.mediaSession.setActionHandler('pause', () => {
                     audio.pause();
                     navigator.mediaSession.playbackState = "paused";
                 });
+
+                // TU SÚ NOVÉ HANDLERY PRE TLAČIDLÁ DOPREDU / DOZADU:
+                navigator.mediaSession.setActionHandler('nexttrack', () => {
+                    spustiDalsieRadio('vpred');
+                });
+
+                navigator.mediaSession.setActionHandler('previoustrack', () => {
+                    spustiDalsieRadio('vzad');
+                });
+            }
+        }
+
+        
+        function spustiDalsieRadio(smer) {
+            if (!currentPlayingType || currentPlayingType === "") return;
+            
+            // Nájdeme aktuálnu pozíciu v obľúbených (0 až 5)
+            let currentIndex = slotFavorites.indexOf(currentPlayingType);
+            if (currentIndex === -1) return;
+
+            let novyIndex = currentIndex;
+            let najdeneRadio = null;
+
+            // Prejdeme pole (maximálne 6-krát, aby sme neskončili v nekonečnej slučke)
+            for (let i = 0; i < 6; i++) {
+                if (smer === 'vpred') {
+                    novyIndex = (novyIndex + 1) % 6; // Na konci skočí na 0
+                } else {
+                    novyIndex = (novyIndex - 1 + 6) % 6; // Na začiatku skočí na 5
+                }
+
+                const idKandidata = slotFavorites[novyIndex];
+                if (!idKandidata) continue; // Preskoč prázdny slot
+
+                const item = DATABASE.find(d => d.id === idKandidata);
+                
+                // POISTKA: Kontrola, či rádio existuje, má reálnu streamovaciu URL a nie je to externá appka
+                if (item && item.url && !item.url.includes('googleusercontent.com') && !item.url.includes('music.apple.com') && !item.url.includes('music.youtube.com') && !item.url.includes('tidal.com') && !item.url.includes('soundcloud.com')) {
+                    najdeneRadio = item;
+                    break;
+                }
+            }
+
+            // Ak sme našli vhodné rádio, bleskovo ho spustíme
+            if (najdeneRadio) {
+                playRadio(najdeneRadio.url, najdeneRadio.id);
             }
         }
         
