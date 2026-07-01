@@ -100,7 +100,7 @@
             justify-content: flex-start;
         }
 
-        /* VRCHNÁ ZÓNA (HODINY + DÁTUM) - V dennom režime tlačí hodiny nahor */
+        /* VRCHNÁ ZÓNA (HODINY + DÁTUM) - Na šírku tlačí prvky nahor */
         .clock-top-zone {
             display: flex;
             flex-direction: column;
@@ -120,7 +120,7 @@
         .big-clock-hours { color: #fff; }
         .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
         
-        /* SPOJENÝ A ZVÄČŠENÝ RIADOK PRE MESTO, DÁTUM A MENINY - V dennom pritisnutý k hodinám */
+        /* Spojený a pritisnutý riadok pre mesto, dátum a meniny */
         .big-clock-date-wrapper {
             display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; 
             width: 100%; border-bottom: 1px dashed #333; padding-bottom: 1.5vh; 
@@ -131,7 +131,7 @@
         .big-clock-date { color: #fff; }
         .big-clock-nameday { color: #ff9f0a; }
 
-        /* Spodný masívny meteo container rozdelený 60/40 horizontálne */
+        /* Spodný meteo container */
         .main-weather-container {
             display: flex;
             flex-direction: row;
@@ -281,7 +281,7 @@
     
         #nightBottomInfo { display: none; }
 
-        /* --- NOVÝ INTEGROVANÝ NOČNÝ PREHRÁVAČ --- */
+        /* --- INTEGRÁCIA NOČNÉHO PREHRÁVAČA --- */
         .night-player-container {
             display: none;
             flex-direction: column;
@@ -328,7 +328,7 @@
         .night-btn:active { transform: scale(0.9); }
         .night-btn.btn-playpause { font-size: 9vw; }
 
-        /* --- NOČNÝ REŽIM BLOKOVANIE / REŠTRUKTURALIZÁCIA --- */
+        /* --- NOČNÝ REŽIM BLOKOVANIE / RESET ŠTRUKTÚRY --- */
         body.full-night-mode .favorites-sidebar,
         body.full-night-mode .big-clock-date-wrapper,
         body.full-night-mode #settingsToggleBtn, 
@@ -346,11 +346,12 @@
             padding: 0 4vw !important; 
         }
         
-        /* Absolútne nezávislá izolácia nočných hodín na stred obrazovky */
+        /* Absolútne nezávislá izolácia a vycentrovanie nočných hodín na stred (Landscape aj Portrait) */
         body.full-night-mode .clock-top-zone {
             justify-content: center !important;
             margin-top: 0 !important;
             flex: none !important;
+            height: auto !important;
         }
         body.full-night-mode .big-clock-time { 
             font-size: 28vw !important; 
@@ -358,6 +359,7 @@
             margin: 0 !important; 
             transform: scaleY(1.20) translateY(-0.5vh) !important; 
             flex: none !important;
+            margin-top: 0 !important;
         }
         body.full-night-mode .big-clock-hours, body.full-night-mode .big-clock-minutes, body.full-night-mode #nightBottomInfo { color: var(--night-color) !important; }
         
@@ -504,23 +506,44 @@
             
             .placeholder-view { 
                 padding: 2vh 3vw; 
-                justify-content: center !important; 
-                gap: 2vh;
+                justify-content: flex-start !important; 
+                gap: 0px;
             }
+
+            /* UKOTVENIE BLOKOV: HODINY VÝŠKA 62% / METEO VÝŠKA 38% */
+            .clock-top-zone {
+                height: 62% !important;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                flex: none !important;
+                box-sizing: border-box;
+            }
+
+            .main-weather-container { 
+                flex-direction: row !important; 
+                height: 38% !important; 
+                margin-top: 0 !important; 
+                margin-bottom: 0 !important; 
+                width: 100%; 
+                flex: none !important;
+                box-sizing: border-box;
+            }
+
             .big-clock-time { 
                 font-size: 26vmin; 
                 line-height: 0.8; 
-                margin-top: 2vh; 
+                margin-top: 0; 
                 width: 100%; 
                 display: flex;
                 justify-content: center; 
             }
-            .big-clock-date-wrapper { margin-top: 0; padding-bottom: 1vh; width: 100%; font-size: 3.8vmin; flex-wrap: wrap; justify-content: center; }
+            .big-clock-date-wrapper { margin-top: 0; padding-bottom: 1vh; width: 100%; font-size: 3.8vmin; flex-wrap: wrap; justify-content: center; border-bottom: none; }
             .big-clock-date { color: #fff; }
             .big-clock-nameday { margin-top: 0; }
         
-            /* UPRAVENÝ METEO CONTAINER NA VÝŠKU */
-            .main-weather-container { flex-direction: row !important; height: 25vh !important; margin-top: 0.5vh; margin-bottom: 1vh; width: 100%; }
             .weather-left-side { width: 50% !important; border-right: 1px solid #151515 !important; padding: 0 4px; box-sizing: border-box; }
             
             /* IKONA NAD TEPLOTOU */
@@ -536,7 +559,7 @@
             #mainWeatherDesc { font-size: 2.5vmin !important; }
             .weather-sub-row { font-size: 4vmin !important; gap: 12px; margin-top: 0.5vh; }
         
-            /* --- UPRAVENÁ PRAVÁ STRANA: DNES / ZAJTRA NA VÝŠKU --- */
+            /* --- REŠTRUKTURALIZÁCIA PRE DNES / ZAJTRA NA VÝŠKU --- */
             .main-mini-strip { 
                 width: 50% !important; 
                 flex-direction: column !important; 
