@@ -760,7 +760,7 @@
                     
                     <div class="settings-night-row">
                         <i class="fa-solid fa-bed label-icon" title="Prerušenie noci (Snooze)"></i>
-                        <button onclick="zmenDibuOdkladu(); event.stopPropagation();" id="set-snooze-time">1 min</button>
+                        <button onclick="zmenDobuOdkladu(); event.stopPropagation();" id="set-snooze-time">1 min</button>
                     </div>
                     <div class="settings-night-row">
                         <i class="fa-solid fa-palette label-icon" title="Farba nočného zobrazenia"></i>
@@ -1232,7 +1232,7 @@ function inicializujPlochuNastaveni() {
             resetSettingsTimer();
         }
 
-        function zmenDibuOdkladu() {
+        function zmenDobuOdkladu() {
             let novaDoba = prompt("Zadaj dobu prebudenia hodín v minútach (Snooze):", cfgSnoozeMin);
             if (novaDoba && !isNaN(novaDoba) && parseInt(novaDoba) > 0) {
                 cfgSnoozeMin = parseInt(novaDoba);
@@ -1485,6 +1485,36 @@ function inicializujPlochuNastaveni() {
             }
         }
 
+        function aktualizujZamknutuObrazovku(idRadia) {
+            if ('mediaSession' in navigator) {
+                const hrajuceRadio = DATABASE.find(d => d.id === idRadia);
+                const nazovRadia = hrajuceRadio ? hrajuceRadio.name : idRadia.toUpperCase();
+                const ikonaRadia = hrajuceRadio && hrajuceRadio.img ? hrajuceRadio.img : "https://raw.githubusercontent.com/zmobilu/assets/main/kiosk-ikona.png";
+
+                // Nastavenie metadát pre widget na uzamknutej obrazovke
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: nazovRadia,
+                    artist: 'Živé vysielanie',
+                    album: 'Kuchynský Kiosk 📻',
+                    artwork: [
+                        { src: ikonaRadia, sizes: '512x512', type: 'image/png' }
+                    ]
+                });
+
+                // Prepojenie tlačidiel zo zamknutej obrazovky na tvoje funkcie v kóde
+                navigator.mediaSession.setActionHandler('play', () => {
+                    if (audio.src) {
+                        audio.play();
+                        navigator.mediaSession.playbackState = "playing";
+                    }
+                });
+                navigator.mediaSession.setActionHandler('pause', () => {
+                    audio.pause();
+                    navigator.mediaSession.playbackState = "paused";
+                });
+            }
+        }
+        
         function playRadio(url, id) {
             audio.pause();
             audio.src = url;
@@ -1500,6 +1530,7 @@ function inicializujPlochuNastaveni() {
                 }
                 renderSidebarFavorites();
                 runClockEngine(); 
+                aktualizujZamknutuObrazovku(id);
             })
             .catch((e) => console.log("Stream offline", e));
         }
@@ -1511,6 +1542,11 @@ function inicializujPlochuNastaveni() {
             currentPlayingType = "";
             renderSidebarFavorites();
             runClockEngine();
+            
+            // RIADOK (vyčistí widget na zamknutej obrazovke):
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = null;
+            }
         }
 
         function triggerExternalApp(url, id) {
