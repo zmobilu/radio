@@ -1261,10 +1261,10 @@
                 
                 if (item && id !== null) {
                     card.className = "fav-card";
-                    if (currentPlayingType === item.id) card.classList.add("playing");
-                    card.setAttribute("style", item.style);
+                    if (currentPlayingType === item.id && !audio.paused) card.classList.add("playing");
+                    //card.setAttribute("style", item.style);
                     card.onclick = () => handleFavCardClick(item);
-
+                    
                     if (item.img) {
                         card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
                     } else if (item.icon) {
@@ -1388,6 +1388,8 @@
             if (item.url) {
                 if (currentPlayingType === item.id) {
                     audio.pause(); 
+                    // Okamžité prekreslenie sidebaru pre zmazanie orámovania bez čakania na event
+                    renderSidebarFavorites(); 
                 } else {
                     if (item.icon && (item.id === 'spotify' || item.id === 'applemusic' || item.id === 'youtube' || item.id === 'tidal')) {
                         triggerExternalApp(item.url, item.id);
