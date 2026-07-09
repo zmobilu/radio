@@ -821,7 +821,7 @@
         }, false);
 
         const DATABASE = [
-            { id: "slovensko", name: "Slovensko", url: "http://stream.rozhlas.sk/Slovensko_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png", style: "background:#00547E;", category: "Verejnoprávne" },
+            { id: "slovensko", name: "Slovensko", url: "https://icecast.stv.livebox.sk/Slovensko_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png", style: "background:#00547E;", category: "Verejnoprávne" },
             { id: "fm", name: "Rádio_FM", url: "https://icecast.stv.livebox.sk/fm_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioFM.png", style: "background:#111;", category: "Verejnoprávne" },
             { id: "regina", name: "Regina", url: "https://icecast.stv.livebox.sk/regina-ba_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioReginaZ.png", style: "background:#111;", category: "Verejnoprávne" },
             { id: "devin", name: "Devín", url: "https://icecast.stv.livebox.sk/devin_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioDevin.png", style: "background:#111;", category: "Verejnoprávne" },
@@ -1446,7 +1446,7 @@
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: nazovRadia,
                     artist: 'Živé vysielanie',
-                    album: 'Kuchynský Kiosk 📻',
+                    album: 'Meteo 📻',
                     artwork: [ { src: ikonaRadia, sizes: '512x512', type: 'image/png' } ]
                 });
 
@@ -1660,7 +1660,7 @@
             // --- ANTI-STALL LOGIKA ---
             let stallTimeout = null;
             audio.addEventListener('waiting', () => {
-                if (currentPlayingType && currentPlayingType !== "") {
+                if (currentPlayingType && currentPlayingType !== "" && !audio.paused) {
                     clearTimeout(stallTimeout);
                     stallTimeout = setTimeout(() => {
                         console.log("Detekovaný výpadok bufferu, reštartujem stream...");
@@ -1670,7 +1670,7 @@
                             audio.load();
                             audio.play().catch(e => console.log("Chyba auto-reštartu:", e));
                         }
-                    }, 2500); 
+                    }, 10000); 
                 }
             });
 
