@@ -994,7 +994,7 @@
                 const pct = ((temp - minGraphTemp) / tempRange) * 52 + 12;
                 
                 const rainVal = rain[idx] ? parseFloat(rain[idx]) : 0;
-                const rainHtml = rainVal > 0 ? `<span class="chart-rain-info">💧${rainVal.toFixed(1)}</span>` : `<span class="chart-rain-info"></span>`;
+                const rainHtml = rainVal > 0 ? `<span class="chart-rain-info">💧${rainVal.toFixed(1)}</span>` : `<span class="chart-rain-info">&nbsp;</span>`;
                 
                 const cCode = codes[idx] !== undefined ? codes[idx] : 0;
                 function getWeatherEmoji(wCode) {
