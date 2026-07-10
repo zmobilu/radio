@@ -460,16 +460,30 @@
         
         #hourly-chart-container { 
             display: flex; 
-            justify-content: space-between; 
+            justify-content: flex-start; /*space-between; */
             align-items: flex-end; 
             height: 42vh; 
             width: 100%;
-            gap: 0.8%;
-            box-sizing: border-box;
+            gap: 12px; /* 0.8%; */
+            /* box-sizing: border-box;*/ 
+            overflow-x: auto; /* Povinné skrolovanie do strán pre šírku aj výšku */
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 8px;
         }
-        .chart-temp-info { font-size: 1.8vmin; font-weight: bold; margin-bottom: 2px; }
+
+        /* Každý stĺpec dostane garantovanú minimálnu šírku, aby písmo nezmenšovalo */
+        #hourly-chart-container > div {
+            min-width: 50px; 
+            flex-shrink: 0;
+        }
+        /* Písmo pre graf natvrdo v pixeloch, žiadne vmin! */
+        .chart-temp-info { font-size: 15px !important; font-weight: bold; }
+        .chart-icon-info { font-size: 22px !important; }
+        .chart-rain-info { font-size: 12px !important; color: #4dabff; min-height: 14px; }
+    
+        /*.chart-temp-info { font-size: 1.8vmin; font-weight: bold; margin-bottom: 2px; }
         .chart-icon-info { font-size: 2.6vmin; margin-bottom: 2px; }
-        .chart-rain-info { font-size: 1.5vmin; color: #4dabff; height: 1.8vmin; font-weight: bold; margin-bottom: 2px; }
+        .chart-rain-info { font-size: 1.5vmin; color: #4dabff; height: 1.8vmin; font-weight: bold; margin-bottom: 2px; } */
 
         #extended-forecast-container { 
             display: grid; 
