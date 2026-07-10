@@ -101,19 +101,32 @@
         
         /* Hodiny na celú šírku pravého bloku */
         .big-clock-time {
+            /* Minimálne 48px, ideálne 20vw, maximálne 140px */
+            font-size: clamp(48px, 20vw, 140px); 
+            line-height: 0.9;
+        }
+
+        .big-clock-date-wrapper {
+            flex-wrap: wrap; /* Ak sa nezmestí mesto, dátum a meniny vedľa seba, zalomí ich to */
+            justify-content: center;
+            gap: 5px 12px;
+            font-size: clamp(14px, 2.5vh, 22px); /* Stabilná veľkosť pre čitateľnosť */
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+        /*.big-clock-time {
             font-size: 23vw; font-weight: 800; line-height: 0.75; letter-spacing: -4px;
             display: flex; justify-content: center; align-items: center; width: 100%;
             transform: scaleY(1.05); cursor: pointer; margin-top: 0;
-        }
+        }*/
         .big-clock-hours { color: #fff; }
         .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
         
         /* SPOJENÝ A ZVÄČŠENÝ RIADOK PRE MESTO, DÁTUM A MENINY */
-        .big-clock-date-wrapper {
+        /*.big-clock-date-wrapper {
             display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; 
             width: 100%; border-bottom: 1px dashed #333; padding-bottom: 1.5vh; margin-top: -0.5vh;
             font-size: 3.4vmin; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
-        }
+        }*/
         .big-clock-city { color: #ff9f0a; font-weight: bold; letter-spacing: 2px; }
         .big-clock-date { color: #fff; }
         .big-clock-nameday { color: #ff9f0a; }
