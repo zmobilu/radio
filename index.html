@@ -130,7 +130,16 @@
             margin-bottom: 0;
         }
         
-        /* Ľavá polovica: Aktuálne počasie (60%) */
+        .weather-left-side {
+            display: flex;
+            flex-direction: row; /* Predvolene vedľa seba */
+            flex-wrap: wrap;    /* Ak niet miesta, zalomí pod seba */
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* Ľavá polovica: Aktuálne počasie (60%) 
         .weather-left-side {
             width: 60%;
             display: flex;
@@ -142,11 +151,18 @@
             box-sizing: border-box;
             cursor: pointer;
             padding: 0 10px;
-        }
+        } */
         
         /* Pravá polovica: Predpoveď Dnes / Zajtra (40%) */
         .main-mini-strip {
-            width: 40%;
+            display: flex;
+            flex-direction: row; /* Predvolene vedľa seba */
+            flex-wrap: wrap;    /* Ak niet miesta, zalomí pod seba */
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+            /*width: 40%;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -156,13 +172,20 @@
             margin-top: 0;
             padding-top: 0;
             gap: 1.5vh;
-        }
+        }*/
         .weather-wrapper-block {
+            display: flex;
+            flex-direction: row; /* Na šírku: ikona a teplota vedľa seba */
+            flex-wrap: wrap;     
+            justify-content: center;
+            align-items: center;
+        }
+        /*.weather-wrapper-block {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-        }
+        }*/
         .weather-core-row {
             display: flex;
             align-items: center;
@@ -403,7 +426,12 @@
                 width: 100% !important;
             }
         }
-
+        /* Pomocou Media Query pre úzke obrazovky (na výšku) otočíme smer nad seba */
+        @media (max-width: 480px), (orientation: portrait) {
+            .weather-wrapper-block {
+                flex-direction: column; /* Ikona skočí NAD teplotu */
+            }
+        }
         /* --- CELOOBRAZOVKOVÉ DETAILNÉ ZOBRAZENIE GRAFU --- */
         .weather-detail-view {
             display: none; 
