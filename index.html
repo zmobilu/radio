@@ -145,7 +145,8 @@
             display: flex;
             flex-direction: row;
             width: 100%;
-            height: 38vh;
+            height: auto;
+            flex: 1;
             align-items: center;
             justify-content: space-between;
             margin-top: 1vh;
@@ -595,7 +596,14 @@
             .big-clock-date { color: #fff; }
             .big-clock-nameday { margin-top: 0; }
         
-            .main-weather-container { flex-direction: row !important; height: 25vh !important; margin-top: 0.5vh; margin-bottom: 1vh; width: 100%; }
+            .main-weather-container { 
+                flex-direction: row !important; 
+                height: auto !important;    /* ZMENA: Namiesto 25vh !important uvoľníme výšku */
+                flex: 1 !important;         /* PRIDANÉ: Správne vyplnenie priestoru na výšku */
+                margin-top: 0.5vh; 
+                margin-bottom: 1vh; 
+                width: 100%; 
+            }
             .weather-left-side { width: 50% !important; border-right: 1px solid #151515 !important; padding: 0 4px; box-sizing: border-box; }
             
             .weather-core-row { 
