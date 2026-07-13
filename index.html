@@ -118,9 +118,11 @@
             align-items: center;
             width: 100%;
             flex: 0 1 auto; /* Umožní hodinám flexibilne sa prispôsobiť */
-            transform: scaleY(1.5);
-            transform-origin: center bottom;
-            margin: 0;
+            transform: scaleY(1.24);
+            transform-origin: center center;
+            /* ZMENA: Stiahnutie hodín nižšie od horného okraja */
+            margin-top: 4vh; 
+            margin-bottom: 0;
         }
         
         .big-clock-date-wrapper {
@@ -603,9 +605,9 @@
                 line-height: 0.8; 
                 /* Výraznejšie natiahnutie na výšku */
                 transform: scaleY(1.60) !important; 
-                transform-origin: center bottom;
+                transform-origin: center center; !important;
                 /* Posun hodín smerom nadol od horného okraja */
-                margin-top: 5vh !important; 
+                margin-top: 6vh !important; 
                 margin-bottom: 0 !important;
                 width: 100%; 
                 display: flex;
