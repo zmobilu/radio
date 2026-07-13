@@ -101,17 +101,26 @@
         
         /* Hodiny na celú šírku pravého bloku */
         .big-clock-time {
-            /* Minimálne 48px, ideálne 20vw, maximálne 140px */
-            font-size: clamp(48px, 20vw, 140px); 
+            /* Zvýšený horný limit zo 140px na 240px a upravená ideálna veľkosť na 16vw */
+            font-size: clamp(60px, 16vw, 240px); 
             line-height: 0.9;
-        }
-
-        .big-clock-date-wrapper {
-            flex-wrap: wrap; /* Ak sa nezmestí mesto, dátum a meniny vedľa seba, zalomí ich to */
+            font-weight: 800;
+            display: flex;
             justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .big-clock-date-wrapper {
+            display: flex; /* Dôležité: aktivuje flexbox pre justify-content */
+            flex-wrap: wrap; 
+            justify-content: center;
+            align-items: center;
+            text-align: center; /* Bezpečné centrovanie pri zalomení riadkov */
             gap: 5px 12px;
-            font-size: clamp(14px, 2.5vh, 22px); /* Stabilná veľkosť pre čitateľnosť */
+            font-size: clamp(14px, 2.5vh, 22px); 
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            width: 100%;
         }
         /*.big-clock-time {
             font-size: 23vw; font-weight: 800; line-height: 0.75; letter-spacing: -4px;
@@ -572,7 +581,17 @@
                 display: flex;
                 justify-content: center; 
             }
-            .big-clock-date-wrapper { margin-top: 0; padding-bottom: 1vh; width: 100%; font-size: 3.8vmin; flex-wrap: wrap; justify-content: center; }
+            /*.big-clock-date-wrapper { margin-top: 0; padding-bottom: 1vh; width: 100%; font-size: 3.8vmin; flex-wrap: wrap; justify-content: center; }*/
+            .big-clock-date-wrapper { 
+                margin-top: 0; 
+                padding-bottom: 1vh; 
+                width: 100%; 
+                font-size: 3.8vmin; 
+                display: flex;          /* Uistite sa, že je aj tu */
+                flex-wrap: wrap; 
+                justify-content: center; 
+                text-align: center;     /* Zaistí dokonalé vycentrovanie menín pod dátumom */
+            }
             .big-clock-date { color: #fff; }
             .big-clock-nameday { margin-top: 0; }
         
