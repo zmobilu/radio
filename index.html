@@ -118,7 +118,7 @@
             align-items: center;
             width: 100%;
             flex: 0 1 auto; /* Umožní hodinám flexibilne sa prispôsobiť */
-            transform: scaleY(1.24);
+            transform: scaleY(1.4);
             transform-origin: center center;
             /* ZMENA: Stiahnutie hodín nižšie od horného okraja */
             margin-top: 4vh; 
@@ -137,7 +137,7 @@
             font-size: clamp(18px, 3.0vh, 32px); 
             
             /* PRIDANÉ: Zvýraznenie hrúbky písma, aby nebol riadok taký tenký */
-            font-weight: 300; 
+            font-weight: 600; 
             
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             width: 100%;
@@ -607,7 +607,7 @@
                 transform: scaleY(1.60) !important; 
                 transform-origin: center center; !important;
                 /* Posun hodín smerom nadol od horného okraja */
-                margin-top: 6vh !important; 
+                margin-top: 4vh !important; 
                 margin-bottom: 0 !important;
                 width: 100%; 
                 display: flex;
@@ -624,6 +624,8 @@
                 flex-wrap: wrap; 
                 justify-content: center; 
                 text-align: center;     /* Zaistí dokonalé vycentrovanie menín pod dátumom */
+                /* PRIDANÉ: Zvýraznenie hrúbky písma, aby nebol riadok taký tenký */
+                font-weight: 600;
             }
             .big-clock-date { color: #fff; }
             .big-clock-nameday { margin-top: 0; }
