@@ -118,6 +118,9 @@
             align-items: center;
             width: 100%;
             flex: 0 1 auto; /* Umožní hodinám flexibilne sa prispôsobiť */
+            transform: scaleY(1.24);
+            transform-origin: center bottom;
+            margin: 0;
         }
         
         .big-clock-date-wrapper {
@@ -586,10 +589,14 @@
             }
             .main-content-area { width: 100vw; flex: 1; order: 1; }
             
-            .placeholder-view { 
+           .placeholder-view { 
                 padding: 2vh 3vw; 
-                justify-content: center !important; 
-                gap: 2vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start; /* Zmena: hodiny ostanú hore, nebudú centrované */
+                height: 100%;
+                box-sizing: border-box;
+                gap: 0; /* Zrušíme fixný gap, rozostupy vyriešime flexom */
             }
             .big-clock-time { 
                 font-size: 26vmin; 
@@ -615,11 +622,12 @@
         
             .main-weather-container { 
                 flex-direction: row !important; 
-                height: auto !important;    /* ZMENA: Namiesto 25vh !important uvoľníme výšku */
-                flex: 1 !important;         /* PRIDANÉ: Správne vyplnenie priestoru na výšku */
-                margin-top: 0.5vh; 
-                margin-bottom: 1vh; 
+                height: auto !important;
                 width: 100%; 
+                /* ZMENA: margin-top: auto odtlačí celý tento blok úplne nadol k rádiám */
+                margin-top: auto !important; 
+                margin-bottom: 1vh !important; 
+                flex: 0 0 auto !important; /* Fixný kontajner, ktorý sa len prispôsobí obsahu */
             }
             .weather-left-side { width: 50% !important; border-right: 1px solid #151515 !important; padding: 0 4px; box-sizing: border-box; }
             
