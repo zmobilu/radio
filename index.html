@@ -93,22 +93,31 @@
         
         /* --- PROFI DIZAJN EXTRA VÝRAZNÝCH HODÍN A POČASIA --- */
         .placeholder-view {
-            display: flex; width: 100%; height: 100%; flex-direction: column;
-            align-items: center; justify-content: space-between; background: #000; box-sizing: border-box;
-            padding: 2vh 3vw; padding-right: calc(3vw + env(safe-area-inset-right));
+            display: flex; 
+            width: 100%; 
+            height: 100%; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; /* ZMENA: Centrovanie namiesto space-between */
+            gap: 2vh;                /* PRIDANÉ: Automatická medzera medzi hodinami, dátumom a počasím */
+            background: #000; 
+            box-sizing: border-box;
+            padding: 2vh 3vw; 
+            padding-right: calc(3vw + env(safe-area-inset-right));
             overflow: hidden;
         }
         
         /* Hodiny na celú šírku pravého bloku */
         .big-clock-time {
-            /* Zvýšený horný limit zo 140px na 240px a upravená ideálna veľkosť na 16vw */
-            font-size: clamp(60px, 16vw, 240px); 
+            /* Zvýšený horný limit zo 140px na 240px a upravená ideálna veľkosť na 16vw a 480 pre este vacsie zobrazenie*/
+            font-size: clamp(60px, 16vw, 480px); 
             line-height: 0.9;
             font-weight: 800;
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
+            flex: 0 1 auto; /* Umožní hodinám flexibilne sa prispôsobiť */
         }
         
         .big-clock-date-wrapper {
@@ -146,7 +155,7 @@
             flex-direction: row;
             width: 100%;
             height: auto;
-            flex: 1;
+            flex: 0 1 auto;
             align-items: center;
             justify-content: space-between;
             margin-top: 1vh;
