@@ -118,7 +118,7 @@
             align-items: center;
             width: 100%;
             flex: 0 1 auto; /* Umožní hodinám flexibilne sa prispôsobiť */
-            transform: scaleY(1.24);
+            transform: scaleY(1.6);
             transform-origin: center bottom;
             margin: 0;
         }
@@ -601,15 +601,21 @@
             .big-clock-time { 
                 font-size: 26vmin; 
                 line-height: 0.8; 
-                margin-top: 2vh; 
+                /* Výraznejšie natiahnutie na výšku */
+                transform: scaleY(1.60) !important; 
+                transform-origin: center bottom;
+                /* Posun hodín smerom nadol od horného okraja */
+                margin-top: 5vh !important; 
+                margin-bottom: 0 !important;
                 width: 100%; 
                 display: flex;
                 justify-content: center; 
             }
             /*.big-clock-date-wrapper { margin-top: 0; padding-bottom: 1vh; width: 100%; font-size: 3.8vmin; flex-wrap: wrap; justify-content: center; }*/
             .big-clock-date-wrapper { 
-                margin-top: 0; 
-                padding-bottom: 1vh; 
+                /* Pridáme horný okraj, aby kvôli vysokému scale hodín text nevbehol do číslic */
+                margin-top: 3vh !important; 
+                padding-bottom: 1vh;
                 width: 100%; 
                 font-size: 3.8vmin; 
                 display: flex;          /* Uistite sa, že je aj tu */
