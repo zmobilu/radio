@@ -121,15 +121,23 @@
         }
         
         .big-clock-date-wrapper {
-            display: flex; /* Dôležité: aktivuje flexbox pre justify-content */
-            flex-wrap: wrap; 
+            display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             align-items: center;
-            text-align: center; /* Bezpečné centrovanie pri zalomení riadkov */
+            text-align: center;
             gap: 5px 12px;
-            font-size: clamp(14px, 2.5vh, 22px); 
+            
+            /* ZMENA: Zvýšený spodný limit na 18px, ideálna veľkosť na 3.5vh a strop na 32px */
+            font-size: clamp(18px, 3.5vh, 32px); 
+            
+            /* PRIDANÉ: Zvýraznenie hrúbky písma, aby nebol riadok taký tenký */
+            font-weight: 600; 
+            
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             width: 100%;
+            flex: 0 0 auto;
+            margin: 1vh 0;
         }
         /*.big-clock-time {
             font-size: 23vw; font-weight: 800; line-height: 0.75; letter-spacing: -4px;
