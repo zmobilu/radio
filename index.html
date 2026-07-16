@@ -605,7 +605,7 @@
                 line-height: 0.8; 
                 /* Výraznejšie natiahnutie na výšku */
                 transform: scaleY(1.60) !important; 
-                transform-origin: center center; !important;
+                transform-origin: center center !important;
                 /* Posun hodín smerom nadol od horného okraja */
                 margin-top: 8vh !important; 
                 margin-bottom: 0 !important;
@@ -768,6 +768,10 @@
                     <span class="big-clock-date" id="bigDate">---</span>
                     <span style="color: #444;" id="dateSeparator">•</span>
                     <span class="big-clock-nameday" id="bigNameday">---</span>
+                </div>
+                
+                <div id="player-now-playing" style="font-size: 1.2rem; color: #aaa; margin-top: 10px; min-height: 1.5em; text-align: center;">
+                    Načítavam informácie o skladbe...
                 </div>
                 
                 <div class="main-weather-container">
@@ -986,6 +990,14 @@
             if (t < 28) return '#ffa500';
             return '#ff4500';
         }
+        function getWeatherIcon(wCode) {
+            if (wCode >= 1 && wCode <= 3) return "⛅";
+            if (wCode >= 45 && wCode <= 48) return "🌫️";
+            if ((wCode >= 51 && wCode <= 67) || (wCode >= 80 && wCode <= 82)) return "🌧️";
+            if ((wCode >= 71 && wCode <= 77) || (wCode >= 85 && wCode <= 86)) return "❄️";
+            if (wCode >= 95 && wCode <= 99) return "⛈️";
+            return "☀️";
+        }
 
         async function fetchWeatherData() {
             try {
@@ -1002,15 +1014,7 @@
                     const appTemp = Math.round(rawApparent);
                     const tColor = getTempColor(rawTemp);
                     const appColor = getTempColor(rawApparent);
-
-                    function getWeatherIcon(wCode) {
-                        if (wCode >= 1 && wCode <= 3) return "⛅";
-                        if (wCode >= 45 && wCode <= 48) return "🌫️";
-                        if ((wCode >= 51 && wCode <= 67) || (wCode >= 80 && wCode <= 82)) return "🌧️";
-                        if ((wCode >= 71 && wCode <= 77) || (wCode >= 85 && wCode <= 86)) return "❄️";
-                        if (wCode >= 95 && wCode <= 99) return "⛈️";
-                        return "☀️";
-                    }
+                  
                     const icon = getWeatherIcon(code);
                     aktualnaTeplotaText = `${icon} ${temp}°C`;
 
@@ -1062,7 +1066,7 @@
                 console.log("Chyba pri načítaní počasia:", e);
             }
         }
-
+         
         function vykresliGraf(mod) {
             const chartContainer = document.getElementById('hourly-chart-container');
             if (!chartContainer || !weatherDataBackup) return;
@@ -1114,15 +1118,7 @@
                 const rainHtml = rainVal > 0 ? `<span class="chart-rain-info">💧${rainVal.toFixed(1)}</span>` : `<span class="chart-rain-info">&nbsp;</span>`;
                 
                 const cCode = codes[idx] !== undefined ? codes[idx] : 0;
-                function getWeatherEmoji(wCode) {
-                    if (wCode >= 1 && wCode <= 3) return "⛅";
-                    if (wCode >= 45 && wCode <= 48) return "🌫️";
-                    if ((wCode >= 51 && wCode <= 67) || (wCode >= 80 && wCode <= 82)) return "🌧️";
-                    if ((wCode >= 71 && wCode <= 77) || (wCode >= 85 && wCode <= 86)) return "❄️";
-                    if (wCode >= 95 && wCode <= 99) return "⛈️";
-                    return "☀️";
-                }
-                const weatherIconHtml = `<span class="chart-icon-info">${getWeatherEmoji(cCode)}</span>`;
+                const weatherIconHtml = `<span class="chart-icon-info">${getWeatherIcon(cCode)}</span>`;
 
                 const cloudVal = cloud[idx] ? Math.round(cloud[idx]) : 0;
                 const bgOpacity = 0.05 + (cloudVal / 100) * 0.15; 
@@ -1191,15 +1187,6 @@
             
             const dniVTyzdni = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
             const dnes = new Date();
-
-            function getWeatherIcon(wCode) {
-                if (wCode >= 1 && wCode <= 3) return "⛅";
-                if (wCode >= 45 && wCode <= 48) return "🌫️";
-                if ((wCode >= 51 && wCode <= 67) || (wCode >= 80 && wCode <= 82)) return "🌧️";
-                if ((wCode >= 71 && wCode <= 77) || (wCode >= 85 && wCode <= 86)) return "❄️";
-                if (wCode >= 95 && wCode <= 99) return "⛈️";
-                return "☀️";
-            }
 
             for (let i = 0; i <= 5; i++) {
                 if(i >= weatherDataBackup.daily.weather_code.length) break;
@@ -1602,6 +1589,8 @@
         function playRadio(url, id) {
             audio.src = url;
             audio.load();
+            // Zoberieme priamu URL adresu rádia a spustíme analýzu streamu
+            sledujStreamMetadat(url);
             currentPlayingType = id;
             localStorage.setItem('kiosk_last_radio_url', url);
             localStorage.setItem('kiosk_last_radio_type', id);
@@ -1847,6 +1836,8 @@
                     renderSidebarFavorites();
                     runClockEngine();
                     aktualizujNochnyPrehravacVizual();
+                    if (metadataController) metadataController.abort();
+                    document.getElementById("player-now-playing").innerText = "";
                 }, CAS_PRE_HARD_STOP);
             });
                 
@@ -1863,14 +1854,90 @@
         document.addEventListener('touchstart', function (event) {
             if (event.touches.length > 1) event.preventDefault();
         }, { passive: false });
+
+        let metadataController = null; // Umožní nám zastaviť čítanie pri prepnutí rádia
+        
+        async function sledujStreamMetadat(streamUrl) {
+            // Ak už nejaké čítanie beží, zastavíme ho
+            if (metadataController) {
+                metadataController.abort();
+            }
+            metadataController = new AbortController();
+        
+            const textElement = document.getElementById("player-now-playing");
+            textElement.innerText = "Hľadám názov skladby...";
+        
+            try {
+                // Požiadame o stream s požiadavkou na ICY metadáta
+                const response = await fetch(streamUrl, {
+                    headers: { 'Icy-Metadata': '1' },
+                    signal: metadataController.signal
+                });
+        
+                // Zistíme, ako často server posiela metadáta (v bajtoch)
+                const metaInt = parseInt(response.headers.get('icy-metaint'));
+                if (!metaInt) {
+                    textElement.innerText = "Tento stream neposiela priebežné metadáta.";
+                    return;
+                }
+        
+                const reader = response.body.getReader();
+                let buffer = new Uint8Array();
+                let bytesRead = 0;
+        
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+        
+                    // Spájame prichádzajúce zvukové dáta
+                    let newBuffer = new Uint8Array(buffer.length + value.length);
+                    newBuffer.set(buffer);
+                    newBuffer.set(value, buffer.length);
+                    buffer = newBuffer;
+        
+                    // Prechádzame dáta a hľadáme metadáta na základe intervalu metaInt
+                    while (buffer.length > metaInt) {
+                        // Preskočíme samotné audio dáta
+                        const metaLengthByte = buffer[metaInt];
+                        const metaLength = metaLengthByte * 16; // Dĺžka metadát je násobok 16
+        
+                        if (buffer.length >= metaInt + 1 + metaLength) {
+                            if (metaLength > 0) {
+                                // Vytiahneme textový balíček s metadátami
+                                const metaBytes = buffer.subarray(metaInt + 1, metaInt + 1 + metaLength);
+                                const decoder = new TextDecoder('utf-8');
+                                const metaString = decoder.decode(metaBytes);
+        
+                                // Metadáta vyzerajú takto: StreamTitle='Interpret - Pieseň';
+                                const match = metaString.match(/StreamTitle='(.*?)';/);
+                                if (match && match[1]) {
+                                    textElement.innerText = match[1]; // Vypíšeme pesničku na displej
+                                }
+                            }
+                            // Odstrihneme spracovanú časť a pokračujeme v čítaní ďalšej
+                            buffer = buffer.subarray(metaInt + 1 + metaLength);
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.log("Chyba pri čítaní metadát:", error);
+                    textElement.innerText = "";
+                }
+            }
+        }
+        
     </script>
-</body>
-    <!-- Vyskakujúce okno pre zoznam mien -->
-<div id="namesModal" style="display: none; position: fixed; z-index: 9999999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); justify-content: center; align-items: center;" onclick="this.style.display='none'">
-    <div style="background: #111; border: 1px solid #ff9f0a; padding: 20px; border-radius: 12px; text-align: center; min-width: 250px; max-width: 80%;" onclick="event.stopPropagation()">
-        <h3 style="color: #ff9f0a; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 16px;">Dnes majú meniny</h3>
-        <div id="modalNamesList" style="font-size: 20px; font-weight: bold; color: #fff; display: flex; flex-direction: column; gap: 8px; margin: 15px 0;"></div>
-        <button onclick="document.getElementById('namesModal').style.display='none'" style="background: #222; color: #ff9f0a; border: 1px solid #ff9f0a; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;">Zatvoriť</button>
+     <!-- Vyskakujúce okno pre zoznam mien -->
+    <div id="namesModal" style="display: none; position: fixed; z-index: 9999999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); justify-content: center; align-items: center;" onclick="this.style.display='none'">
+        <div style="background: #111; border: 1px solid #ff9f0a; padding: 20px; border-radius: 12px; text-align: center; min-width: 250px; max-width: 80%;" onclick="event.stopPropagation()">
+            <h3 style="color: #ff9f0a; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 16px;">Dnes majú meniny</h3>
+            <div id="modalNamesList" style="font-size: 20px; font-weight: bold; color: #fff; display: flex; flex-direction: column; gap: 8px; margin: 15px 0;"></div>
+            <button onclick="document.getElementById('namesModal').style.display='none'" style="background: #222; color: #ff9f0a; border: 1px solid #ff9f0a; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;">Zatvoriť</button>
+        </div>
     </div>
-</div>
+</body>
+   
 </html>
