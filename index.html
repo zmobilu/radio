@@ -436,7 +436,7 @@
                 transform: translateY(0) !important;
             }
             body.full-night-mode .big-clock-time {
-                transform: scaleY(1.30) translateY(-4vh) !important;
+                transform: scaleY(1.30) translateY(-10vh) !important;
             }
             body.full-night-mode .night-player-container {
                 flex-direction: row !important;
@@ -1685,7 +1685,14 @@
             if ((jeNocnyCas || manualnaNocAktivna) && terazMili > nocnyRezimSnoozeDo && !isSettingsModeActive) {
                 bodyEl.classList.add('full-night-mode');
                 
-                let meninyNocturnalText = dnesneMeno ? `${dnesneMeno}    •    ` : "";
+            // Pôvodný riadok: let meninyNocturnalText = dnesneMeno ? `${dnesneMeno}    •    ` : "";
+            // NOVÝ RIADOK:
+            let meninyNocturnalText = "";
+            if (dnesneMeno) {
+                // Ak máme v poli viac mien, pridáme k menu "+X" aj pre nočný režim
+                const extraMena = (dnesneVsetkyMena.length > 1) ? ` +${dnesneVsetkyMena.length - 1}` : "";
+                meninyNocturnalText = `${dnesneMeno}${extraMena}    •    `;
+            }
                 
                 if (bottomInfoEl) {
                     const lenCisloTeploty = parseInt(aktualnaTeplotaText.replace(/[^0-9.-]/g, '')) || 0;
