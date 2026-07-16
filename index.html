@@ -1863,7 +1863,7 @@
         let bauerIntervalId = null;    // Globálna premenná na zastavenie aktualizácie pesničiek Bauer rádií
         
         async function sledujStreamMetadat(streamUrl) {
-            // 1. ZASTAVÍME VŠETKO BEŽIACE
+            // 1. ZASTAVÍME VŠETKO BEŽIACE (streamy aj časovače API)
             if (metadataController) {
                 metadataController.abort();
             }
@@ -1877,12 +1877,55 @@
             const textElement = document.getElementById("player-now-playing");
             textElement.innerText = "Hľadám názov skladby...";
         
-            // --- PODPORA PRE BAUER MEDIA API (CORS obchádzka pre Rock, Expres, Europa 2, Melody) ---
-            const bauerStanice = ["rock", "expres", "europa2", "melody"];
+            // --- VÝNIMKA PRE RÁDIÁ S OFICIÁLNYM API (STVR + BAUER) ---
             
+            // 1. RÁDIO SLOVENSKO & RÁDIO_FM (STVR API)
+            if (currentPlayingType === "slovensko" || currentPlayingType === "fm") {
+                try {
+                    const stanicaId = currentPlayingType;
+                    // Mapovanie ID tvojho systému na ID v API STVR (Slovensko = 1, FM = 4)
+                    const stvrId = (stanicaId === "slovensko") ? 1 : 4; 
+        
+                    const nacitajStvrPiesen = async () => {
+                        if (currentPlayingType !== stanicaId) return;
+                        const res = await fetch("https://api.stvr.sk/news/playing");
+                        const data = await res.json();
+                        
+                        if (data && data.playing) {
+                            const info = data.playing.find(r => r.station_id === stvrId);
+                            if (info && info.now) {
+                                textElement.innerText = `${info.now.artist} - ${info.now.title}`;
+                            } else {
+                                textElement.innerText = "Hrá slovo / Živé vysielanie";
+                            }
+                        }
+                    };
+        
+                    await nacitajStvrPiesen();
+        
+                    // Interval aktualizácie každých 30 sekúnd
+                    bauerIntervalId = setInterval(async () => {
+                        if (currentPlayingType === stanicaId) {
+                            await nacitajStvrPiesen();
+                        } else {
+                            clearInterval(bauerIntervalId);
+                            bauerIntervalId = null;
+                        }
+                    }, 30000);
+        
+                    return; // Ukončíme, aby sme nečítali surový stream
+                } catch (e) {
+                    console.log("Chyba STVR API:", e);
+                    textElement.innerText = "Informácie nedostupné";
+                    return;
+                }
+            }
+        
+            // 2. BAUER MEDIA (Rock, Expres, Europa 2, Melody)
+            const bauerStanice = ["rock", "expres", "europa2", "melody"];
             if (bauerStanice.includes(currentPlayingType)) {
                 try {
-                    const stanicaId = currentPlayingType; // Uložíme si, čo práve začalo hrať
+                    const stanicaId = currentPlayingType;
                     
                     const nacitajBauerPiesen = async () => {
                         if (currentPlayingType !== stanicaId) return;
@@ -1893,10 +1936,8 @@
                         }
                     };
                     
-                    // Načítame hneď pri štarte
                     await nacitajBauerPiesen();
                     
-                    // Nastavíme pravidelnú aktualizáciu (každých 30 sekúnd) uloženú v globálnej premennej
                     bauerIntervalId = setInterval(async () => {
                         if (currentPlayingType === stanicaId) {
                             await nacitajBauerPiesen();
@@ -1906,15 +1947,16 @@
                         }
                     }, 30000);
                     
-                    return; // Ukončíme funkciu, aby sme nečítali stream, keďže máme API
+                    return; // Ukončíme, aby sme nečítali surový stream
                 } catch (e) {
                     console.log("Chyba Bauer API:", e);
                     textElement.innerText = "Informácie nedostupné";
                     return;
                 }
             }
-            // -------------------------------------------------------------------------------------
+            // ----------------------------------------------------------------------
         
+            // 3. PRIAME ČÍTANIE METADÁT ZO STREAMU (pre Fun Chill, Rádio TO atď.)
             try {
                 // Požiadame o stream s požiadavkou na ICY metadáta
                 const response = await fetch(streamUrl, {
@@ -1967,7 +2009,7 @@
             } catch (error) {
                 if (error.name !== 'AbortError') {
                     console.log("Chyba pri čítaní metadát:", error);
-                    textElement.innerText = "";
+                    textElement.innerText = "Informácie nedostupné";
                 }
             }
         }
