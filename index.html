@@ -1647,6 +1647,11 @@
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             
+            // Ak je celá hodina (napr. 01:00, 02:00...) a presne 0. sekunda, skontroluj/načítaj meniny
+            if (m === '00' && now.getSeconds() === 0) {
+                fetchNamedayData();
+            }
+            
             const aktCasString = `${h}:${m}`;
             document.getElementById('bigHours').textContent = h;
             document.getElementById('bigMinutes').textContent = m;
