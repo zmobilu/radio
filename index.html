@@ -1600,6 +1600,11 @@
         }
         
         function playRadio(url, id) {
+            // --- SEM PRIDÁME TENTO RIADOK ---
+	        if (id === "fun" || id === "slovensko") {
+        	testujApiPiesni(id);
+	        }
+	        // --------------------------------
             audio.src = url;
             audio.load();
             currentPlayingType = id;
@@ -1863,6 +1868,44 @@
         document.addEventListener('touchstart', function (event) {
             if (event.touches.length > 1) event.preventDefault();
         }, { passive: false });
+        
+        // Pomocná testovacia funkcia na načítanie hranej piesne
+        async function testujApiPiesni(idRadia) {
+            console.log(`Skúšam načítať pieseň pre: ${idRadia}`);
+            
+            try {
+                if (idRadia === "slovensko") {
+                    // Oficiálne API pre stanice STVR (Slovensko, Rádio_FM, atď.)
+                    const response = await fetch("https://api.stvr.sk/news/playing");
+                    const data = await response.json();
+                    console.log("STVR API odpoveď:", data);
+                    
+                    // Nájdeme v zozname rádio Slovensko (zvyčajne má id 1 alebo názov "Slovensko")
+                    // Naformátujeme výstup podľa toho, ako presne vyzerá štruktúra ich JSONu
+                    if (data && data.playing) {
+                        const slovenskoInfo = data.playing.find(r => r.station_id === 1 || r.station_name === "Slovensko");
+                        if (slovenskoInfo && slovenskoInfo.now) {
+                            console.log("Aktuálne hrá na Slovensku:", slovenskoInfo.now.artist + " - " + slovenskoInfo.now.title);
+                            return slovenskoInfo.now.artist + " - " + slovenskoInfo.now.title;
+                        }
+                    }
+                } 
+                else if (idRadia === "fun") {
+                    // Oficiálne API pre Fun Rádio
+                    const response = await fetch("https://www.funradio.sk/api/songs/now");
+                    const data = await response.json();
+                    console.log("Fun Rádio API odpoveď:", data);
+                    
+                    if (data && data.artist && data.title) {
+                        console.log("Aktuálne hrá na Fun Rádiu:", data.artist + " - " + data.title);
+                        return data.artist + " - " + data.title;
+                    }
+                }
+            } catch (error) {
+                console.error(`Chyba pri načítaní API pre ${idRadia}:`, error);
+            }
+            return null;
+        }
     </script>
 </body>
     <!-- Vyskakujúce okno pre zoznam mien -->
