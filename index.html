@@ -1708,6 +1708,9 @@
             document.title = `${aktualnaTeplotaText} | ${stavRadia}`;
         }
 
+        // Globálna premenná, kde si uložíme kompletný zoznam mien pre daný deň
+        let dnesneVsetkyMena = [];
+
         async function fetchNamedayData() {
             const now = new Date();
             const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -1717,14 +1720,24 @@
                 const text = await response.text();
                 for (let line of text.split('\n')) {
                     if (line.includes(`${mm}-${dd}`)) {
-                        let povodneMeno = line.split(/[;,]/)[1].trim();
+                        // Rozdelíme riadok: na indexe 0 je dátum, na indexe 1 sú mená oddelené čiarkami
+                        let rawNamesLine = line.split(/[;,]/).slice(1).join(',');
+                        // Vyčistíme mená od prázdnych znakov a rozdelíme ich do poľa
+                        dnesneVsetkyMena = rawNamesLine.split(',').map(m => m.trim()).filter(m => m !== "");
+
+                        if (dnesneVsetkyMena.length === 0) return;
+
+                        // Hlavné meno bude prvé v poradí
+                        let povodneMeno = dnesneVsetkyMena[0];
                         dnesneMeno = povodneMeno; 
+                        
                         const bigNameday = document.getElementById('bigNameday');
                         const sep = document.getElementById('dateSeparator');
                         
                         if(sep) sep.style.display = "inline";
                         bigNameday.style.color = "#ff9f0a";
 
+                        // Priradenie ikoniek podľa tvojich kategórií
                         if (RODINA.includes(povodneMeno)) {
                             dnesneMeno = `❤️ ${povodneMeno}`;
                             bigNameday.style.color = "#ff3b30";
@@ -1737,7 +1750,22 @@
                             dnesneMeno = `💼 ${povodneMeno}`;
                             bigNameday.style.color = "#34c759";
                         }
-                        bigNameday.textContent = dnesneMeno;
+
+                        // Ak existujú ďalšie mená, pridáme indikátor +X (napr. +2)
+                        if (dnesneVsetkyMena.length > 1) {
+                            const pocetDalsich = dnesneVsetkyMena.length - 1;
+                            bigNameday.innerHTML = `${dnesneMeno} <span style="color: #666; font-size: 0.8em; font-weight: normal; margin-left: 4px;">+${pocetDalsich}</span>`;
+                        } else {
+                            bigNameday.textContent = dnesneMeno;
+                        }
+
+                        // Nastavíme kliknutie na zobrazenie vyskakovacieho okna
+                        bigNameday.style.cursor = 'pointer';
+                        bigNameday.onclick = (event) => {
+                            event.stopPropagation(); // zabráni spusteniu iných kliknutí (napr. nočného režimu)
+                            otvorOknoMien();
+                        };
+
                         break;
                     }
                 }
@@ -1745,6 +1773,42 @@
                 const sep = document.getElementById('dateSeparator');
                 if(sep) sep.style.display = "none";
             }
+        }
+
+        // Pomocná funkcia, ktorá naplní a zobrazí vyskakovacie okno
+        function otvorOknoMien() {
+            const modal = document.getElementById('namesModal');
+            const listContainer = document.getElementById('modalNamesList');
+            if (!modal || !listContainer) return;
+
+            listContainer.innerHTML = "";
+
+            // Vypíšeme všetky mená pod seba
+            dnesneVsetkyMena.forEach((meno, index) => {
+                const item = document.createElement('div');
+                let symbol = "";
+                
+                // Pridáme symboly k menám aj v okne, ak sa nachádzajú v tvojich zoznamoch
+                if (RODINA.includes(meno)) symbol = "❤️ ";
+                else if (MOJE_MENA.includes(meno)) symbol = "⭐ ";
+                else if (SPOLUZIACI.includes(meno)) symbol = "🎓 ";
+                else if (KOLEGOVIA.includes(meno)) symbol = "💼 ";
+
+                item.textContent = `${symbol}${meno}`;
+                // Prvé meno zvýrazníme, keďže je hlavné
+                if (index === 0) {
+                    item.style.color = "#ff9f0a";
+                    item.style.borderBottom = "1px solid #222";
+                    item.style.paddingBottom = "8px";
+                    item.style.marginBottom = "4px";
+                } else {
+                    item.style.color = "#aaa";
+                    item.style.fontSize = "18px";
+                }
+                listContainer.appendChild(item);
+            });
+
+            modal.style.display = "flex";
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1815,4 +1879,12 @@
         }, { passive: false });
     </script>
 </body>
+    <!-- Vyskakujúce okno pre zoznam mien -->
+<div id="namesModal" style="display: none; position: fixed; z-index: 9999999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); justify-content: center; align-items: center;" onclick="this.style.display='none'">
+    <div style="background: #111; border: 1px solid #ff9f0a; padding: 20px; border-radius: 12px; text-align: center; min-width: 250px; max-width: 80%;" onclick="event.stopPropagation()">
+        <h3 style="color: #ff9f0a; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 16px;">Dnes majú meniny</h3>
+        <div id="modalNamesList" style="font-size: 20px; font-weight: bold; color: #fff; display: flex; flex-direction: column; gap: 8px; margin: 15px 0;"></div>
+        <button onclick="document.getElementById('namesModal').style.display='none'" style="background: #222; color: #ff9f0a; border: 1px solid #ff9f0a; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;">Zatvoriť</button>
+    </div>
+</div>
 </html>
