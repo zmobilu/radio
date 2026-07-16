@@ -1849,27 +1849,6 @@
                     aktualizujNochnyPrehravacVizual();
                 }, CAS_PRE_HARD_STOP);
             });
-
-            // --- ANTI-STALL LOGIKA ---
-            let stallTimeout = null;
-            audio.addEventListener('waiting', () => {
-                if (currentPlayingType && currentPlayingType !== "" && !audio.paused) {
-                    clearTimeout(stallTimeout);
-                    stallTimeout = setTimeout(() => {
-                        console.log("Detekovaný výpadok bufferu, reštartujem stream...");
-                        const currentUrl = audio.src;
-                        if (currentUrl) {
-                            audio.pause();
-                            audio.load();
-                            audio.play().catch(e => console.log("Chyba auto-reštartu:", e));
-                        }
-                    }, 10000); 
-                }
-            });
-
-            audio.addEventListener('playing', () => {
-                clearTimeout(stallTimeout);
-            });
                 
             fetchWeatherData();
             setInterval(fetchWeatherData, 15 * 60 * 1000);
