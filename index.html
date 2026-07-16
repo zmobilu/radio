@@ -1837,6 +1837,10 @@
                     runClockEngine();
                     aktualizujNochnyPrehravacVizual();
                     if (metadataController) metadataController.abort();
+                    if (bauerIntervalId) {
+                        clearInterval(bauerIntervalId);
+                        bauerIntervalId = null;
+                    }
                     document.getElementById("player-now-playing").innerText = "";
                 }, CAS_PRE_HARD_STOP);
             });
@@ -1856,16 +1860,60 @@
         }, { passive: false });
 
         let metadataController = null; // Umožní nám zastaviť čítanie pri prepnutí rádia
+        let bauerIntervalId = null;    // Globálna premenná na zastavenie aktualizácie pesničiek Bauer rádií
         
         async function sledujStreamMetadat(streamUrl) {
-            // Ak už nejaké čítanie beží, zastavíme ho
+            // 1. ZASTAVÍME VŠETKO BEŽIACE
             if (metadataController) {
                 metadataController.abort();
             }
             metadataController = new AbortController();
         
+            if (bauerIntervalId) {
+                clearInterval(bauerIntervalId);
+                bauerIntervalId = null;
+            }
+        
             const textElement = document.getElementById("player-now-playing");
             textElement.innerText = "Hľadám názov skladby...";
+        
+            // --- PODPORA PRE BAUER MEDIA API (CORS obchádzka pre Rock, Expres, Europa 2, Melody) ---
+            const bauerStanice = ["rock", "expres", "europa2", "melody"];
+            
+            if (bauerStanice.includes(currentPlayingType)) {
+                try {
+                    const stanicaId = currentPlayingType; // Uložíme si, čo práve začalo hrať
+                    
+                    const nacitajBauerPiesen = async () => {
+                        if (currentPlayingType !== stanicaId) return;
+                        const res = await fetch(`https://api.bauermedia.sk/playing/now?station=${stanicaId}`);
+                        const data = await res.json();
+                        if (data && data.artist && data.title) {
+                            textElement.innerText = `${data.artist} - ${data.title}`;
+                        }
+                    };
+                    
+                    // Načítame hneď pri štarte
+                    await nacitajBauerPiesen();
+                    
+                    // Nastavíme pravidelnú aktualizáciu (každých 30 sekúnd) uloženú v globálnej premennej
+                    bauerIntervalId = setInterval(async () => {
+                        if (currentPlayingType === stanicaId) {
+                            await nacitajBauerPiesen();
+                        } else {
+                            clearInterval(bauerIntervalId);
+                            bauerIntervalId = null;
+                        }
+                    }, 30000);
+                    
+                    return; // Ukončíme funkciu, aby sme nečítali stream, keďže máme API
+                } catch (e) {
+                    console.log("Chyba Bauer API:", e);
+                    textElement.innerText = "Informácie nedostupné";
+                    return;
+                }
+            }
+            // -------------------------------------------------------------------------------------
         
             try {
                 // Požiadame o stream s požiadavkou na ICY metadáta
@@ -1883,7 +1931,6 @@
         
                 const reader = response.body.getReader();
                 let buffer = new Uint8Array();
-                let bytesRead = 0;
         
                 while (true) {
                     const { done, value } = await reader.read();
@@ -1897,24 +1944,20 @@
         
                     // Prechádzame dáta a hľadáme metadáta na základe intervalu metaInt
                     while (buffer.length > metaInt) {
-                        // Preskočíme samotné audio dáta
                         const metaLengthByte = buffer[metaInt];
-                        const metaLength = metaLengthByte * 16; // Dĺžka metadát je násobok 16
+                        const metaLength = metaLengthByte * 16; 
         
                         if (buffer.length >= metaInt + 1 + metaLength) {
                             if (metaLength > 0) {
-                                // Vytiahneme textový balíček s metadátami
                                 const metaBytes = buffer.subarray(metaInt + 1, metaInt + 1 + metaLength);
                                 const decoder = new TextDecoder('utf-8');
                                 const metaString = decoder.decode(metaBytes);
         
-                                // Metadáta vyzerajú takto: StreamTitle='Interpret - Pieseň';
                                 const match = metaString.match(/StreamTitle='(.*?)';/);
                                 if (match && match[1]) {
-                                    textElement.innerText = match[1]; // Vypíšeme pesničku na displej
+                                    textElement.innerText = match[1]; 
                                 }
                             }
-                            // Odstrihneme spracovanú časť a pokračujeme v čítaní ďalšej
                             buffer = buffer.subarray(metaInt + 1 + metaLength);
                         } else {
                             break;
