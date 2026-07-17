@@ -125,11 +125,6 @@
             margin-top: 2vh; /* ZMENA: 4vh povodne Odstránená horná medzera pre pritiahnutie k hornému okraju */
             margin-bottom: 0;
         }
-        /*.big-clock-time {
-            font-size: 23vw; font-weight: 800; line-height: 0.75; letter-spacing: -4px;
-            display: flex; justify-content: center; align-items: center; width: 100%;
-            transform: scaleY(1.05); cursor: pointer; margin-top: 0;
-        }*/
         .big-clock-date-wrapper {
             display: flex;
             flex-wrap: wrap;
@@ -145,43 +140,99 @@
             width: 100%;
             flex: 0 0 auto;
             margin: 4vh 0 1vh 0; /* Poradie: HORE (4vh) | VPRAVO (0) | DOLE (2vh) | VĽAVO (0) */
-        }
-        /* SPOJENÝ A ZVÄČŠENÝ RIADOK PRE MESTO, DÁTUM A MENINY */
-        /*.big-clock-date-wrapper {
-            display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; 
-            width: 100%; border-bottom: 1px dashed #333; padding-bottom: 1.5vh; margin-top: -0.5vh;
-            font-size: 3.4vmin; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
-        }*/
+        }        
         .big-clock-hours { color: #fff; }
         .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
         .big-clock-city { color: #ff9f0a; font-weight: bold; letter-spacing: 2px; }
         .big-clock-date { color: #fff; }
         .big-clock-nameday { color: #ff9f0a; }
 
-        /* 1. Hlavný obal počasia dostane rovnakú šírku, aby pod sebou všetko sedelo na milimeter */
+        /* 1. Hlavný obal počasia - optimálna šírka pod hodinami */
         .main-weather-container {
             display: flex;
             flex-direction: column;
             width: 100%;
-            max-width: 680px;            /* Určuje celkovú ideálnu šírku celého bloku počasia */
-            margin: 0 auto;              /* Vycentruje celý tento blok v pravom paneli */
+            max-width: 580px;
+            margin: 0 auto;
             align-items: center;
             justify-content: center;
-            gap: 0vh;
+            gap: 0;
         }
         
-        /* 2. Upravená šírka vrchného riadku počasia */
-        .weather-top-row {
+        /* 2. Popis stavu (Polojasno) - menší a pritiahnutý bližšie k teplotám */
+        #mainWeatherDesc {
+            font-size: 2.8vmin;
+            font-weight: 500;            /* Tenšie písmo */
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 0.5vh;           /* Minimálny odstup od hlavnej teploty */
+            text-align: center;
+            width: 100%;
+        }
+        
+        /* 3. Spodný pás predpovede - pritiahnutý bližšie k Polojasno */
+        .main-mini-strip {
             display: flex;
-            flex-direction: row;
+            flex-direction: row; 
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            width: 100%;                 
+            margin-top: 1.5vh;           /* Malá medzera pod textom Polojasno */
+            gap: 15px;
+        }
+        
+        /* 4. Boxy predpovede - zmena na stĺpec (nápis hore, dáta pod ním) */
+        .mini-day-box {
+            display: flex;
+            flex-direction: column;      /* Prvky idú pod seba */
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            background: #080808;
+            border: 1px solid #111;
+            padding: 1vh 12px;           /* Kompaktné odsadenie */
+            border-radius: 10px;
+            box-sizing: border-box;
+            min-width: 0;
+        }
+        
+        /* 5. Nápis dňa (DNES / ZAJTRA) - menší, tenší a vycentrovaný nad dátami */
+        .mini-label { 
+            font-size: 2.8vmin;          /* Menšie písmo, prispôsobené pocitovej teplote */
+            color: #888;                 /* Jemnejšia sivá farba, aby nápis netlačil */
+            font-weight: 500;            /* Tenšia hrúbka písma */
+            letter-spacing: 1px; 
+            text-align: center;
+            margin-bottom: 4px;          /* Medzera medzi nápisom a riadkom s ikonou/teplotami */
+            width: 100%;
+        }
+        
+        /* 6. Údaje (ikona + teploty) v jednom riadku pod nápisom */
+        .mini-data-row {
+            display: flex;
+            flex-direction: row;         /* Ikona a teplota ostanú vedľa seba */
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: space-between; /* Roztlačí teplotu a bočné ikony na okraj tejto šírky */
-            width: 100%;                 /* Plná šírka prispôsobená kontajneru */
-            padding: 0 10px;             /* Drobná rezerva na krajoch */
-            box-sizing: border-box;
+            justify-content: center;     /* Vycentrované v boxe */
+            gap: 10px;                   /* Užšia medzera medzi ikonou a číslami */
+            width: 100%;
         }
-            
+        
+        /* 7. Menšia ikona v predpovedi */
+        #mainFc0Icon, #mainFc1Icon { 
+            font-size: 5.2vmin !important; /* Menšia veľkosť, aby sa riadok nerozťahoval */
+            display: inline-block;
+            line-height: 1;
+        }
+        
+        /* 8. Menšie a tenšie teploty v predpovedi */
+        #mainFc0Temp, #mainFc1Temp { 
+            font-size: 3.2vmin !important; /* Menšie písmo pre bezpečné zmestenie */
+            font-weight: 500;            /* Tenká hrúbka */
+            white-space: nowrap;
+        }
+           
         /* Celkový ľavý blok (stĺpec: top riadok + centrovaný popis pod ním) */
         .weather-left-side {
             display: flex;
@@ -189,19 +240,8 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-        }
-        
-         /* 4. Spodný pás predpovede sa roztiahne presne od okraja po okraj */
-        .main-mini-strip {
-            display: flex;
-            flex-direction: row; 
-            flex-wrap: nowrap;
-            justify-content: space-between; /* DNES pôjde úplne vľavo, ZAJTRA úplne vpravo */
-            width: 100%;                 /* Zmena z 90% na 100% pre dokonalé lícovanie s vrchným blokom */
-            max-width: 100%;             /* Zrušený limit 550px, šírku teraz riadi .main-weather-container */
-            margin-top: 3.5vh;           /* Elegantný rozostup od textu Polojasno */
-            gap: 20px;
-        }
+        }      
+         
         .weather-wrapper-block {
             display: flex;
             flex-direction: row; /* Na šírku: ikona a teplota vedľa seba */
@@ -209,12 +249,7 @@
             justify-content: center;
             align-items: center;
         }
-        /*.weather-wrapper-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }*/
+        
         .weather-core-row {
             display: flex;
             align-items: center;
@@ -223,18 +258,7 @@
         }
         #mainBigIcon { font-size: 19vmin !important; line-height: 1; }
         #mainBigTemp { font-size: 17vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
-        
-        /* 3. Popis stavu (napr. Polojasno) - zväčšíme a zvýrazníme */
-        #mainWeatherDesc {
-            font-size: 3.5vmin;          /* Zväčšené z 3vmin pre lepšiu čitateľnosť */
-            font-weight: 700;            /* Hrubšie písmo */
-            color: #eee;                 /* Jasnejšia biela, aby text pekne vystúpil */
-            text-transform: uppercase;
-            letter-spacing: 3px;         /* Širšie rozostupy písmen */
-            margin-top: 2vh;             /* Väčšia medzera pod teplotami */
-            text-align: center;
-            width: 100%;
-        }
+                
         /* Pocitový stĺpec vedľa hlavnej teploty */
         .weather-sub-row { 
             font-size: 4.8vmin !important; 
@@ -256,31 +280,7 @@
         }
         
         .sub-row-item-temp i { color: #ffa500; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }
-        .sub-row-item-hum i { color: #4dabff; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }
-        /* 5. Boxy predpovede - zväčšenie písma a vnútorného priestoru */
-        .mini-day-box {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            flex: 1;                     /* Rovnomerné rozdelenie šírky */
-            background: #080808;
-            border: 1px solid #111;
-            padding: 1.8vh 24px;         /* Zväčšený padding pre masívnejší vzhľad */
-            border-radius: 12px;
-            box-sizing: border-box;
-            min-width: 0;
-        }
-        
-        /* 6. Zväčšenie textu DNES / ZAJTRA */
-        .mini-label { 
-            font-size: 3.8vmin;          /* Zväčšené z 3.4vmin */
-            color: #fff; 
-            font-weight: 800;            /* Extra hrubé pre prémiovejší vzhľad */
-            letter-spacing: 1.5px; 
-            text-align: left;
-            margin-bottom: 0;
-        }
+        .sub-row-item-hum i { color: #4dabff; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }        
         
         /* Údaje (ikona + teploty) v jednom riadku na pravej strane boxu */
         .mini-data-row {
@@ -290,19 +290,6 @@
             align-items: center;
             justify-content: flex-end;
             gap: 15px;               /* Medzera medzi ikonou a číslami */
-        }
-        
-        /* 7. Teploty v predpovedi */
-        #mainFc0Temp, #mainFc1Temp { 
-            font-size: 4.5vmin !important; /* Zväčšené z 4.2vmin */
-            font-weight: 800; 
-            white-space: nowrap;
-        }
-        
-        /* 8. Ikona v predpovedi */
-        #mainFc0Icon, #mainFc1Icon { 
-            font-size: 7.2vmin !important; /* Jemné zväčšenie ikoniek */
-            display: inline-block;
         }
 
         /* --- EXTRA KOMPAKTNÝ PANEL NASTAVENÍ --- */
