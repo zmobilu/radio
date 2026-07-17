@@ -121,7 +121,7 @@
             transform: scaleY(1.4);
             transform-origin: center center;
             /* ZMENA: Stiahnutie hodín nižšie od horného okraja */
-            margin-top: 4vh; 
+            margin-top: 2vh; /* ZMENA: 4vh povodne Odstránená horná medzera pre pritiahnutie k hornému okraju */
             margin-bottom: 0;
         }
         
@@ -132,17 +132,14 @@
             align-items: center;
             text-align: center;
             gap: 5px 12px;
-            
-            /* ZMENA: Zvýšený spodný limit na 18px, ideálna veľkosť na 3.5vh a strop na 32px */
+             /* ZMENA: Zvýšený spodný limit na 18px, ideálna veľkosť na 3.5vh a strop na 32px */
             font-size: clamp(18px, 3.0vh, 32px); 
-            
             /* PRIDANÉ: Zvýraznenie hrúbky písma, aby nebol riadok taký tenký */
             font-weight: 600; 
-            
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             width: 100%;
             flex: 0 0 auto;
-            margin: 2vh 0;
+            margin: 4vh 0 2vh 0; /* ZMENA: z 2vh na 4vh hore zabezpečí bezchybný odskok od natiahnutých hodín */
         }
         /*.big-clock-time {
             font-size: 23vw; font-weight: 800; line-height: 0.75; letter-spacing: -4px;
