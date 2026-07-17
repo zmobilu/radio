@@ -300,16 +300,6 @@
         
         .sub-row-item-temp i { color: #ffa500; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }
         .sub-row-item-hum i { color: #4dabff; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }        
-        
-        /* Údaje (ikona + teploty) v jednom riadku na pravej strane boxu */
-        .mini-data-row {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;       /* Striktný zákaz zalomenia teplôt */
-            align-items: center;
-            justify-content: flex-end;
-            gap: 15px;               /* Medzera medzi ikonou a číslami */
-        }
 
         /* --- EXTRA KOMPAKTNÝ PANEL NASTAVENÍ --- */
         .settings-night-panel {
@@ -611,140 +601,45 @@
                 padding: 2vh 3vw; 
                 display: flex;
                 flex-direction: column;
-                justify-content: flex-start; /* Zmena: hodiny ostanú hore, nebudú centrované */
+                justify-content: flex-start; /* Hodiny ostanú hore */
                 height: 100%;
                 box-sizing: border-box;
-                gap: 0; /* Zrušíme fixný gap, rozostupy vyriešime flexom */
+                gap: 0; 
             }
             .big-clock-time { 
                 font-size: 26vmin; 
                 line-height: 0.8; 
-                /* Výraznejšie natiahnutie na výšku */
                 transform: scaleY(1.60) !important; 
                 transform-origin: center center !important;
-                /* Posun hodín smerom nadol od horného okraja */
                 margin-top: 8vh !important; 
                 margin-bottom: 0 !important;
                 width: 100%; 
                 display: flex;
                 justify-content: center; 
             }
-            /*.big-clock-date-wrapper { margin-top: 0; padding-bottom: 1vh; width: 100%; font-size: 3.8vmin; flex-wrap: wrap; justify-content: center; }*/
             .big-clock-date-wrapper { 
-                /* Pridáme horný okraj, aby kvôli vysokému scale hodín text nevbehol do číslic */
                 margin-top: 5vh !important; 
                 padding-bottom: 1vh;
                 width: 100%; 
                 font-size: 3.8vmin; 
-                display: flex;          /* Uistite sa, že je aj tu */
+                display: flex;          
                 flex-wrap: wrap; 
                 justify-content: center; 
-                text-align: center;     /* Zaistí dokonalé vycentrovanie menín pod dátumom */
-                /* PRIDANÉ: Zvýraznenie hrúbky písma, aby nebol riadok taký tenký */
+                text-align: center;     
                 font-weight: 600;
             }
             .big-clock-date { color: #fff; }
             .big-clock-nameday { margin-top: 0; }
         
+            /* BEZ ZMENY DIZAJNU: Originálny MAIN blok sa iba odtlačí nad rádiá */
             .main-weather-container { 
-                flex-direction: row !important; 
-                height: auto !important;
-                width: 100%; 
-                /* ZMENA: margin-top: auto odtlačí celý tento blok úplne nadol k rádiám */
                 margin-top: auto !important; 
-                margin-bottom: 1vh !important; 
-                flex: 0 0 auto !important; /* Fixný kontajner, ktorý sa len prispôsobí obsahu */
+                margin-bottom: 2vh !important; 
+                flex: 0 0 auto !important;
+                /* Ponechá si max-width: 480px a flex-direction: column z MAIN */
             }
-            .weather-left-side { width: 50% !important; border-right: 1px solid #151515 !important; padding: 0 4px; box-sizing: border-box; }
-            
-            .weather-core-row { 
-                flex-direction: column !important; 
-                gap: 4px !important; 
-            }
-            #mainBigIcon { font-size: 11vmin !important; line-height: 1; }
-            #mainBigTemp { 
-                font-size: 10vmin !important; 
-                white-space: nowrap !important;
-            }
-            #mainWeatherDesc { font-size: 2.5vmin !important; }
-            .weather-sub-row { font-size: 4vmin !important; gap: 12px; margin-top: 0.5vh; }
-        
-            .main-mini-strip { 
-                width: 50% !important; 
-                flex-direction: column !important; 
-                gap: 1.5vh !important; 
-                padding-left: 2vw; 
-                height: 100%; 
-                justify-content: center;
-                box-sizing: border-box; 
-            }
-            
-            .mini-day-box { 
-                width: 100% !important; 
-                height: 44%; 
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between; 
-                padding: 1.5vh 2vw !important; 
-                border-radius: 12px; 
-                box-sizing: border-box;
-            }
-            
-            .mini-label { 
-                font-size: 3.2vmin !important; 
-                width: 100%; 
-                text-align: center; 
-                letter-spacing: 1.5px;
-                margin-bottom: 2px;
-            }
-            
-            .mini-data-row {
-                flex-direction: row !important;      /* Držíme ikonu a text vedľa seba aj na výšku */
-                flex-wrap: nowrap !important;
-                gap: 6px !important;                 /* Mierne zmenšená medzera pre úzke displeje */
-                justify-content: center !important;
-                align-items: center !important;
-                width: 100% !important;
-                box-sizing: border-box !important;
-                flex: 1; 
-            }
-            
-            #mainFc0Icon, #mainFc1Icon { 
-                font-size: 7vmin !important; 
-                text-align: center !important; 
-                line-height: 1;
-            }
-            
-            #mainFc0Temp, #mainFc1Temp { 
-                font-size: 3.6vmin !important; 
-                font-weight: 700; 
-                width: 100%; 
-                text-align: center !important; 
-                white-space: nowrap !important; 
-                line-height: 1.1;
-            }
-                                            
-            .weather-detail-view { padding: 15px 10px; justify-content: space-between; }
-            #weather-location-main { font-size: 4vmin; }
-            #weather-location-date, #weather-location-time { font-size: 4vmin; }
-            #weather-details-top-inline { height: 45vh; }
-            #weather-sun-row { gap: 15px; margin-bottom: 1vh; }
-            .sun-box { padding: 3px 10px; font-size: 3vmin; }
-            .sun-box i { font-size: 3.2vmin !important; }
-            
-            #hourly-chart-container { height: 35vh; overflow-x: auto; overflow-y: hidden; justify-content: flex-start; gap: 15px; padding-bottom: 5px; }
-            #hourly-chart-container::-webkit-scrollbar { display: none; }
-            #hourly-chart-container > div { width: 55px !important; flex-shrink: 0; }
-            
-            .chart-temp-info { font-size: 3.5vmin; }
-            .chart-icon-info { font-size: 4.5vmin; }
-            .chart-rain-info { font-size: 2.8vmin; height: 3vmin; }
-            #hourly-chart-container span { font-size: 3.5vmin !important; }
-            
-            #extended-forecast-container { grid-template-columns: repeat(3, 1fr); height: 32vh; gap: 8px; margin-top: 2vh; }
-            .forecast-day-label { font-size: 3.2vmin; }
-            .forecast-day-icon { font-size: 7vmin !important; margin: 3px 0 !important; }
-            .forecast-day-temp { font-size: 3.5vmin !important; }
+
+            /* Ak v budúcnosti niečo pretečie, uvidíš to tu v surovom stave z MAIN */
         }
 
         .settings-grid-view { padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important; }
