@@ -1856,7 +1856,54 @@
                 }
             }
             // ----------------------------------------------------------------------
-        
+        // --- VÝNIMKA PRE SLOVENSKÝ ROZHLAS (STVR) ---
+            const sroStanice = ["slovensko", "fm", "devin", "regina"];
+            if (sroStanice.includes(currentPlayingType)) {
+                try {
+                    const stanicaId = currentPlayingType;
+                    // Mapa ID na kód stanice v API Slovenského rozhlasu
+                    const sroIdMap = { "slovensko": "slovensko", "fm": "fm", "devin": "devin", "regina": "regina-ba" };
+                    const apiKod = sroIdMap[stanicaId];
+
+                    const nacitajSroPiesen = async () => {
+                        if (currentPlayingType !== stanicaId) return;
+                        // Volanie oficiálneho API cez CORS proxy kvôli bezpečnosti v prehliadači
+                        const res = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://moj.rozhlas.sk/api/program/sro/' + apiKod + '/now-playing')}`);
+                        const data = await res.json();
+                        
+                        if (data && data.current && data.current.title) {
+                            const interpret = data.current.artist ? data.current.artist.name : "";
+                            const skladba = data.current.title;
+                            
+                            if (interpret) {
+                                textElement.innerText = `${interpret} - ${skladba}`;
+                            } else {
+                                textElement.innerText = skladba; // Ak ide napr. o reláciu, vypíše len jej názov
+                            }
+                        } else {
+                            textElement.innerText = "";
+                        }
+                    };
+
+                    await nacitajSroPiesen();
+
+                    // Aktualizácia každých 20 sekúnd (Slovenský rozhlas má kratšie intervaly zmien)
+                    bauerIntervalId = setInterval(async () => {
+                        if (currentPlayingType === stanicaId) {
+                            await nacitajSroPiesen();
+                        } else {
+                            clearInterval(bauerIntervalId);
+                            bauerIntervalId = null;
+                        }
+                    }, 20000);
+
+                    return;
+                } catch (e) {
+                    console.log("Chyba SRo API:", e);
+                    textElement.innerText = "";
+                    return;
+                }
+            }
             // 3. PRIAME ČÍTANIE METADÁT ZO STREAMU (Slovensko, FM, Fun, Chill...)
             try {
                 // Počkáme 1.5 sekundy, kým sa audio prúd reálne naštartuje a až potom pošleme požiadavku na metadáta
