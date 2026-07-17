@@ -744,6 +744,17 @@
             border-color: var(--night-color) !important;
             color: var(--night-color) !important;
         }
+        #player-now-playing {
+            font-size: clamp(12px, 2.2vh, 18px) !important;
+            /* Medzera sa aplikuje iba vtedy, keď box NIE JE prázdny */
+            margin-top: 0.5vh !important; 
+            margin-bottom: 0 !important;
+        }
+        /* Keď je element prázdny, úplne ho schováme, aby nezaberal miesto */
+        #player-now-playing:empty {
+            display: none !important;
+        }
+        
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
@@ -770,7 +781,7 @@
                     <span class="big-clock-nameday" id="bigNameday">---</span>
                 </div>
                 
-                <div id="player-now-playing" style="font-size: 1.2rem; color: #aaa; margin-top: 6px; min-height: 1.5em; text-align: center;">
+                <div id="player-now-playing" style="color: #aaa; text-align: center;"></div>
                 </div>
                 
                 <div class="main-weather-container">
@@ -1491,6 +1502,8 @@
             if (item.url) {
                 if (currentPlayingType === item.id) {
                     audio.pause(); 
+                    // OKAMŽITÉ VYMAZANIE TEXTU SKLABDY PRI MANUÁLNOM ZASTAVENÍ
+                    document.getElementById("player-now-playing").innerText = "";
                     // Okamžité prekreslenie sidebaru pre zmazanie orámovania bez čakania na event
                     renderSidebarFavorites(); 
                 } else {
@@ -1819,6 +1832,8 @@
             });
 
             audio.addEventListener('pause', () => {
+                // OKAMŽITÉ VYMAZANIE TEXTU PRI AKOMKOĽVEK PAUSE
+                document.getElementById("player-now-playing").innerText = "";
                 if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
                 renderSidebarFavorites();
                 aktualizujNochnyPrehravacVizual();
