@@ -161,7 +161,7 @@
         /* Spodný masívny meteo container rozdelený 60/40 horizontálne */
         .main-weather-container {
             display: flex;
-            flex-direction: row;
+            flex-direction: column; /* ZMENA: z row na column, čím skočí predpoveď pod počasie */
             width: 100%;
             height: auto;
             flex: 0 1 auto;
@@ -169,6 +169,7 @@
             justify-content: space-between;
             margin-top: 0vh; /*žiadna medzera nad počasim tých tam uz je dost */
             margin-bottom: 0;
+            gap: 0vh; /* PRIDANÉ: ziadna Medzera medzi aktuálnym počasím a predpoveďou pod ním navrh bol 1.5 na čo? maju svoje bloky čo im vytvaraju priestor */
         }
         
         .weather-left-side {
@@ -198,10 +199,11 @@
         .main-mini-strip {
             display: flex;
             flex-direction: row; /* Predvolene vedľa seba */
-            flex-wrap: wrap;    /* Ak niet miesta, zalomí pod seba */
+            flex-wrap: nowrap;   
             justify-content: center;
             align-items: center;
             gap: 15px;
+            width: 100%; /* Roztiahnutie na šírku pre dokonalé vycentrovanie */
         }
             /*width: 40%;
             display: flex;
@@ -263,10 +265,10 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 90%;
+            width: 140px; /* ZMENA: Pevná rozumná šírka boxu, aby sa nerozťahovali cez celú obrazovku predtým 90%;*/
             background: #080808;
             border: 1px solid #111;
-            padding: 1.2vh 3vw;
+            padding: 1vh 15px /*pred 15px bolo 3vw;*/
             border-radius: 12px;
             box-sizing: border-box;
         }
