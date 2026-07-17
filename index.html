@@ -770,8 +770,7 @@
                     <span class="big-clock-nameday" id="bigNameday">---</span>
                 </div>
                 
-                <div id="player-now-playing" style="font-size: 1.2rem; color: #aaa; margin-top: 10px; min-height: 1.5em; text-align: center;">
-                    Načítavam informácie o skladbe...
+                <div id="player-now-playing" style="font-size: 1.2rem; color: #aaa; margin-top: 6px; min-height: 1.5em; text-align: center;">
                 </div>
                 
                 <div class="main-weather-container">
@@ -1865,8 +1864,8 @@
         async function sledujStreamMetadat(streamUrl) {
             const textElement = document.getElementById("player-now-playing");
             
-            // 1. OKAMŽITÝ RESET TEXTU A STAVU (Zamedzí zasekávaniu starých názvov)
-            textElement.innerText = "Hľadám názov skladby...";
+            // 1. Okamžitý reset - pri každom prepnutí okamžite vyčistíme obrazovku
+            textElement.innerText = ""; 
             
             // Zastavíme predchádzajúce čítanie streamu
             if (metadataController) {
@@ -1874,7 +1873,7 @@
                 metadataController = null;
             }
             
-            // Vyčistíme staré Bauer / STVR intervaly, ak nejaké bežali
+            // Vyčistíme staré Bauer intervaly, ak nejaké bežali
             if (bauerIntervalId) {
                 clearInterval(bauerIntervalId);
                 bauerIntervalId = null;
@@ -1884,9 +1883,7 @@
             metadataController = new AbortController();
             const localSignal = metadataController.signal;
         
-           // --- VÝNIMKA PRE RÁDIÁ S OFICIÁLNYM API (BAUER) ---
-            
-            // 2. BAUER MEDIA (Rock, Expres, Europa 2, Melody)
+            // --- VÝNIMKA PRE RÁDIÁ S OFICIÁLNYM API (BAUER) ---
             const bauerStanice = ["rock", "expres", "europa2", "melody"];
             if (bauerStanice.includes(currentPlayingType)) {
                 try {
@@ -1894,11 +1891,12 @@
                     
                     const nacitajBauerPiesen = async () => {
                         if (currentPlayingType !== stanicaId) return;
-                        // Použijeme CORS proxy, aby rádio Rock a ostatné Bauer rádiá nezasekávali kiosk
                         const res = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://api.bauermedia.sk/playing/now?station=' + stanicaId)}`);
                         const data = await res.json();
                         if (data && data.artist && data.title) {
                             textElement.innerText = `${data.artist} - ${data.title}`;
+                        } else {
+                            textElement.innerText = ""; // Ak API nič nevráti, bude prázdno
                         }
                     };
                     
@@ -1913,28 +1911,31 @@
                         }
                     }, 30000);
                     
-                    return; // Ukončíme, aby sme nečítali surový stream
+                    return; 
                 } catch (e) {
                     console.log("Chyba Bauer API:", e);
-                    const aktualneRadio = DATABASE.find(d => d.id === currentPlayingType);
-                    textElement.innerText = aktualneRadio ? `Živé vysielanie - ${aktualneRadio.name}` : "Živé vysielanie";
+                    textElement.innerText = ""; // V prípade chyby API necháme prázdno
                     return;
                 }
             }
             // ----------------------------------------------------------------------
         
-            // 3. PRIAME ČÍTANIE METADÁT ZO STREAMU (pre Slovensko, FM, Regina, Devín, Fun, Chill, Rádio TO atď.)
+            // 3. PRIAME ČÍTANIE METADÁT ZO STREAMU (Slovensko, FM, Fun, Chill...)
             try {
+                // Počkáme 1.5 sekundy, kým sa audio prúd reálne naštartuje a až potom pošleme požiadavku na metadáta
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                if (localSignal.aborted) return;
+
                 const response = await fetch(streamUrl, {
                     headers: { 'Icy-Metadata': '1' },
-                    signal: localSignal // Použijeme localSignal namiesto metadataController.signal
+                    signal: localSignal 
                 }).catch(err => {
                     throw new Error("CORS_OR_NETWORK_ERROR");
                 });
         
                 const metaInt = parseInt(response.headers.get('icy-metaint'));
                 if (!metaInt) {
-                    textElement.innerText = "Hrá živé vysielanie";
+                    textElement.innerText = ""; // Žiadne metadáta v streame = ticho
                     return;
                 }
         
@@ -1962,7 +1963,9 @@
         
                                 const match = metaString.match(/StreamTitle='(.*?)';/);
                                 if (match && match[1]) {
-                                    textElement.innerText = match[1]; 
+                                    // Odstránime prípadné zbytočné medzery a ak je názov reálny, zobrazíme ho
+                                    const cistyNazov = match[1].trim();
+                                    textElement.innerText = cistyNazov !== "" ? cistyNazov : "";
                                 }
                             }
                             buffer = buffer.subarray(metaInt + 1 + metaLength);
@@ -1974,8 +1977,7 @@
             } catch (error) {
                 if (error.name !== 'AbortError') {
                     console.log("Metadáta nedostupné (CORS/Network):", error.message);
-                    const aktualneRadio = DATABASE.find(d => d.id === currentPlayingType);
-                    textElement.innerText = aktualneRadio ? `Živé vysielanie - ${aktualneRadio.name}` : "Živé vysielanie";
+                    textElement.innerText = ""; // Akékoľvek zlyhanie siete/CORS prebehne bez textu na displeji
                 }
             }
         }
