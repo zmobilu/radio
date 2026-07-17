@@ -147,101 +147,139 @@
         .big-clock-date { color: #fff; }
         .big-clock-nameday { color: #ff9f0a; }
 
-        /* 1. Hlavný obal počasia - optimálna šírka pod hodinami */
+        /* 1. Hlavný a jediný obal celého počasia - drží všetko pokope ako jeden pevný celok */
         .main-weather-container {
             display: flex;
             flex-direction: column;
             width: 100%;
-            max-width: 580px;
+            max-width: 480px;            /* Fixná optimálna šírka celého bloku */
             margin: 0 auto;
             align-items: center;
             justify-content: center;
             gap: 0;
+            box-sizing: border-box;
         }
         
-        /* 2. Popis stavu (Polojasno) - menší a pritiahnutý bližšie k teplotám */
+        /* 2. Zjednotený vnútorný blok pre aktuálne počasie (horný riadok + text pod ním) */
+        .weather-left-side {
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100% !important;     /* Vždy 100% šírka v rámci nadradeného bloku */
+            border-right: none !important; /* Zrušenie starého deliaceho pruhu */
+            padding: 0 !important;
+            box-sizing: border-box;
+        }
+
+        /* 3. Spoločný riadok pre ikonu, teplotu a pocitový stĺpec */
+        .weather-top-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: center;     /* Dokonalé centrovanie jadra počasia */
+            gap: 25px;                   /* Fixná medzera medzi hlavnou teplotou a pocitovými dátami */
+            width: 100%;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+        
+        /* Jadro s ikonou a hlavnou teplotou */
+        .weather-core-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        #mainBigIcon { font-size: 14vmin !important; line-height: 1; }
+        #mainBigTemp { font-size: 13vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
+
+        /* 4. Pocitový stĺpec (Teplota + Vlhkosť) - pevne vedľa hlavnej teploty, lícovaný doľava k ikonám */
+        .weather-sub-row { 
+            font-size: 3.8vmin !important; 
+            font-weight: 500; 
+            display: flex;
+            flex-direction: column;   
+            align-items: flex-start;     /* Lícovanie ikoniek pod seba zľava */
+            justify-content: center;
+            gap: 6px;                
+            margin-top: 0 !important;
+        }
+
+        /* 5. Textový popis stavu (ZAMRAČENÉ) - centrovaný priamo pod riadkom počasia */
         #mainWeatherDesc {
-            font-size: 2.8vmin;
-            font-weight: 500;            /* Tenšie písmo */
+            font-size: 2.8vmin !important;
+            font-weight: 600;
             color: #aaa;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            margin-top: 0.5vh;           /* Minimálny odstup od hlavnej teploty */
+            margin-top: 1vh !important;
+            margin-bottom: 0 !important;
             text-align: center;
             width: 100%;
         }
         
-        /* 3. Spodný pás predpovede - pritiahnutý bližšie k Polojasno */
+        /* 6. Spodný pás predpovede (DNES a ZAJTRA) - natiahnutý presne na šírku horného bloku */
         .main-mini-strip {
-            display: flex;
-            flex-direction: row; 
+            display: flex !important;
+            flex-direction: row !important; 
             flex-wrap: nowrap;
             justify-content: space-between;
-            width: 100%;                 
-            margin-top: 1.5vh;           /* Malá medzera pod textom Polojasno */
-            gap: 15px;
+            width: 100% !important;                 
+            margin-top: 2vh !important;  /* Elegantný odstup pod textovým popisom */
+            gap: 12px !important;
+            padding: 0 !important;
+            height: auto !important;
         }
         
-        /* 4. Boxy predpovede - zmena na stĺpec (nápis hore, dáta pod ním) */
+        /* Boxy predpovede idú vertikálne (label hore, dáta dole) */
         .mini-day-box {
-            display: flex;
-            flex-direction: column;      /* Prvky idú pod seba */
+            display: flex !important;
+            flex-direction: column !important;
             align-items: center;
             justify-content: center;
             flex: 1;
             background: #080808;
             border: 1px solid #111;
-            padding: 1vh 12px;           /* Kompaktné odsadenie */
+            padding: 1vh 10px !important;
             border-radius: 10px;
             box-sizing: border-box;
             min-width: 0;
+            width: auto !important;
+            height: auto !important;
         }
         
-        /* 5. Nápis dňa (DNES / ZAJTRA) - menší, tenší a vycentrovaný nad dátami */
+        /* Centrovanie textu DNES / ZAJTRA nad predpoveďou */
         .mini-label { 
-            font-size: 2.8vmin;          /* Menšie písmo, prispôsobené pocitovej teplote */
-            color: #888;                 /* Jemnejšia sivá farba, aby nápis netlačil */
-            font-weight: 500;            /* Tenšia hrúbka písma */
+            font-size: 2.5vmin !important; 
+            color: #888; 
+            font-weight: 500; 
             letter-spacing: 1px; 
-            text-align: center;
-            margin-bottom: 4px;          /* Medzera medzi nápisom a riadkom s ikonou/teplotami */
-            width: 100%;
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 4px !important; 
+            width: 100% !important;
+            text-align: center !important;
         }
         
-        /* 6. Údaje (ikona + teploty) v jednom riadku pod nápisom */
+        /* Riadok s ikonou a číslami v malom boxe */
         .mini-data-row {
-            display: flex;
-            flex-direction: row;         /* Ikona a teplota ostanú vedľa seba */
+            display: flex !important;
+            flex-direction: row !important;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: center;     /* Vycentrované v boxe */
-            gap: 10px;                   /* Užšia medzera medzi ikonou a číslami */
-            width: 100%;
-        }
-        
-        /* 7. Menšia ikona v predpovedi */
-        #mainFc0Icon, #mainFc1Icon { 
-            font-size: 5.2vmin !important; /* Menšia veľkosť, aby sa riadok nerozťahoval */
-            display: inline-block;
-            line-height: 1;
-        }
-        
-        /* 8. Menšie a tenšie teploty v predpovedi */
-        #mainFc0Temp, #mainFc1Temp { 
-            font-size: 3.2vmin !important; /* Menšie písmo pre bezpečné zmestenie */
-            font-weight: 500;            /* Tenká hrúbka */
-            white-space: nowrap;
-        }
-           
-        /* Celkový ľavý blok (stĺpec: top riadok + centrovaný popis pod ním) */
-        .weather-left-side {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            width: 100%;
-        }      
-         
+            gap: 8px !important;
+            width: 100% !important;
+            opacity: 1 !important;
+        }
+        
+        #mainFc0Icon, #mainFc1Icon { font-size: 4.5vmin !important; line-height: 1; }
+        #mainFc0Temp, #mainFc1Temp { font-size: 3vmin !important; font-weight: 600; white-space: nowrap !important; text-align: center !important; }
+        
         .weather-wrapper-block {
             display: flex;
             flex-direction: row; /* Na šírku: ikona a teplota vedľa seba */
@@ -250,25 +288,6 @@
             align-items: center;
         }
         
-        .weather-core-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        #mainBigIcon { font-size: 19vmin !important; line-height: 1; }
-        #mainBigTemp { font-size: 17vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
-                
-        /* Pocitový stĺpec vedľa hlavnej teploty */
-        .weather-sub-row { 
-            font-size: 4.8vmin !important; 
-            font-weight: 500; 
-            display: flex;
-            flex-direction: column;   /* Hodnoty pod sebou */
-            align-items: flex-start;  /* Zarovnané doľava */
-            gap: 12px;                /* Medzera medzi teplotou a vlhkosťou */
-            margin-top: 0 !important;
-        }
         
         /* Položky v pocitovom stĺpci: ikona + hodnota natvrdo vedľa seba */
         .sub-row-item-temp, .sub-row-item-hum {
@@ -779,12 +798,9 @@
                 </div>
                 
                 <div id="player-now-playing" style="color: #aaa; text-align: center;"></div>
-
-                
+ 
                 <div class="main-weather-container">
-                    <!-- NAHRADIŤ TÝMTO NOVÝM BLOKOM -->
                 <div class="weather-left-side" onclick="toggleWeatherView(event)">
-                    <!-- Spoločný riadok pre hlavnú teplotu a pocitový stĺpec vedľa seba -->
                     <div class="weather-top-row">
                         <div class="weather-core-row">
                             <span id="mainBigIcon">☀️</span>
