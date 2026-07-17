@@ -1863,64 +1863,29 @@
         let bauerIntervalId = null;    // Globálna premenná na zastavenie aktualizácie pesničiek Bauer rádií
         
         async function sledujStreamMetadat(streamUrl) {
-            // 1. ZASTAVÍME VŠETKO BEŽIACE (streamy aj časovače API)
+            const textElement = document.getElementById("player-now-playing");
+            
+            // 1. OKAMŽITÝ RESET TEXTU A STAVU (Zamedzí zasekávaniu starých názvov)
+            textElement.innerText = "Hľadám názov skladby...";
+            
+            // Zastavíme predchádzajúce čítanie streamu
             if (metadataController) {
                 metadataController.abort();
+                metadataController = null;
             }
-            metadataController = new AbortController();
-        
+            
+            // Vyčistíme staré Bauer / STVR intervaly, ak nejaké bežali
             if (bauerIntervalId) {
                 clearInterval(bauerIntervalId);
                 bauerIntervalId = null;
             }
-        
-            const textElement = document.getElementById("player-now-playing");
-            textElement.innerText = "Hľadám názov skladby...";
-        
-            // --- VÝNIMKA PRE RÁDIÁ S OFICIÁLNYM API (STVR + BAUER) ---
             
-            // 1. RÁDIO SLOVENSKO & RÁDIO_FM (STVR API)
-            if (currentPlayingType === "slovensko" || currentPlayingType === "fm") {
-                try {
-                    const stanicaId = currentPlayingType;
-                    // Mapovanie ID tvojho systému na ID v API STVR (Slovensko = 1, FM = 4)
-                    const stvrId = (stanicaId === "slovensko") ? 1 : 4; 
+            // Vytvoríme nový controller pre toto rádio
+            metadataController = new AbortController();
+            const localSignal = metadataController.signal;
         
-                    const nacitajStvrPiesen = async () => {
-                        if (currentPlayingType !== stanicaId) return;
-                        const res = await fetch("https://api.stvr.sk/news/playing");
-                        const data = await res.json();
-                        
-                        if (data && data.playing) {
-                            const info = data.playing.find(r => r.station_id === stvrId);
-                            if (info && info.now) {
-                                textElement.innerText = `${info.now.artist} - ${info.now.title}`;
-                            } else {
-                                textElement.innerText = "Hrá slovo / Živé vysielanie";
-                            }
-                        }
-                    };
-        
-                    await nacitajStvrPiesen();
-        
-                    // Interval aktualizácie každých 30 sekúnd
-                    bauerIntervalId = setInterval(async () => {
-                        if (currentPlayingType === stanicaId) {
-                            await nacitajStvrPiesen();
-                        } else {
-                            clearInterval(bauerIntervalId);
-                            bauerIntervalId = null;
-                        }
-                    }, 30000);
-        
-                    return; // Ukončíme, aby sme nečítali surový stream
-                } catch (e) {
-                    console.log("Chyba STVR API:", e);
-                    textElement.innerText = "Informácie nedostupné";
-                    return;
-                }
-            }
-        
+           // --- VÝNIMKA PRE RÁDIÁ S OFICIÁLNYM API (BAUER) ---
+            
             // 2. BAUER MEDIA (Rock, Expres, Europa 2, Melody)
             const bauerStanice = ["rock", "expres", "europa2", "melody"];
             if (bauerStanice.includes(currentPlayingType)) {
@@ -1929,7 +1894,8 @@
                     
                     const nacitajBauerPiesen = async () => {
                         if (currentPlayingType !== stanicaId) return;
-                        const res = await fetch(`https://api.bauermedia.sk/playing/now?station=${stanicaId}`);
+                        // Použijeme CORS proxy, aby rádio Rock a ostatné Bauer rádiá nezasekávali kiosk
+                        const res = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://api.bauermedia.sk/playing/now?station=' + stanicaId)}`);
                         const data = await res.json();
                         if (data && data.artist && data.title) {
                             textElement.innerText = `${data.artist} - ${data.title}`;
@@ -1950,19 +1916,19 @@
                     return; // Ukončíme, aby sme nečítali surový stream
                 } catch (e) {
                     console.log("Chyba Bauer API:", e);
-                    textElement.innerText = "Informácie nedostupné";
+                    const aktualneRadio = DATABASE.find(d => d.id === currentPlayingType);
+                    textElement.innerText = aktualneRadio ? `Živé vysielanie - ${aktualneRadio.name}` : "Živé vysielanie";
                     return;
                 }
             }
             // ----------------------------------------------------------------------
         
-            // 3. PRIAME ČÍTANIE METADÁT ZO STREAMU (pre Fun Chill, Rádio TO atď.)
+            // 3. PRIAME ČÍTANIE METADÁT ZO STREAMU (pre Slovensko, FM, Regina, Devín, Fun, Chill, Rádio TO atď.)
             try {
                 const response = await fetch(streamUrl, {
                     headers: { 'Icy-Metadata': '1' },
-                    signal: metadataController.signal
+                    signal: localSignal // Použijeme localSignal namiesto metadataController.signal
                 }).catch(err => {
-                    // Chytíme sieťovú/CORS chybu skôr, než stihne crashnúť hlavný try-catch
                     throw new Error("CORS_OR_NETWORK_ERROR");
                 });
         
@@ -2008,7 +1974,6 @@
             } catch (error) {
                 if (error.name !== 'AbortError') {
                     console.log("Metadáta nedostupné (CORS/Network):", error.message);
-                    // Namiesto "Informácie nedostupné" radšej ukážeme elegantný fallback
                     const aktualneRadio = DATABASE.find(d => d.id === currentPlayingType);
                     textElement.innerText = aktualneRadio ? `Živé vysielanie - ${aktualneRadio.name}` : "Živé vysielanie";
                 }
