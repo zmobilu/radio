@@ -265,14 +265,14 @@
             text-align: center !important;
         }
         
-        /* Riadok s ikonou a číslami v malom boxe */
+        /* Údaje (ikona + teploty) v jednom riadku - OPRAVENÉ CENTROVANIE */
         .mini-data-row {
             display: flex !important;
             flex-direction: row !important;
             flex-wrap: nowrap !important;
             align-items: center !important;
-            justify-content: center !important; /* Presné vycentrovanie pod nápis */
-            gap: 8px !important;                /* Zmenšená medzera, aby údaje nevyskakovali z boxu */
+            justify-content: center !important; /* Presné vycentrovanie v boxe */
+            gap: 8px !important;                /* Kompaktná medzera, aby text neliezol von */
             width: 100% !important;
             box-sizing: border-box !important;
         }
@@ -699,10 +699,13 @@
             }
             
             .mini-data-row {
-                flex-direction: column !important;
-                gap: 4px !important;
-                justify-content: center;
-                align-items: center;
+                flex-direction: row !important;      /* Držíme ikonu a text vedľa seba aj na výšku */
+                flex-wrap: nowrap !important;
+                gap: 6px !important;                 /* Mierne zmenšená medzera pre úzke displeje */
+                justify-content: center !important;
+                align-items: center !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
                 flex: 1; 
             }
             
