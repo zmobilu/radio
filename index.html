@@ -167,55 +167,31 @@
             flex: 0 1 auto;
             align-items: center;
             justify-content: space-between;
-            margin-top: 0vh; /*žiadna medzera nad počasim tých tam uz je dost */
+            margin-top: 0; /*žiadna medzera nad počasim tých tam uz je dost */
             margin-bottom: 0;
             gap: 0vh; /* PRIDANÉ: ziadna Medzera medzi aktuálnym počasím a predpoveďou pod ním navrh bol 1.5 na čo? maju svoje bloky čo im vytvaraju priestor */
         }
         
         .weather-left-side {
             display: flex;
-            flex-direction: row; /* Predvolene vedľa seba */
-            flex-wrap: wrap;    /* Ak niet miesta, zalomí pod seba */
+            flex-direction: row; /* Drží hlavné počasie a sub-row vedľa seba */
+            flex-wrap: nowrap;    /* ZAKÁZANIE ZALOMENIA: Hodnoty neskočia pod teplomer */
             justify-content: center;
             align-items: center;
-            gap: 15px;
+            gap: 25px; /* Medzera medzi hlavnou teplotou a bočným panelom */
         }
         
-        /* Ľavá polovica: Aktuálne počasie (60%) 
-        .weather-left-side {
-            width: 60%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            border-right: 1px solid #151515;
-            box-sizing: border-box;
-            cursor: pointer;
-            padding: 0 10px;
-        } */
-        
-        /* Pravá polovica: Predpoveď Dnes / Zajtra (40%) */
+         /* Pravá polovica: Predpoveď Dnes / Zajtra (40%) */
         .main-mini-strip {
             display: flex;
             flex-direction: row; /* Predvolene vedľa seba */
-            flex-wrap: nowrap;   
+            flex-wrap: nowrap;   /* ZAKÁZANIE ZALOMENIA: Boxy ostanú striktne vedľa seba */
             justify-content: center;
             align-items: center;
             gap: 15px;
             width: 100%; /* Roztiahnutie na šírku pre dokonalé vycentrovanie */
+            margin-top: 2.5vh;   /* Medzera pod popisom počasia, aby predpoveď dýchala */
         }
-            /*width: 40%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            border-top: none;
-            margin-top: 0;
-            padding-top: 0;
-            gap: 1.5vh;
-        }*/
         .weather-wrapper-block {
             display: flex;
             flex-direction: row; /* Na šírku: ikona a teplota vedľa seba */
@@ -254,9 +230,11 @@
         .weather-sub-row { 
             font-size: 4.8vmin !important; 
             font-weight: 400; 
-            margin-top: 1.2vh; 
+            margin-top: 0; /* Odstránime horný okraj, keďže sú na boku */ 
             display: flex;
-            gap: 25px;
+            flex-direction: column; /* ZMENA: Prvky (teplota a vlhkosť) pôjdu vertikálne pod seba */
+            align-items: flex-start; /* Zarovnanie ikoniek pekne pod seba vľavo */
+            gap: 10px;           /* Medzera medzi riadkom teplomera a kvapky */
         }
         
         /* Pravá polovica: Predpoveď Dnes / Zajtra vertikálne pod sebou */
@@ -265,10 +243,10 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 140px; /* ZMENA: Pevná rozumná šírka boxu, aby sa nerozťahovali cez celú obrazovku predtým 90%;*/
+            width: 170px; /* ZMENA: Pevná rozumná šírka boxu, aby sa nerozťahovali cez celú obrazovku predtým 90%;*/
             background: #080808;
             border: 1px solid #111;
-            padding: 1vh 15px /*pred 15px bolo 3vw;*/
+            padding: 1.2vh 15px /*pred 15px bolo 3vw;*/
             border-radius: 12px;
             box-sizing: border-box;
         }
