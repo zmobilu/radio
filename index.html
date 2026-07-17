@@ -269,12 +269,12 @@
         .mini-data-row {
             display: flex !important;
             flex-direction: row !important;
-            flex-wrap: nowrap;
-            align-items: center;
-            justify-content: center;
-            gap: 8px !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            justify-content: center !important; /* Presné vycentrovanie pod nápis */
+            gap: 8px !important;                /* Zmenšená medzera, aby údaje nevyskakovali z boxu */
             width: 100% !important;
-            opacity: 1 !important;
+            box-sizing: border-box !important;
         }
         
         #mainFc0Icon, #mainFc1Icon { font-size: 4.5vmin !important; line-height: 1; }
