@@ -198,14 +198,17 @@
 
         /* 4. Pocitový stĺpec (Teplota + Vlhkosť) - pevne vedľa hlavnej teploty, lícovaný doľava k ikonám */
         .weather-sub-row { 
-            font-size: 3.8vmin !important; 
-            font-weight: 500; 
+            font-size: 3.6vmin !important; 
+            font-weight: 600; 
             display: flex;
             flex-direction: column;   
             align-items: flex-start;     /* Lícovanie ikoniek pod seba zľava */
             justify-content: center;
-            gap: 6px;                
+            gap: 2px;                
             margin-top: 0 !important;
+            letter-spacing: 0px !important;    /* Striktný zákaz rastu do šírky */
+            transform: scaleY(1.25);            /* Výrazné natiahnutie čisto do výšky */
+            transform-origin: left center;     /* Fixácia zľava - rastie len hore/dole, do boku ani milimeter */
         }
 
         /* 5. Textový popis stavu (ZAMRAČENÉ) - centrovaný priamo pod riadkom počasia */
@@ -303,13 +306,13 @@
         }
         
         
-        /* Položky v pocitovom stĺpci: ikona + hodnota natvrdo vedľa seba */
-        .sub-row-item-temp, .sub-row-item-hum {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            flex-wrap: nowrap;        /* Zakáže zalomenie ikony a textu */
-            white-space: nowrap;      /* Text sa nikdy nerozdelí */
+        /* Úprava ikoniek v pocitovom stĺpci - zachovanie kompaktného boku */
+        .sub-row-item-temp i, .sub-row-item-hum i {
+            font-size: 0.8em;
+            width: 24px;                       /* Úzka fixná šírka, aby ikona neroztláčala text doprava */
+            text-align: center;
+            margin-right: 4px !important;      /* Minimálny odstup od čísel */
+            letter-spacing: 0px !important;
         }
         
         .sub-row-item-temp i { color: #ffa500; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }
