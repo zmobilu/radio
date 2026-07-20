@@ -1883,50 +1883,52 @@
                 }
             }
             // ----------------------------------------------------------------------
-        // --- VÝNIMKA PRE SLOVENSKÝ ROZHLAS (STVR) ---
-            const sroStanice = ["slovensko", "fm", "devin", "regina"];
-            if (sroStanice.includes(currentPlayingType)) {
+            // --- VÝNIMKA PRE SLOVENSKÝ ROZHLAS (STVR) ---
+            const sroMap = {
+                'slovensko': { domain: 'slovensko.stvr.sk', channel: 12 },
+                'fm':        { domain: 'fm.stvr.sk',        channel: 5 },  // prípadne upravte channel ID
+                'devin':     { domain: 'devin.stvr.sk',     channel: 3 },
+                'regina':    { domain: 'reginazapad.stvr.sk', channel: 1 }
+            };
+            
+            if (sroMap[currentPlayingType]) {
                 try {
-                    const stanicaId = currentPlayingType;
-                    // Mapa ID na kód stanice v API Slovenského rozhlasu
-                    const sroIdMap = { "slovensko": "slovensko", "fm": "fm", "devin": "devin", "regina": "regina-ba" };
-                    const apiKod = sroIdMap[stanicaId];
-
-                    const nacitajSroPiesen = async () => {
-                        if (currentPlayingType !== stanicaId) return;
-                        // Volanie oficiálneho API cez CORS proxy kvôli bezpečnosti v prehliadači
-                        const res = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://moj.rozhlas.sk/api/program/sro/' + apiKod + '/now-playing')}`);
+                    const stanica = sroMap[currentPlayingType];
+                    
+                    const nacitajSroPlaylist = async () => {
+                        if (!sroMap[currentPlayingType]) return;
+            
+                        const playlistUrl = `https://${stanica.domain}/json/snippet/radio_playlist.json?channel=${stanica.channel}`;
+                        const targetUrl = encodeURIComponent(playlistUrl);
+                        
+                        const res = await fetch(`https://api.allorigins.win/get?url=${targetUrl}`);
                         const data = await res.json();
                         
-                        if (data && data.current && data.current.title) {
-                            const interpret = data.current.artist ? data.current.artist.name : "";
-                            const skladba = data.current.title;
-                            
-                            if (interpret) {
-                                textElement.innerText = `${interpret} - ${skladba}`;
-                            } else {
-                                textElement.innerText = skladba; // Ak ide napr. o reláciu, vypíše len jej názov
+                        if (data && data.contents) {
+                            const jsonData = JSON.parse(data.contents);
+                            const htmlSnippet = jsonData.snippets?.['snippet-playlist'];
+            
+                            if (htmlSnippet) {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(htmlSnippet, 'text/html');
+                                const firstItem = doc.querySelector('li.list');
+            
+                                if (firstItem) {
+                                    const artist = firstItem.querySelector('.title')?.innerText.trim() || '';
+                                    const song = firstItem.querySelector('.song')?.innerText.trim() || '';
+                                    textElement.innerText = `${artist} - ${song}`;
+                                    return;
+                                }
                             }
-                        } else {
-                            textElement.innerText = "";
                         }
+                        textElement.innerText = "";
                     };
-
-                    await nacitajSroPiesen();
-
-                    // Aktualizácia každých 20 sekúnd (Slovenský rozhlas má kratšie intervaly zmien)
-                    bauerIntervalId = setInterval(async () => {
-                        if (currentPlayingType === stanicaId) {
-                            await nacitajSroPiesen();
-                        } else {
-                            clearInterval(bauerIntervalId);
-                            bauerIntervalId = null;
-                        }
-                    }, 20000);
-
+            
+                    await nacitajSroPlaylist();
+                    bauerIntervalId = setInterval(nacitajSroPlaylist, 30000); // Obnova každých 30s
                     return;
                 } catch (e) {
-                    console.log("Chyba SRo API:", e);
+                    console.log("STVR API Error:", e);
                     textElement.innerText = "";
                     return;
                 }
