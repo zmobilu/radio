@@ -1824,6 +1824,7 @@
 
         let metadataController = null; // Umožní nám zastaviť čítanie pri prepnutí rádia
         let bauerIntervalId = null;    // Globálna premenná na zastavenie aktualizácie pesničiek Bauer rádií
+
         
         async function sledujStreamMetadat(streamUrl) {
             const textElement = document.getElementById("player-now-playing");
@@ -1847,63 +1848,67 @@
             metadataController = new AbortController();
             const localSignal = metadataController.signal;
         
-            // --- VÝNIMKA PRE RÁDIÁ S OFICIÁLNYM API (BAUER) ---
-            const bauerStanice = ["rock", "expres", "europa2", "melody"];
-            if (bauerStanice.includes(currentPlayingType)) {
-                try {
-                    const stanicaId = currentPlayingType;
-                    
-                    const nacitajBauerPiesen = async () => {
-                        if (currentPlayingType !== stanicaId) return;
-                        const res = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://api.bauermedia.sk/playing/now?station=' + stanicaId)}`);
+            // --- VÝNIMKA PRE RÁDIO ROCK ---
+            if (currentPlayingType === 'rock') {
+                const nacitajRockPiesen = async () => {
+                    // Kontrola, či sa medzičasom nezmenila stanica alebo nezastavil prehrávač
+                    if (localSignal.aborted || currentPlayingType !== 'rock') return;
+            
+                    try {
+                        const res = await fetch('https://api.radiorock.sk/playlist', { signal: localSignal });
                         const data = await res.json();
-                        if (data && data.artist && data.title) {
-                            textElement.innerText = `${data.artist} - ${data.title}`;
+            
+                        if (localSignal.aborted || currentPlayingType !== 'rock') return;
+            
+                        if (data && data.length > 0) {
+                            const artist = data[0].artist?.trim() || '';
+                            const title = data[0].title?.trim() || '';
+            
+                            if (artist || title) {
+                                textElement.innerText = `${artist} - ${title}`;
+                            } else {
+                                textElement.innerText = "";
+                            }
                         } else {
-                            textElement.innerText = ""; // Ak API nič nevráti, bude prázdno
+                            textElement.innerText = "";
                         }
-                    };
-                    
-                    await nacitajBauerPiesen();
-                    
-                    bauerIntervalId = setInterval(async () => {
-                        if (currentPlayingType === stanicaId) {
-                            await nacitajBauerPiesen();
-                        } else {
-                            clearInterval(bauerIntervalId);
-                            bauerIntervalId = null;
+                    } catch (e) {
+                        if (e.name !== 'AbortError') {
+                            console.log("Rádio Rock API Error:", e);
+                            textElement.innerText = "";
                         }
-                    }, 30000);
-                    
-                    return; 
-                } catch (e) {
-                    console.log("Chyba Bauer API:", e);
-                    textElement.innerText = ""; // V prípade chyby API necháme prázdno
-                    return;
-                }
+                    }
+                };
+            
+                await nacitajRockPiesen();
+                bauerIntervalId = setInterval(nacitajRockPiesen, 30000); // Obnova každých 30s
+                return;
             }
-            // ----------------------------------------------------------------------
             // --- VÝNIMKA PRE SLOVENSKÝ ROZHLAS (STVR) ---
             const sroMap = {
                 'slovensko': { domain: 'slovensko.stvr.sk', channel: 12 },
-                'fm':        { domain: 'fm.stvr.sk',        channel: 5 },  // prípadne upravte channel ID
+                'fm':        { domain: 'fm.stvr.sk',        channel: 5 },
                 'devin':     { domain: 'devin.stvr.sk',     channel: 3 },
                 'regina':    { domain: 'reginazapad.stvr.sk', channel: 1 }
             };
             
             if (sroMap[currentPlayingType]) {
-                try {
-                    const stanica = sroMap[currentPlayingType];
-                    
-                    const nacitajSroPlaylist = async () => {
-                        if (!sroMap[currentPlayingType]) return;
+                const stanica = sroMap[currentPlayingType];
+                const spustenaStanicaType = currentPlayingType; // Uložíme si štartovaciu stanicu
             
+                const nacitajSroPlaylist = async () => {
+                    // Kontrola, či sa medzičasom nezmenila stanica alebo nezastavil prehrávač
+                    if (localSignal.aborted || currentPlayingType !== spustenaStanicaType) return;
+            
+                    try {
                         const playlistUrl = `https://${stanica.domain}/json/snippet/radio_playlist.json?channel=${stanica.channel}`;
                         const targetUrl = encodeURIComponent(playlistUrl);
                         
-                        const res = await fetch(`https://api.allorigins.win/get?url=${targetUrl}`);
+                        const res = await fetch(`https://api.allorigins.win/get?url=${targetUrl}`, { signal: localSignal });
                         const data = await res.json();
                         
+                        if (localSignal.aborted || currentPlayingType !== spustenaStanicaType) return;
+            
                         if (data && data.contents) {
                             const jsonData = JSON.parse(data.contents);
                             const htmlSnippet = jsonData.snippets?.['snippet-playlist'];
@@ -1914,24 +1919,27 @@
                                 const firstItem = doc.querySelector('li.list');
             
                                 if (firstItem) {
-                                    const artist = firstItem.querySelector('.title')?.innerText.trim() || '';
-                                    const song = firstItem.querySelector('.song')?.innerText.trim() || '';
-                                    textElement.innerText = `${artist} - ${song}`;
+                                    // Použijeme textContent namiesto innerText pre lepšiu kompatibilitu s DOMParser
+                                    const artist = firstItem.querySelector('.title')?.textContent.trim() || '';
+                                    const song = firstItem.querySelector('.song')?.textContent.trim() || '';
+                                    
+                                    textElement.innerText = (artist || song) ? `${artist} - ${song}` : "";
                                     return;
                                 }
                             }
                         }
                         textElement.innerText = "";
-                    };
+                    } catch (e) {
+                        if (e.name !== 'AbortError') {
+                            console.log("STVR API Error:", e);
+                            textElement.innerText = "";
+                        }
+                    }
+                };
             
-                    await nacitajSroPlaylist();
-                    bauerIntervalId = setInterval(nacitajSroPlaylist, 30000); // Obnova každých 30s
-                    return;
-                } catch (e) {
-                    console.log("STVR API Error:", e);
-                    textElement.innerText = "";
-                    return;
-                }
+                await nacitajSroPlaylist();
+                bauerIntervalId = setInterval(nacitajSroPlaylist, 30000);
+                return;
             }
             // 3. PRIAME ČÍTANIE METADÁT ZO STREAMU (Slovensko, FM, Fun, Chill...)
             try {
