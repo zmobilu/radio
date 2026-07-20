@@ -1848,33 +1848,37 @@
             metadataController = new AbortController();
             const localSignal = metadataController.signal;
         
-            // --- VÝNIMKA PRE RÁDIO ROCK ---
+            // --- VÝNIMKA PRE RÁDIO ROCK (cez radia.sk) ---
             if (currentPlayingType === 'rock') {
                 const nacitajRockPiesen = async () => {
-                    // Kontrola, či sa medzičasom nezmenila stanica alebo nezastavil prehrávač
                     if (localSignal.aborted || currentPlayingType !== 'rock') return;
             
                     try {
-                        const res = await fetch('https://api.radiorock.sk/playlist', { signal: localSignal });
+                        const targetUrl = encodeURIComponent('https://www.radia.sk/radia/rock/playlist');
+                        const res = await fetch(`https://api.allorigins.win/get?url=${targetUrl}`, { signal: localSignal });
                         const data = await res.json();
             
                         if (localSignal.aborted || currentPlayingType !== 'rock') return;
             
-                        if (data && data.length > 0) {
-                            const artist = data[0].artist?.trim() || '';
-                            const title = data[0].title?.trim() || '';
+                        if (data && data.contents) {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(data.contents, 'text/html');
+                            
+                            // Vytiahneme najnovšiu pesničku z vrchu tabuľky
+                            const prvyRiadok = doc.querySelector('#playlist_table .row.data');
             
-                            if (artist || title) {
-                                textElement.innerText = `${artist} - ${title}`;
-                            } else {
-                                textElement.innerText = "";
+                            if (prvyRiadok) {
+                                const artist = prvyRiadok.querySelector('.interpret')?.textContent.trim() || '';
+                                const song = prvyRiadok.querySelector('.titul')?.textContent.trim() || '';
+            
+                                textElement.innerText = (artist || song) ? `${artist} - ${song}` : "";
+                                return;
                             }
-                        } else {
-                            textElement.innerText = "";
                         }
+                        textElement.innerText = "";
                     } catch (e) {
                         if (e.name !== 'AbortError') {
-                            console.log("Rádio Rock API Error:", e);
+                            console.log("Radia.sk Rock Parsing Error:", e);
                             textElement.innerText = "";
                         }
                     }
