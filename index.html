@@ -98,8 +98,8 @@
             height: 100%; 
             flex-direction: column;
             align-items: center; 
-            justify-content: center; /* ZMENA: Centrovanie namiesto space-between */
-            gap: 2vh;                /* PRIDANÉ: Automatická medzera medzi hodinami, dátumom a počasím */
+            justify-content: space-between center; /* ZMENA: Centrovanie namiesto space-between */
+            gap: 8vh;                /* PRIDANÉ: Automatická medzera medzi hodinami, dátumom a počasím */
             background: #000; 
             box-sizing: border-box;
             padding: 2vh 3vw; 
@@ -119,16 +119,16 @@
             align-items: center;
             width: 100%;
             flex: 0 1 auto; /* Umožní hodinám flexibilne sa prispôsobiť */
-            transform: scaleY(1.4);
+            transform: scaleY(1.8);
             transform-origin: center center;
             /* ZMENA: Stiahnutie hodín nižšie od horného okraja */
-            margin-top: 0 !important;          /* Odstránená horná medzera */
+            margin-top: 3vh !important;          /* Odstránená horná medzera */
             /* margin-top: 2vh;  ZMENA: 4vh povodne Odstránená horná medzera pre pritiahnutie k hornému okraju */
-            margin-bottom: 6vh;
+            margin-bottom: 0vh;
         }
         .big-clock-date-wrapper {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: column;
             justify-content: center;
             align-items: center;
             text-align: center;
@@ -140,8 +140,7 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             width: 100%;
             flex: 0 0 auto;
-            margin: 1.5vh 0 1vh 0 !important;  /* Znížený horný odstup zo 4vh na 1.5vh */
-            /* margin: 4vh 0 1vh 0;  Poradie: HORE (4vh) | VPRAVO (0) | DOLE (2vh) | VĽAVO (0) */
+            margin: 4vh 0 0vh 0 !important;  /Poradie: HORE (4vh) | VPRAVO (0) | DOLE (2vh) | VĽAVO (0) */
         }        
         .big-clock-hours { color: #fff; }
         .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
@@ -181,7 +180,7 @@
             flex-wrap: nowrap;
             align-items: center;
             justify-content: center;     /* Dokonalé centrovanie jadra počasia */
-            gap: 25px;                   /* Fixná medzera medzi hlavnou teplotou a pocitovými dátami */
+            gap: 5px;                   /* Fixná medzera medzi hlavnou teplotou a pocitovými dátami */
             width: 100%;
             padding: 0 10px;
             box-sizing: border-box;
@@ -282,7 +281,7 @@
             flex-wrap: nowrap !important;
             align-items: center !important;
             justify-content: center !important; /* Presné vycentrovanie v boxe */
-            gap: 8px !important;                /* Kompaktná medzera, aby text neliezol von */
+            gap: 5px !important;                /* Kompaktná medzera, aby text neliezol von */
             width: 100% !important;
             box-sizing: border-box !important;
         }
@@ -296,7 +295,7 @@
             display: inline-block;
             transform: scaleY(1.25);            /* Roztiahne písmo do výšky */
             transform-origin: center center;
-            letter-spacing: 0.5px;              /* Opticky rozšíri text do strán */
+            letter-spacing: 0.3px;              /* Opticky rozšíri text do strán */
         }
         
         .weather-wrapper-block {
@@ -319,6 +318,7 @@
         
         .sub-row-item-temp i { color: #ffa500; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }
         .sub-row-item-hum i { color: #4dabff; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }        
+
 
         /* --- EXTRA KOMPAKTNÝ PANEL NASTAVENÍ --- */
         .settings-night-panel {
