@@ -122,7 +122,8 @@
             transform: scaleY(1.4);
             transform-origin: center center;
             /* ZMENA: Stiahnutie hodín nižšie od horného okraja */
-            margin-top: 2vh; /* ZMENA: 4vh povodne Odstránená horná medzera pre pritiahnutie k hornému okraju */
+            margin-top: 0 !important;          /* Odstránená horná medzera */
+            /* margin-top: 2vh;  ZMENA: 4vh povodne Odstránená horná medzera pre pritiahnutie k hornému okraju */
             margin-bottom: 0;
         }
         .big-clock-date-wrapper {
@@ -139,7 +140,8 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             width: 100%;
             flex: 0 0 auto;
-            margin: 4vh 0 1vh 0; /* Poradie: HORE (4vh) | VPRAVO (0) | DOLE (2vh) | VĽAVO (0) */
+            margin: 1.5vh 0 1vh 0 !important;  /* Znížený horný odstup zo 4vh na 1.5vh */
+            /* margin: 4vh 0 1vh 0;  Poradie: HORE (4vh) | VPRAVO (0) | DOLE (2vh) | VĽAVO (0) */
         }        
         .big-clock-hours { color: #fff; }
         .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
