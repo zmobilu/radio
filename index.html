@@ -679,9 +679,17 @@
         }
         #player-now-playing {
             font-size: clamp(12px, 2.2vh, 18px) !important;
-            /* Medzera sa aplikuje iba vtedy, keď box NIE JE prázdny */
             margin-top: 0.5vh !important; 
             margin-bottom: 0 !important;
+        
+            /* Zabezpečí, že prvok drží výšku jedného riadku aj vtedy, keď je úplne prázdny */
+            display: block !important; 
+            min-height: 1.2em !important; 
+            line-height: 1.2 !important; 
+        
+            /* Ak používate vertikálne natiahnutie písma */
+            transform: scaleY(1.20) !important;
+            transform-origin: top left !important;
         }
         /* Keď je element prázdny, úplne ho schováme, aby nezaberal miesto 
         #player-now-playing:empty {
