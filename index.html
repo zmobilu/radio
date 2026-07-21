@@ -436,6 +436,24 @@
             transform: scaleY(1.20) !important; 
         }
         body.full-night-mode .big-clock-hours, body.full-night-mode .big-clock-minutes, body.full-night-mode #nightBottomInfo, body.full-night-mode #player-now-playing { color: var(--night-color) !important; }
+
+        body.full-night-mode #player-now-playing {
+            display: block !important;
+            position: absolute !important;
+            bottom: 11vh !important; /* Presne medzi rádio (18vh) a dátum (5vh) */
+            left: 0;
+            width: 100% !important;
+            text-align: center !important;
+            font-size: 3.5vw !important;
+            font-weight: 500 !important;
+            color: var(--night-color) !important;
+            z-index: 10 !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
         
         body.full-night-mode #nightBottomInfo { 
             display: block !important; 
@@ -471,6 +489,10 @@
                 bottom: 18vh;
                 width: auto !important;
             }
+            body.full-night-mode #player-now-playing {
+                bottom: 11vh !important;
+                font-size: 2.2vw !important; /* Mierne zmenšenie písma na šírku */
+            }
             body.full-night-mode .night-player-station {
                 font-size: 3.5vw !important;
                 margin-bottom: 0 !important;
@@ -493,7 +515,7 @@
             }
             body.full-night-mode .night-player-container {
                 position: absolute !important;
-                bottom: 22vh;
+                bottom: 18vh !important; /* Posun rádia vyššie, aby uvoľnilo miesto pre pesničku */
                 width: 100% !important;
             }
         }
