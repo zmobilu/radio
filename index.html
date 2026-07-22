@@ -938,6 +938,29 @@
                 opacity: 1;
                 transform: translateX(-50%) scale(1);
             }
+            /* --- PLYNULÝ PRECHOD DO NOČNÉHO REŽIMU --- */
+            body, 
+            .workspace-container, 
+            .favorites-sidebar, 
+            .main-content-area, 
+            .placeholder-view, 
+            .big-clock-time, 
+            .big-clock-date-wrapper, 
+            .main-weather-container, 
+            #nightBottomInfo, 
+            #player-now-playing {
+                transition: opacity 1.5s ease-in-out, background-color 1.5s ease-in-out, color 1.5s ease-in-out !important;
+            }
+        /* --- PLYNULÉ KRESLENIE STĹPCOV GRAFU --- */
+            .chart-bar-fill {
+                width: 100%;
+                height: 0%; /* Štartovacia výška pre animáciu */
+                border-radius: 4px 4px 0 0;
+                border: 1px solid #222;
+                border-bottom: none;
+                box-sizing: border-box;
+                transition: height 0.8s cubic-bezier(0.25, 1, 0.5, 1); /* Plynulý dobeh (ease-out) */
+            }
 
         
     </style>
@@ -1309,15 +1332,15 @@
             const chartContainer = document.getElementById('hourly-chart-container');
             if (!chartContainer || !weatherDataBackup) return;
             chartContainer.innerHTML = ''; 
-
+        
             let temps = [], rain = [], cloud = [], wind = [], labels = [], codes = [];
             let dayIdx = (mod === 'teraz') ? 0 : mod;
             
             if (weatherDataBackup.daily && weatherDataBackup.daily.sunrise && weatherDataBackup.daily.sunset) {
                 document.getElementById('sun-rise-val').textContent = weatherDataBackup.daily.sunrise[dayIdx].split('T')[1]; 
-                document.getElementById('sun-set-val').textContent = weatherDataBackup.daily.sunset[dayIdx].split('T')[1];   
+                document.getElementById('sun-set-val').textContent = weatherDataBackup.daily.sunset[dayIdx].split('T')[1];    
             }
-
+        
             if (mod === 'teraz') {
                 const currentHourIndex = new Date().getHours();
                 temps = weatherDataBackup.hourly.temperature_2m.slice(currentHourIndex, currentHourIndex + 12);
@@ -1342,11 +1365,11 @@
                     labels.push(String(step * 2) + ':00');
                 }
             }
-
+        
             const maxGraphTemp = Math.max(...temps);
             const minGraphTemp = Math.min(...temps);
             const tempRange = (maxGraphTemp - minGraphTemp) || 1;
-
+        
             temps.forEach((temp, idx) => {
                 if (temp === undefined) return;
                 const roundedTemp = Math.round(temp);
@@ -1357,36 +1380,43 @@
                 
                 const cCode = codes[idx] !== undefined ? codes[idx] : 0;
                 const weatherIconHtml = `<span class="chart-icon-info">${getWeatherIcon(cCode)}</span>`;
-
+        
                 const cloudVal = cloud[idx] ? Math.round(cloud[idx]) : 0;
                 const bgOpacity = 0.05 + (cloudVal / 100) * 0.15; 
                 const colBackground = `linear-gradient(to top, rgba(255,255,255, ${bgOpacity}), ${getTempColor(temp)})`;
                 
                 const windVal = wind[idx] ? Math.round(wind[idx]) : 0;
                 const windHtml = windVal > 0 ? `<span style="font-size: 12px; color: #fff; margin-top: 5px;"><i class="fas fa-wind" style="font-size:0.8em; color:#aaa;"></i> ${windVal}</span>` : `<span style="min-height: 14px;"></span>`;
-
-                // 1. NAJPRV VYTVORÍME ELEMENT COLUMN
+                
+                // 1. Vytvoríme element stĺpca
                 const column = document.createElement('div');
                 column.style.cssText = `display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; flex: 1;`;
                 
-                // 2. NAPLNÍME HO HTML OBSAHOM
+                // 2. Naplníme ho HTML s triedou .chart-bar-fill pre animáciu rastu
                 column.innerHTML = `
                     ${rainHtml}
                     ${weatherIconHtml}
                     <span class="chart-temp-info" style="color: ${getTempColor(temp)};">${roundedTemp}°</span>
-                    <div style="width: 100%; height: ${pct}%; background: ${colBackground}; border-radius: 4px 4px 0 0; border: 1px solid #222; border-bottom: none; box-sizing: border-box;"></div>
+                    <div class="chart-bar-fill" data-height="${pct}%" style="background: ${colBackground};"></div>
                     <span style="font-size: 14px; color: #fff; margin-top: 5px; font-weight: 500;">${labels[idx]}</span>
                     ${windHtml}
                 `;
-
-                // 3. AŽ TERAZ PRIRADÍME ANIMÁCIU IKONE VO VNÚTRI COLUMN
+        
+                // 3. Priradíme animáciu ikone počasia
                 const iconEl = column.querySelector('.chart-icon-info');
                 if (iconEl) priradAnimaciuIkone(iconEl, cCode);
-
+        
                 chartContainer.appendChild(column);
             });
+        
+            // 4. Spustenie plynulého "vyrastania" stĺpčekov odspodu nahor
+            setTimeout(() => {
+                chartContainer.querySelectorAll('.chart-bar-fill').forEach(bar => {
+                    const targetHeight = bar.getAttribute('data-height');
+                    if (targetHeight) bar.style.height = targetHeight;
+                });
+            }, 50);
         }
-
         function prepniDenGrafu(e, dayIndex) {
             if (e) {
                 e.stopPropagation();
