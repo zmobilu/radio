@@ -24,7 +24,21 @@
         :root {
             --night-color: #ffff00;
         }
-
+        
+        /* Globálna zmena kurzora na ručičku pre všetky interaktívne prvky */
+        button,
+        a,
+        [onclick],
+        .fav-card,
+        .cfg-mini-card,
+        .forecast-day-box,
+        .color-dot,
+        .weather-left-side,
+        .big-clock-time,
+        .big-clock-nameday {
+            cursor: pointer !important;
+        }
+        
         /* --- RESET A ZÁKLADNÉ NASTAVENIE --- */
         body {
             margin: 0; padding: 0; background-color: #000; color: #fff;
