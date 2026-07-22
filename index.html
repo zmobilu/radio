@@ -164,7 +164,7 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             width: 100%;
             flex: 0 0 auto;
-            margin: 8vh 0 0vh 0 !important;  /Poradie: HORE (4vh) | VPRAVO (0) | DOLE (2vh) | VĽAVO (0) */
+            margin: 8vh 0 0vh 0 !important;  /*Poradie: HORE (4vh) | VPRAVO (0) | DOLE (2vh) | VĽAVO (0) */
         }        
         .big-clock-hours { color: #fff; }
         .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
@@ -639,33 +639,44 @@
             border: none !important;            /* Odstráni rámik */
             box-shadow: none !important;        /* Odstráni tieň */
             padding: 0 !important;
-            font-size: 2vmin; 
+            font-size: 2.2vmin;                 /* Mierne zväčšené pre lepšiu čitateľnosť */
             font-weight: bold; 
             display: flex; 
             align-items: center; 
             gap: 8px; 
         }
 
+        /* Veľkosť pre SVG aj FontAwesome ikony */
+        .sun-box i, 
+        .sun-box svg {
+            width: 2.4vmin;
+            height: 2.4vmin;
+            min-width: 18px;
+            min-height: 18px;
+            font-size: 2.4vmin !important;
+            display: inline-block;
+        }
+
         /* Východ slnka: Oranžový dizajn s animáciou */
         .sun-box-rise {
             color: #ff9f0a;
         }
-        .sun-box-rise i { 
-            font-size: 2.2vmin !important; 
+        .sun-box-rise i,
+        .sun-box-rise svg { 
             color: #ff9f0a;
+            stroke: #ff9f0a;
             animation: sunriseAnim 3.5s infinite ease-in-out;
-            display: inline-block;
         }
 
         /* Západ slnka: Červenkasto-oranžový dizajn s animáciou */
         .sun-box-set {
             color: #ff4500;
         }
-        .sun-box-set i { 
-            font-size: 2.2vmin !important; 
+        .sun-box-set i,
+        .sun-box-set svg { 
             color: #ff4500;
+            stroke: #ff4500;
             animation: sunsetAnim 3.5s infinite ease-in-out;
-            display: inline-block;
         }
 
         /* Kľúčové snímky pre plynulé animácie */
@@ -678,7 +689,15 @@
             0%, 100% { transform: translateY(-2px) scale(1.1); opacity: 1; filter: drop-shadow(0 0 8px rgba(255, 69, 0, 0.8)); }
             50% { transform: translateY(2px) scale(0.9); opacity: 0.6; filter: drop-shadow(0 0 0px transparent); }
         }
-        
+        /* --- OPRAVA PRE SVG IKONY SLNKA --- */
+        .sun-icon {
+            width: 2.4vmin;
+            height: 2.4vmin;
+            min-width: 18px;
+            min-height: 18px;
+            display: inline-block;
+            vertical-align: middle;
+        }
         #hourly-chart-container { 
             display: flex; 
             justify-content: flex-start; /*space-between; */
@@ -1185,11 +1204,17 @@
         <div id="weather-details-top-inline">
             <div id="weather-sun-row">
                 <div class="sun-box sun-box-rise">
-                    <i class="fa-solid fa-sun-sunrise"></i>
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2v6M4.93 10.93l4.24 4.24M2 18h20M20 18a8 8 0 0 0-16 0"/>
+                        <polyline points="16 6 12 2 8 6"/>
+                    </svg>
                     <span id="sun-rise-val">--:--</span>
                 </div>
                 <div class="sun-box sun-box-set">
-                    <i class="fa-solid fa-sun-sunset"></i>
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="#ff4500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 10v6M4.93 10.93l4.24 4.24M2 18h20M20 18a8 8 0 0 0-16 0"/>
+                        <polyline points="8 12 12 16 16 12"/>
+                    </svg>
                     <span id="sun-set-val">--:--</span>
                 </div>
             </div>
@@ -1638,12 +1663,7 @@
             runClockEngine();
             resetSettingsTimer();
         }
-        // --- FUNKCIA PRE ZNOVUSPUSENIE SPRIEVODCU ---
-        function spustiTourZnova() {
-            localStorage.removeItem('kiosk_tour_done');
-            location.reload();
-        }
-
+        
         function zmenNastavenieMesta() {
             let navrhMesta = prompt("Zadaj názov mesta (napr. Bratislava, Kosice, Praha):", cfgMestoNazov);
             if (navrhMesta && navrhMesta.trim() !== "") {
