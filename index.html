@@ -1620,10 +1620,7 @@
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             
-            // Ak je celá hodina (napr. 01:00, 02:00...) a presne 0. sekunda, skontroluj/načítaj meniny
-            if (m === '00' && now.getSeconds() === 0) {
-                fetchNamedayData();
-            }
+            skontrolujAObnovMeniny();
             
             const aktCasString = `${h}:${m}`;
             document.getElementById('bigHours').textContent = h;
@@ -1690,9 +1687,19 @@
 
         // Globálna premenná, kde si uložíme kompletný zoznam mien pre daný deň
         let dnesneVsetkyMena = [];
+        let poslednyNacitanyDen = -1;
+
+        function skontrolujAObnovMeniny() {
+            const dnes = new Date().getDate();
+            if (dnes !== poslednyNacitanyDen) {
+                poslednyNacitanyDen = dnes;
+                fetchNamedayData();
+            }
+        }
 
         async function fetchNamedayData() {
             const now = new Date();
+            poslednyNacitanyDen = now.getDate();
             const mm = String(now.getMonth() + 1).padStart(2, '0');
             const dd = String(now.getDate()).padStart(2, '0');
             try {
@@ -1794,6 +1801,19 @@
         document.addEventListener('DOMContentLoaded', () => {
             const sep = document.getElementById('dateSeparator');
             if(sep) sep.style.display = "none";
+
+            // Pri načítaní stránky preveríme a stiahneme meniny
+            skontrolujAObnovMeniny();
+            
+            // Kontrola pri každom kliknutí/dotyku kdekoľvek na stránke
+            document.addEventListener('click', skontrolujAObnovMeniny);
+            
+            // Kontrola pri prebudení obrazovky / návrate na kartu
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    skontrolujAObnovMeniny();
+                }
+            });
             
             // --- CENTRÁLNY AUDIO EVENT MANAŽMENT PRE STOP/PAUSE S ČASOVAČOM ---
             audio.addEventListener('play', () => {
