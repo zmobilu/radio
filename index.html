@@ -849,6 +849,42 @@
             .weather-core-row #mainBigIcon {
                 animation: sunRotatePulse 25s infinite linear;
             }
+
+        /* --- VŠEOBECNÉ ANIMÁCIE PRE EMOJI IKONY POČASIA KDEKOĽVEK V KIOSKU --- */
+
+            /* Základné nastavenie pre plynulý pohyb ikoniek */
+            #mainBigIcon, #mainFc0Icon, #mainFc1Icon, .chart-icon-info, .forecast-day-icon {
+                display: inline-block !important;
+                transform-origin: center center;
+            }
+            
+            /* 1. Všetky slniečka (☀️) budú jemne rotovať a dýchať */
+            #mainFc0Icon:contains("☀️"), #mainFc1Icon:contains("☀️"), 
+            .chart-icon-info:contains("☀️"), .forecast-day-icon:contains("☀️") {
+                animation: sunRotatePulse 20s infinite linear;
+            }
+            
+            /* 2. Všetky obláčiky a polojasno (⛅ / 🌫️) sa budú plynulo kolísať */
+            #mainFc0Icon:contains("⛅"), #mainFc1Icon:contains("⛅"),
+            .chart-icon-info:contains("⛅"), .forecast-day-icon:contains("⛅") {
+                animation: cloudFloat 4s infinite ease-in-out;
+            }
+            
+            /* 3. Všetky daždivé ikony a sneženie (🌧️ / ❄️) budú jemne kvapkať/pérovať */
+            #mainFc0Icon:contains("🌧️"), #mainFc1Icon:contains("🌧️"),
+            .chart-icon-info:contains("🌧️"), .forecast-day-icon:contains("🌧️"),
+            #mainFc0Icon:contains("❄️"), #mainFc1Icon:contains("❄️") {
+                animation: rainDrop 2s infinite ease-in-out;
+            }
+            
+            /* 4. Všetky búrky (⛈️) budú občasne blikať */
+            #mainFc0Icon:contains("⛈️"), #mainFc1Icon:contains("⛈️"),
+            .chart-icon-info:contains("⛈️"), .forecast-day-icon:contains("⛈️") {
+                animation: lightningFlash 5s infinite ease-in-out;
+            }
+
+
+        
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
@@ -1195,7 +1231,7 @@
                         const min = Math.round(data.daily.temperature_2m_min[i]);
                         
                         const mIcon = document.getElementById(`mainFc${i}Icon`);
-                        if (mIcon) mIcon.textContent = getWeatherIcon(dCode);
+                        if (mIcon) mIcon.textContent = getWeatherIcon(dCode); priradAnimaciuIkone(mIcon, dCode);
                         
                         const mTemp = document.getElementById(`mainFc${i}Temp`);
                         if (mTemp) mTemp.innerHTML = `<span style="color:${getTempColor(max)}">${max}°</span> / <span style="color:#aaa">${min}°</span>`;
@@ -1263,6 +1299,8 @@
                 
                 const cCode = codes[idx] !== undefined ? codes[idx] : 0;
                 const weatherIconHtml = `<span class="chart-icon-info">${getWeatherIcon(cCode)}</span>`;
+                const iconEl = column.querySelector('.chart-icon-info');
+                if (iconEl) priradAnimaciuIkone(iconEl, cCode);
 
                 const cloudVal = cloud[idx] ? Math.round(cloud[idx]) : 0;
                 const bgOpacity = 0.05 + (cloudVal / 100) * 0.15; 
@@ -1360,6 +1398,8 @@
                     </div>
                 `;
                 extendedContainer.appendChild(dayBox);
+                const dayIconEl = dayBox.querySelector('.forecast-day-icon');
+                if (dayIconEl) priradAnimaciuIkone(dayIconEl, exCode);
             }
         }
 
@@ -2337,6 +2377,27 @@
             document.addEventListener('DOMContentLoaded', () => {
                 spustiTourAkJePrvykrat();
             });
+
+        // Pomocná funkcia na pridanie animácie k ľubovoľnému elementu ikony
+            function priradAnimaciuIkone(element, wCode) {
+                if (!element) return;
+                
+                // Zrušíme prípadnú starú animáciu
+                element.style.animation = 'none';
+                
+                // Priradíme novú podľa kódu počasia
+                if (wCode === 0) {
+                    element.style.animation = 'sunRotatePulse 20s infinite linear';
+                } else if (wCode >= 1 && wCode <= 3) {
+                    element.style.animation = 'cloudFloat 4s infinite ease-in-out';
+                } else if ((wCode >= 51 && wCode <= 67) || (wCode >= 80 && wCode <= 82) || (wCode >= 71 && wCode <= 77)) {
+                    element.style.animation = 'rainDrop 2s infinite ease-in-out';
+                } else if (wCode >= 95) {
+                    element.style.animation = 'lightningFlash 4s infinite ease-in-out';
+                } else {
+                    element.style.animation = 'cloudFloat 5s infinite ease-in-out';
+                }
+            }
         
     </script>
      <!-- Vyskakujúce okno pre zoznam mien -->
