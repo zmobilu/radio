@@ -433,155 +433,148 @@
         .night-btn:active { transform: scale(0.9); }
         .night-btn.btn-playpause { font-size: 9vw; }
 
-        /* --- 1. SPOLOČNÝ NOČNÝ ZÁKLAD (Platí vždy a všade) --- */
-        body.full-night-mode .favorites-sidebar {
-            opacity: 0 !important;
-            width: 0 !important;
-            min-width: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            border: none !important;
-            pointer-events: none !important;
-            transition: opacity 1.5s ease-in-out, width 1.5s ease-in-out !important;
-        }
+        /* --- NOČNÝ REŽIM (S PLYNULÝM STMIEVANÍM) --- */
 
-        body.full-night-mode .main-content-area,
-        body.full-night-mode .workspace-container { 
-            width: 100vw !important; 
-            height: 100vh !important; 
-        }
-
-        body.full-night-mode .big-clock-date-wrapper,
-        body.full-night-mode #settingsToggleBtn, 
-        body.full-night-mode .main-weather-container { 
-            opacity: 0 !important;
-            pointer-events: none !important;
-            transition: opacity 1.5s ease-in-out !important;
-        }
-
-        body.full-night-mode .placeholder-view { 
-            width: 100vw !important; 
-            height: 100vh !important; 
-            justify-content: center !important; 
-            align-items: center !important; 
-            padding: 0 !important; 
-            position: relative !important;
-            animation: antiBurnIn 300s infinite linear;
-        }
-
-        /* Farby pre nočný režim */
-        body.full-night-mode .big-clock-hours, 
-        body.full-night-mode .big-clock-minutes, 
-        body.full-night-mode #nightBottomInfo, 
-        body.full-night-mode #player-now-playing { 
-            color: var(--night-color) !important; 
-        }
-
-        body.full-night-mode .big-clock-time { 
-            font-size: 35vh !important; /* Zmena z 28vw na vh, aby sa hodiny prispôsobovali výške */
-            letter-spacing: 0px !important; 
-            margin: 0 !important; 
-            line-height: 1 !important;
-            transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out !important;
-        }
-        body.full-night-mode #player-now-playing {
-            display: block !important;
-            position: absolute !important;
-            left: 0;
-            width: 100% !important;
-            text-align: center !important;
-            font-weight: 500 !important;
-            z-index: 10 !important;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding: 0 20px;
-            box-sizing: border-box;
-            transition: opacity 1.5s ease-in-out !important;
-        }
-
-        body.full-night-mode #nightBottomInfo { 
-            display: block !important; 
-            position: absolute !important; 
-            padding-bottom: env(safe-area-inset-bottom) !important; 
-            font-weight: 500; 
-            letter-spacing: 1px; 
-            opacity: 1; 
-            text-align: center; 
-            width: 100%; 
-            left: 0; 
-            z-index: 10;
-            transition: opacity 1.5s ease-in-out !important;
-        }
-
-        body.full-night-mode .night-player-container.active-playing {
-            display: flex !important;
-            transition: opacity 1.5s ease-in-out !important;
-        }
-
-
-        /* --- 2. ŠPECIFIKÁ PRE NOČNÝ REŽIM NA ŠÍRKU (LANDSCAPE) --- */
-        @media (orientation: landscape) {
-            body.full-night-mode .big-clock-time {
-                /* Kladné translateY posunie hodiny dole do stredu, scaleY ich natiahne */
-                transform: scaleY(1.60) translateY(2vh) !important;
-                transform-origin: center center !important;
+            /* 1. Definícia prechodov (transition) pre plynulý fade-in / fade-out */
+            body .placeholder-view,
+            body #player-now-playing,
+            body #nightBottomInfo,
+            body .night-player-container {
+                transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out !important;
             }
-        
-            body.full-night-mode .night-player-container.active-playing {
-                flex-direction: row !important;
-                gap: 4vw !important;
-                position: absolute !important;
-                width: auto !important;
-                bottom: 16vh !important;
+            
+            /* 2. Skrytie prvkov, ktoré v nočnom režime nemajú byť */
+            body.full-night-mode .favorites-sidebar,
+            body.full-night-mode .big-clock-date-wrapper,
+            body.full-night-mode #settingsToggleBtn, 
+            body.full-night-mode .main-weather-container { 
+                display: none !important;
             }
-        
+            
+            body.full-night-mode .workspace-container, 
+            body.full-night-mode .main-content-area { 
+                width: 100vw; 
+                height: 100vh; 
+            }
+            
+            /* 3. Hlavný kontajner nočného režimu */
+            body.full-night-mode .placeholder-view { 
+                width: 100vw !important; 
+                height: 100vh !important; 
+                transform: translateY(-4dvh) !important; 
+                justify-content: center !important; 
+                align-items: center !important; 
+                padding: 0 !important; 
+                position: relative !important;
+                opacity: 1 !important;
+            }
+            
+            /* Hodiny */
+            body.full-night-mode .big-clock-time { 
+                font-size: 28vw !important; 
+                letter-spacing: 0px !important; 
+                margin: 0 !important; 
+                transform: scaleY(1.20) !important; 
+            }
+            
+            body.full-night-mode .big-clock-hours, 
+            body.full-night-mode .big-clock-minutes, 
+            body.full-night-mode #nightBottomInfo, 
+            body.full-night-mode #player-now-playing { 
+                color: var(--night-color) !important; 
+            }
+            
+            /* Práve hrá (Song info) */
             body.full-night-mode #player-now-playing {
-                bottom: 10vh !important;
-                font-size: 2.2vw !important;
-            }
-        
-            body.full-night-mode .night-player-station {
-                font-size: 3.2vw !important;
-                margin-bottom: 0 !important;
-                border-right: 1px solid rgba(255,255,255,0.15);
-                padding-right: 4vw;
-            }
-        
-            body.full-night-mode .night-player-station img { height: 4vw !important; }
-            body.full-night-mode .night-player-controls { gap: 4vw !important; }
-            body.full-night-mode .night-btn { font-size: 4vw !important; padding: 5px; }
-            body.full-night-mode .night-btn.btn-playpause { font-size: 5vw !important; }
-            body.full-night-mode #nightBottomInfo { font-size: 2.8vw !important; bottom: 4vh !important; }
-        }
-
-
-        /* --- 3. ŠPECIFIKÁ PRE NOČNÝ REŽIM NA VÝŠKU (PORTRAIT) --- */
-       @media (orientation: portrait) {
-            body.full-night-mode .big-clock-time {
-                /* Na výšku dáme väčší vh a posunieme ich viac do stredu obrazovky */
-                font-size: 22vw !important;
-                transform: scaleY(1.70) translateY(12vh) !important;
-                transform-origin: center center !important;
-            }
-        
-            body.full-night-mode .night-player-container.active-playing {
-                flex-direction: column !important;
+                display: block !important;
                 position: absolute !important;
-                bottom: 18vh !important;
+                bottom: 13vh !important; /* Presne medzi rádio (18vh) a dátum (5vh) */
+                left: 0;
                 width: 100% !important;
-            }
-        
-            body.full-night-mode #player-now-playing {
-                bottom: 12vh !important;
+                text-align: center !important;
                 font-size: 3.5vw !important;
+                font-weight: 500 !important;
+                color: var(--night-color) !important;
+                z-index: 10 !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding: 0 20px;
+                box-sizing: border-box;
             }
-        
-            body.full-night-mode #nightBottomInfo {
-                font-size: 4.2vw !important;
-                bottom: 5vh !important;
+            
+            /* Spodné info (dátum/meniny) */
+            body.full-night-mode #nightBottomInfo { 
+                display: block !important; 
+                position: absolute !important; 
+                bottom: 5vh !important; 
+                padding-bottom: env(safe-area-inset-bottom) !important; 
+                font-size: 4.5vw !important; 
+                font-weight: 500; 
+                letter-spacing: 1px; 
+                opacity: 1; 
+                text-align: center; 
+                width: 100%; 
+                left: 0; 
+                z-index: 10;
             }
-        }
+            
+            body.full-night-mode .night-player-container.active-playing {
+                display: flex !important;
+            }
+            
+            /* Špecifické úpravy pre nočný režim na šírku (LANDSCAPE) */
+            @media (orientation: landscape) {
+                body.full-night-mode .placeholder-view {
+                    transform: translateY(0) !important;
+                }
+                body.full-night-mode .big-clock-time {
+                    transform: scaleY(1.30) translateY(-10vh) !important;
+                }
+                body.full-night-mode .night-player-container {
+                    flex-direction: row !important;
+                    gap: 4vw !important;
+                    position: absolute !important;
+                    bottom: 18vh;
+                    width: auto !important;
+                }
+                body.full-night-mode #player-now-playing {
+                    bottom: 11vh !important;
+                    font-size: 2.2vw !important; /* Mierne zmenšenie písma na šírku */
+                }
+                body.full-night-mode .night-player-station {
+                    font-size: 3.5vw !important;
+                    margin-bottom: 0 !important;
+                    border-right: 1px solid rgba(255,255,255,0.15);
+                    padding-right: 4vw;
+                }
+                body.full-night-mode .night-player-station img { height: 4vw !important; }
+                body.full-night-mode .night-player-controls { gap: 5vw !important; }
+                body.full-night-mode .night-btn { font-size: 4.5vw !important; padding: 5px; }
+                body.full-night-mode .night-btn.btn-playpause { font-size: 5.5vw !important; }
+                body.full-night-mode #nightBottomInfo {
+                    font-size: 3.2vw !important;
+                }
+            }
+            
+            /* Špecifické úpravy pre nočný režim na výšku (PORTRAIT) */
+            @media (orientation: portrait) {
+                body.full-night-mode .big-clock-time {
+                    transform: scaleY(1.30) translateY(-8vh) !important;
+                }
+                body.full-night-mode .night-player-container {
+                    position: absolute !important;
+                    bottom: 18vh !important; /* Posun rádia vyššie, aby uvoľnilo miesto pre pesničku */
+                    width: 100% !important;
+                }
+            }
+            
+            /* Pomocou Media Query pre úzke obrazovky (na výšku) otočíme smer nad seba */
+            @media (max-width: 480px), (orientation: portrait) {
+                .weather-wrapper-block {
+                    flex-direction: column; /* Ikona skočí NAD teplotu */
+                }
+            }
         /* --- CELOOBRAZOVKOVÉ DETAILNÉ ZOBRAZENIE GRAFU --- */
         .weather-detail-view {
             display: none; 
