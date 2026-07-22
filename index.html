@@ -438,7 +438,8 @@
         body.full-night-mode .big-clock-date-wrapper,
         body.full-night-mode #settingsToggleBtn, 
         body.full-night-mode .main-weather-container { 
-            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important; /* Počas noci zabráni klikaniu na skryté tlačidlá */
         }
         body.full-night-mode .workspace-container, body.full-night-mode .main-content-area { width: 100vw; height: 100vh; }
         
@@ -944,12 +945,15 @@
             .favorites-sidebar, 
             .main-content-area, 
             .placeholder-view, 
-            .big-clock-time, 
+            .big-clock-time,
+            .big-clock-hours,
+            .big-clock-minutes,
             .big-clock-date-wrapper, 
             .main-weather-container, 
             #nightBottomInfo, 
-            #player-now-playing {
-                transition: opacity 1.5s ease-in-out, background-color 1.5s ease-in-out, color 1.5s ease-in-out !important;
+            #player-now-playing,
+            #settingsToggleBtn {
+                transition: opacity 1.5s ease-in-out, background-color 1.5s ease-in-out, color 1.5s ease-in-out, transform 1.5s ease-in-out !important;
             }
         /* --- PLYNULÉ KRESLENIE STĹPCOV GRAFU --- */
             .chart-bar-fill {
