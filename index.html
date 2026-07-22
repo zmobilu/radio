@@ -845,7 +845,9 @@
         <div id="weather-location-container-top">
             <div id="weather-location-date">--.--.----</div>
             <span style="color: #444;">•</span>
-            <div id="weather-location-main">---</div>
+            <div id="weather-location-main" style="cursor: pointer;" onclick="window.open(`https://www.windy.com/?temp,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť mapu Windy">
+                <i class="fa-solid fa-map-location-dot" style="font-size: 0.8em; margin-right: 6px;"></i><span id="weather-location-text">---</span>
+            </div>
             <span style="color: #444;">•</span>
             <div id="weather-location-time">00:00</div>
         </div>
@@ -1000,8 +1002,8 @@
                     const icon = getWeatherIcon(code);
                     aktualnaTeplotaText = `${icon} ${temp}°C`;
 
-                    const locMain = document.getElementById('weather-location-main');
-                    if (locMain) locMain.textContent = cfgMestoNazov.toUpperCase();
+                    const locMainText = document.getElementById('weather-location-text');
+                    if (locMainText) locMainText.textContent = cfgMestoNazov.toUpperCase();
 
                     const bigCityEl = document.getElementById('bigClockCity');
                     if (bigCityEl) bigCityEl.textContent = cfgMestoNazov.toUpperCase();
