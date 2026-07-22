@@ -800,6 +800,55 @@
             .placeholder-view {
                 animation: daytimeAntiBurnIn 120s infinite ease-in-out;
             }
+
+        /* --- ANIMÁCIE PRE IKONY POČASIA --- */
+
+            /* 1. Slnko: Jemné dýchanie/pulzovanie a pomalá rotácia */
+            @keyframes sunRotatePulse {
+                0% { transform: scale(1) rotate(0deg); opacity: 0.95; }
+                50% { transform: scale(1.08) rotate(180deg); opacity: 1; filter: drop-shadow(0 0 15px rgba(255, 204, 0, 0.8)); }
+                100% { transform: scale(1) rotate(360deg); opacity: 0.95; }
+            }
+            
+            /* 2. Oblaky: Jemné kolísanie zľava doprava */
+            @keyframes cloudFloat {
+                0% { transform: translateX(0px) translateY(0px); }
+                50% { transform: translateX(4px) translateY(-2px); }
+                100% { transform: translateX(0px) translateY(0px); }
+            }
+            
+            /* 3. Dážď: Jemné vertikálne skákanie / kvapkanie */
+            @keyframes rainDrop {
+                0% { transform: translateY(0); }
+                50% { transform: translateY(3px) scaleY(1.05); }
+                100% { transform: translateY(0); }
+            }
+            
+            /* 4. Búrka: Náhle bleskové bliknutie */
+            @keyframes lightningFlash {
+                0%, 90%, 100% { opacity: 1; filter: drop-shadow(0 0 0px transparent); }
+                92% { opacity: 0.3; }
+                94% { opacity: 1; filter: drop-shadow(0 0 18px #ffeb3b); }
+                96% { opacity: 0.5; }
+                98% { opacity: 1; filter: drop-shadow(0 0 25px #ffeb3b); }
+            }
+            
+            /* --- APLIKÁCIA ANIMÁCIÍ NA HLAVNÚ IKONU POČASIA --- */
+            #mainBigIcon {
+                display: inline-block !important;
+                transition: transform 0.5s ease;
+            }
+            
+            /* Efekty podľa ikonky (Emoji / FontAwesome) */
+            #mainBigIcon:contains("☀️"), 
+            .weather-core-row:has(#mainBigIcon) span[id="mainBigIcon"] {
+                animation: sunRotatePulse 20s infinite linear;
+            }
+            
+            /* Všeobecné priradenie animácií pre oblasť počasia */
+            .weather-core-row #mainBigIcon {
+                animation: sunRotatePulse 25s infinite linear;
+            }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
@@ -1095,8 +1144,32 @@
                     const bigCityEl = document.getElementById('bigClockCity');
                     if (bigCityEl) bigCityEl.textContent = cfgMestoNazov.toUpperCase();
                     
-                    const mainBigIconEl = document.getElementById('mainBigIcon');
-                    if (mainBigIconEl) mainBigIconEl.textContent = icon;
+                   const mainBigIconEl = document.getElementById('mainBigIcon');
+                    if (mainBigIconEl) {
+                        mainBigIconEl.textContent = icon;
+                        
+                        // Odstránime staré animácie
+                        mainBigIconEl.style.animation = 'none';
+                        
+                        // Aplikujeme presnú animáciu podľa kódu počasia (Open-Meteo code)
+                        setTimeout(() => {
+                            if (code === 0) {
+                                // Jasno - slnko rotuje a dýcha
+                                mainBigIconEl.style.animation = 'sunRotatePulse 20s infinite linear';
+                            } else if (code >= 1 && code <= 3) {
+                                // Polojasno / Zamračené - oblak sa jemne kolíše
+                                mainBigIconEl.style.animation = 'cloudFloat 4s infinite ease-in-out';
+                            } else if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
+                                // Dážď - jemné kvapkanie
+                                mainBigIconEl.style.animation = 'rainDrop 1.8s infinite ease-in-out';
+                            } else if (code >= 95) {
+                                // Búrka - bleskové blikanie
+                                mainBigIconEl.style.animation = 'lightningFlash 4s infinite ease-in-out';
+                            } else {
+                                mainBigIconEl.style.animation = 'cloudFloat 5s infinite ease-in-out';
+                            }
+                        }, 50);
+                    }
                     
                     const mainBigTempEl = document.getElementById('mainBigTemp');
                     if (mainBigTempEl) {
