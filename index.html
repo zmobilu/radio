@@ -478,12 +478,12 @@
         }
 
         body.full-night-mode .big-clock-time { 
-            font-size: 28vw !important; 
+            font-size: 20vh !important; /* Zmena z 28vw na vh, aby sa hodiny prispôsobovali výške */
             letter-spacing: 0px !important; 
             margin: 0 !important; 
+            line-height: 1 !important;
             transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out !important;
         }
-
         body.full-night-mode #player-now-playing {
             display: block !important;
             position: absolute !important;
@@ -523,9 +523,11 @@
         /* --- 2. ŠPECIFIKÁ PRE NOČNÝ REŽIM NA ŠÍRKU (LANDSCAPE) --- */
         @media (orientation: landscape) {
             body.full-night-mode .big-clock-time {
-                transform: scaleY(1.40) translateY(-3vh) !important;
+                /* Kladné translateY posunie hodiny dole do stredu, scaleY ich natiahne */
+                transform: scaleY(1.40) translateY(2vh) !important;
+                transform-origin: center center !important;
             }
-
+        
             body.full-night-mode .night-player-container.active-playing {
                 flex-direction: row !important;
                 gap: 4vw !important;
@@ -533,19 +535,19 @@
                 width: auto !important;
                 bottom: 16vh !important;
             }
-
+        
             body.full-night-mode #player-now-playing {
                 bottom: 10vh !important;
                 font-size: 2.2vw !important;
             }
-
+        
             body.full-night-mode .night-player-station {
                 font-size: 3.2vw !important;
                 margin-bottom: 0 !important;
                 border-right: 1px solid rgba(255,255,255,0.15);
                 padding-right: 4vw;
             }
-
+        
             body.full-night-mode .night-player-station img { height: 4vw !important; }
             body.full-night-mode .night-player-controls { gap: 4vw !important; }
             body.full-night-mode .night-btn { font-size: 4vw !important; padding: 5px; }
@@ -555,23 +557,26 @@
 
 
         /* --- 3. ŠPECIFIKÁ PRE NOČNÝ REŽIM NA VÝŠKU (PORTRAIT) --- */
-        @media (orientation: portrait) {
+       @media (orientation: portrait) {
             body.full-night-mode .big-clock-time {
-                transform: scaleY(1.40) translateY(-4vh) !important;
+                /* Na výšku dáme väčší vh a posunieme ich viac do stredu obrazovky */
+                font-size: 22vw !important;
+                transform: scaleY(1.50) translateY(12vh) !important;
+                transform-origin: center center !important;
             }
-
+        
             body.full-night-mode .night-player-container.active-playing {
                 flex-direction: column !important;
                 position: absolute !important;
                 bottom: 18vh !important;
                 width: 100% !important;
             }
-
+        
             body.full-night-mode #player-now-playing {
                 bottom: 12vh !important;
                 font-size: 3.5vw !important;
             }
-
+        
             body.full-night-mode #nightBottomInfo {
                 font-size: 4.2vw !important;
                 bottom: 5vh !important;
