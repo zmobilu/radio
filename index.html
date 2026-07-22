@@ -762,7 +762,44 @@
                 box-shadow: 0 0 0 4px #ff9f0a, 0 0 25px rgba(255, 159, 10, 0.8) !important;
                 transition: all 0.3s ease !important;
             }
-        
+
+        /* Rotácia ozubeného kolieska pri prechode myšou / stlačení */
+            .btn-settings i.fa-gear {
+                transition: transform 0.5s ease-in-out;
+            }
+            .btn-settings:hover i.fa-gear,
+            .btn-settings.active i.fa-gear {
+                transform: rotate(180deg);
+            }
+            
+            /* Animovaný pulzujúci rámček pre hrajúce rádio */
+            @keyframes radioGlow {
+                0% { box-shadow: 0 0 5px rgba(255, 159, 10, 0.4); }
+                50% { box-shadow: 0 0 18px rgba(255, 159, 10, 0.9); }
+                100% { box-shadow: 0 0 5px rgba(255, 159, 10, 0.4); }
+            }
+            .fav-card.playing {
+                border: 2px solid #ff9f0a !important;
+                background: #151515;
+                animation: radioGlow 2s infinite ease-in-out;
+            }
+            
+            /* Plynulá animácia prechodu okien a nočného režimu */
+            body, .placeholder-view, .weather-detail-view, .settings-grid-view {
+                transition: background-color 0.8s ease, opacity 0.4s ease;
+            }
+            
+            /* Rozšírená ochrana proti vypáleniu (jemný mikropohyb celého obsahu počas dňa) */
+            @keyframes daytimeAntiBurnIn {
+                0%   { transform: translate(0, 0); }
+                25%  { transform: translate(1px, -1px); }
+                50%  { transform: translate(-1px, 1px); }
+                75%  { transform: translate(-1px, -1px); }
+                100% { transform: translate(0, 0); }
+            }
+            .placeholder-view {
+                animation: daytimeAntiBurnIn 120s infinite ease-in-out;
+            }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
@@ -1403,17 +1440,20 @@
                 const card = document.createElement('div');
                 
                 if (item && id !== null) {
-                    card.className = "fav-card";
-                    if (currentPlayingType === item.id && !audio.paused) card.classList.add("playing");
-                    //card.setAttribute("style", item.style);
-                    card.onclick = () => handleFavCardClick(item);
-                    
-                    if (item.img) {
-                        card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
-                    } else if (item.icon) {
-                        card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
-                    }
-                } else {
+                card.className = "fav-card";
+                
+                if (currentPlayingType === item.id && !audio.paused) {
+                    card.classList.add("playing");
+                }
+                
+                card.onclick = () => handleFavCardClick(item);
+
+                if (item.img) {
+                    card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
+                } else if (item.icon) {
+                    card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
+                }
+            } else {
                     card.className = "fav-card empty";
                     card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
                 }
