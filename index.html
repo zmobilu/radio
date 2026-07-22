@@ -523,7 +523,7 @@
         /* --- 2. ŠPECIFIKÁ PRE NOČNÝ REŽIM NA ŠÍRKU (LANDSCAPE) --- */
         @media (orientation: landscape) {
             body.full-night-mode .big-clock-time {
-                transform: scaleY(1.40) translateY(-2vh) !important;
+                transform: scaleY(1.40) translateY(-3vh) !important;
             }
 
             body.full-night-mode .night-player-container.active-playing {
@@ -2523,7 +2523,33 @@
                     element.style.animation = 'cloudFloat 5s infinite ease-in-out';
                 }
             }
-        
+        // --- JEDNORAZOVÁ NOČNÁ AKTUALIZÁCIA KIOSKU (O 03:00 RÁNO) ---
+            let poslesnaNocnaKontrolaDen = new Date().getDate();
+            
+            async function skontrolujNochnuAktualizaciu() {
+                const teraz = new Date();
+                const aktualnyDen = teraz.getDate();
+                const hodina = teraz.getHours();
+            
+                // Ak je 03:00 ráno a v tento deň sme ešte aktualizáciu nerobili
+                if (hodina === 3 && aktualnyDen !== poslesnaNocnaKontrolaDen) {
+                    poslesnaNocnaKontrolaDen = aktualnyDen;
+                    console.log("Nastal nočný čas (03:00), obnovujem kiosk pre stiahnutie najnovšej verzie...");
+                    
+                    try {
+                        // Skontrolujeme cez HEAD požiadavku, či je na servery nový index.html
+                        const res = await fetch('index.html?t=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
+                        if (res.ok) {
+                            window.location.reload(true); // Tvrdé obnovenie s vyčistením cache
+                        }
+                    } catch (e) {
+                        console.log("Nočná aktualizácia zlyhala (kiosk je offline):", e);
+                    }
+                }
+            }
+            
+            // Kontrola prebieha každú minútu
+            setInterval(skontrolujNochnuAktualizaciu, 60000);
     </script>
      <!-- Vyskakujúce okno pre zoznam mien -->
     <div id="namesModal" style="display: none; position: fixed; z-index: 9999999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); justify-content: center; align-items: center;" onclick="this.style.display='none'">
