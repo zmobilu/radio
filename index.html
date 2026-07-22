@@ -625,9 +625,59 @@
             justify-content: space-between;
             box-sizing: border-box;
         }
-        #weather-sun-row { display: flex; justify-content: center; gap: 30px; width: 100%; margin-bottom: 1.5vh; }
-        .sun-box { background: #fff; color: #000; padding: 4px 12px; border-radius: 6px; font-size: 2vmin; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .sun-box i { font-size: 2.2vmin !important; }
+        /* --- ÚPRAVA PRE VÝCHOD A ZÁPAD SLNKA V GRAFE --- */
+        #weather-sun-row { 
+            display: flex; 
+            justify-content: center; 
+            gap: 24px; 
+            width: 100%; 
+            margin-bottom: 1.5vh; 
+        }
+
+        .sun-box { 
+            background: transparent !important; /* Odstráni biely obdĺžnik */
+            border: none !important;            /* Odstráni rámik */
+            box-shadow: none !important;        /* Odstráni tieň */
+            padding: 0 !important;
+            font-size: 2vmin; 
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+
+        /* Východ slnka: Oranžový dizajn s animáciou */
+        .sun-box-rise {
+            color: #ff9f0a;
+        }
+        .sun-box-rise i { 
+            font-size: 2.2vmin !important; 
+            color: #ff9f0a;
+            animation: sunriseAnim 3.5s infinite ease-in-out;
+            display: inline-block;
+        }
+
+        /* Západ slnka: Červenkasto-oranžový dizajn s animáciou */
+        .sun-box-set {
+            color: #ff4500;
+        }
+        .sun-box-set i { 
+            font-size: 2.2vmin !important; 
+            color: #ff4500;
+            animation: sunsetAnim 3.5s infinite ease-in-out;
+            display: inline-block;
+        }
+
+        /* Kľúčové snímky pre plynulé animácie */
+        @keyframes sunriseAnim {
+            0%, 100% { transform: translateY(2px) scale(0.95); opacity: 0.7; filter: drop-shadow(0 0 0px transparent); }
+            50% { transform: translateY(-2px) scale(1.1); opacity: 1; filter: drop-shadow(0 0 8px rgba(255, 159, 10, 0.8)); }
+        }
+
+        @keyframes sunsetAnim {
+            0%, 100% { transform: translateY(-2px) scale(1.1); opacity: 1; filter: drop-shadow(0 0 8px rgba(255, 69, 0, 0.8)); }
+            50% { transform: translateY(2px) scale(0.9); opacity: 0.6; filter: drop-shadow(0 0 0px transparent); }
+        }
         
         #hourly-chart-container { 
             display: flex; 
@@ -1134,12 +1184,12 @@
 
         <div id="weather-details-top-inline">
             <div id="weather-sun-row">
-                <div class="sun-box">
-                    <i class="fa-solid fa-sun-sunrise" style="color: #ff9f0a;"></i>
+                <div class="sun-box sun-box-rise">
+                    <i class="fa-solid fa-sun-sunrise"></i>
                     <span id="sun-rise-val">--:--</span>
                 </div>
-                <div class="sun-box">
-                    <i class="fa-solid fa-sun-sunset" style="color: #ff4500;"></i>
+                <div class="sun-box sun-box-set">
+                    <i class="fa-solid fa-sun-sunset"></i>
                     <span id="sun-set-val">--:--</span>
                 </div>
             </div>
