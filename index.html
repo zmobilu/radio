@@ -2110,41 +2110,50 @@
         // --- SCRIPT PRE SPRIEVODCU (INTRO TOUR) ---
             const tourKroky = [
                 {
-                    element: ".favorites-sidebar", // Prípadne .buttons-section pre starší kód
+                    element: ".buttons-section", // oblasť tlačidiel rádia
                     title: "📻 Obľúbené stanice",
                     desc: "Kliknutím na rádio okamžite spustíte živý stream. Opätovným kliknutím rádio vypnete."
                 },
                 {
-                    element: ".big-clock-time", // Prípadne #time pre starší kód
+                    element: "#time", // oblasť hodín
                     title: "⏰ Hodiny a Nočný režim",
                     desc: "Kliknutím na hodiny manuálne prepnete dashboard do šetriča/nočného režimu. Opätovným dotykom ho prebudíte."
                 },
                 {
-                    element: ".main-weather-container", // Prípadne .ss-left-col alebo #ss-weather-trigger
+                    element: ".ss-left-col", // oblasť počasia
                     title: "☀️ Počasie a Predpoveď",
                     desc: "Kliknutím na sekciu počasia otvoríte podrobný hodinový graf. Názov mesta vás presmeruje na živú mapu Windy."
                 },
                 {
-                    element: "#settingsToggleBtn", // Prípadne .btn-settings alebo tlačidlo ozubeného kolieska
+                    element: "#spotify-links-container", // prípadne ozubené koliesko
                     title: "⚙️ Nastavenia & Prispôsobenie",
-                    desc: "Tu si môžete zmeniť farbu nočného režimu, nastaviť čas spánku alebo upraviť poradie obľúbených staníc."
+                    desc: "Tu si môžete zmeniť farbu nočného režimu, nastaviť čas spánku alebo upraviť nastavenia."
                 }
             ];
             
             let aktualnyKrokTour = 0;
+            let tourTimer = null;
+            let tourOdskratka = 6; 
+            let tourPocitadlo = tourOdskratka;
             
             function spustiTourAkJePrvykrat() {
-                // Skontrolujeme, či už používateľ sprievodcu nevidel
                 if (!localStorage.getItem('kiosk_tour_done')) {
+                    // Zapíšeme okamžite, aby sa po stlačení F5 už znova nezobrazovalo
+                    localStorage.setItem('kiosk_tour_done', 'true');
+                    
                     setTimeout(() => {
-                        document.getElementById('tour-overlay').style.display = 'flex';
-                        zobrazKrokTour(0);
-                    }, 800); // Mierne oneskorenie po načítaní pre plynulý efekt
+                        const overlay = document.getElementById('tour-overlay');
+                        if (overlay) {
+                            overlay.style.display = 'flex';
+                            aktualnyKrokTour = 0;
+                            zobrazKrokTour(0);
+                        }
+                    }, 1000);
                 }
             }
             
             function zobrazKrokTour(index) {
-                // Odstránime zvýraznenie z predošlého prvku
+                clearInterval(tourTimer);
                 document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
             
                 if (index >= tourKroky.length) {
@@ -2162,12 +2171,34 @@
                 document.getElementById('tour-step-badge').textContent = `Krok ${index + 1} / ${tourKroky.length}`;
                 document.getElementById('tour-title').textContent = krok.title;
                 document.getElementById('tour-desc').textContent = krok.desc;
-                
+            
+                tourPocitadlo = tourOdskratka;
+                aktualizujTextTlacidla(index);
+            
+                tourTimer = setInterval(() => {
+                    tourPocitadlo--;
+                    if (tourPocitadlo > 0) {
+                        aktualizujTextTlacidla(index);
+                    } else {
+                        clearInterval(tourTimer);
+                        dalsiKrokTour();
+                    }
+                }, 1000);
+            }
+            
+            function aktualizujTextTlacidla(index) {
                 const btnNext = document.getElementById('tour-next-btn');
-                btnNext.textContent = (index === tourKroky.length - 1) ? "Rozumiem" : "Ďalej";
+                if (!btnNext) return;
+                
+                if (index === tourKroky.length - 1) {
+                    btnNext.textContent = `Rozumiem (${tourPocitadlo}s)`;
+                } else {
+                    btnNext.textContent = `Ďalej (${tourPocitadlo}s)`;
+                }
             }
             
             function dalsiKrokTour() {
+                clearInterval(tourTimer);
                 aktualnyKrokTour++;
                 if (aktualnyKrokTour < tourKroky.length) {
                     zobrazKrokTour(aktualnyKrokTour);
@@ -2177,13 +2208,19 @@
             }
             
             function ukonciTour() {
+                clearInterval(tourTimer);
                 document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
-                document.getElementById('tour-overlay').style.display = 'none';
-                // Uložíme príznak, že ukážka už bola zobrazená
+                const overlay = document.getElementById('tour-overlay');
+                if (overlay) overlay.style.display = 'none';
                 localStorage.setItem('kiosk_tour_done', 'true');
             }
             
-            // Spustíme kontrolu po načítaní celého DOMu
+            function spustiTourZnova() {
+                localStorage.removeItem('kiosk_tour_done');
+                location.reload();
+            }
+            
+            // Spustenie pri načítaní stránky
             document.addEventListener('DOMContentLoaded', () => {
                 spustiTourAkJePrvykrat();
             });
@@ -2199,14 +2236,14 @@
     </div>
     
 <!-- INTRO TOUR PRE NOVÝCH POUŽÍVATEĽOV -->
-<div id="tour-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 9999999; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
-    <div id="tour-box" style="background: #111; border: 2px solid #ff9f0a; border-radius: 16px; padding: 20px; max-width: 320px; width: 85%; text-align: center; box-shadow: 0 0 20px rgba(255,159,10,0.3); position: relative;">
+<div id="tour-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 99999990; pointer-events: none;">
+    <div id="tour-box" style="position: absolute; top: 20px; right: 20px; background: #111; border: 2px solid #ff9f0a; border-radius: 16px; padding: 20px; max-width: 320px; width: 85%; text-align: center; box-shadow: 0 0 25px rgba(0,0,0,0.9); z-index: 99999999; pointer-events: auto;">
         <div id="tour-step-badge" style="font-size: 11px; font-weight: bold; color: #ff9f0a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Krok 1 / 4</div>
         <h3 id="tour-title" style="margin: 0 0 10px 0; color: #fff; font-size: 18px;">Vitajte v Kiosku! 📻</h3>
         <p id="tour-desc" style="color: #ccc; font-size: 14px; line-height: 1.4; margin-bottom: 20px;">Tento prehľadný sprievodca vám v 4 rýchlych krokoch ukáže, ako dashboard používať.</p>
         
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
-            <button onclick="ukonciTour()" style="background: transparent; color: #666; border: none; font-size: 12px; cursor: pointer; padding: 5px;">Preskočiť</button>
+            <button onclick="ukonciTour()" style="background: transparent; color: #aaa; border: none; font-size: 13px; cursor: pointer; padding: 5px;">Preskočiť</button>
             <button id="tour-next-btn" onclick="dalsiKrokTour()" style="background: #ff9f0a; color: #000; border: none; padding: 8px 18px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer;">Ďalej</button>
         </div>
     </div>
