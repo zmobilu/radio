@@ -38,7 +38,16 @@
         .big-clock-nameday {
             cursor: pointer !important;
         }
-        
+
+        /* Okamžitá reakcia na dotyk prsta na tablete */
+        .fav-card:active,
+        .forecast-day-box:active,
+        .btn-settings:active,
+        #weather-location-main:active {
+            transform: scale(0.96);
+            opacity: 0.8;
+        }
+                
         /* --- RESET A ZÁKLADNÉ NASTAVENIE --- */
         body {
             margin: 0; padding: 0; background-color: #000; color: #fff;
@@ -728,10 +737,23 @@
             transform: scaleY(1.20) !important;
             transform-origin: top left !important;
         }
-        /* Keď je element prázdny, úplne ho schováme, aby nezaberal miesto 
-        #player-now-playing:empty {
-            display: none !important;
-        }*/
+        /* Vizuálny dotykový efekt pre hlavný blok počasia */
+            .weather-left-side:active {
+                opacity: 0.7;
+                transform: scale(0.98);
+                transition: transform 0.1s, opacity 0.1s;
+            }
+            
+            /* Pridanie jemnej ikony grafu k popisu počasia */
+            #mainWeatherDesc::after {
+                content: " \f201"; /* FontAwesome ikona grafu */
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                font-size: 0.75em;
+                color: #ff9f0a;
+                margin-left: 8px;
+                opacity: 0.8;
+            }
         
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
@@ -859,8 +881,9 @@
         <div id="weather-location-container-top">
             <div id="weather-location-date">--.--.----</div>
             <span style="color: #444;">•</span>
-            <div id="weather-location-main" style="cursor: pointer;" onclick="window.open(`https://www.windy.com/?temp,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť mapu Windy">
-                <i class="fa-solid fa-map-location-dot" style="font-size: 0.8em; margin-right: 6px;"></i><span id="weather-location-text">---</span>
+            <div id="weather-location-main" style="cursor: pointer; background: rgba(255,159,10,0.15); border: 1px solid #ff9f0a; padding: 4px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;" onclick="window.open(`https://www.windy.com/?temp,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť mapu Windy">
+                <i class="fa-solid fa-map-location-dot" style="font-size: 0.85em; color: #ff9f0a;"></i>
+                <span id="weather-location-text">---</span>
             </div>
             <span style="color: #444;">•</span>
             <div id="weather-location-time">00:00</div>
