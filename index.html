@@ -755,6 +755,14 @@
                 opacity: 0.8;
             }
         
+        /* Zvýraznenie prvku počas ukážky */
+            .tour-highlight {
+                position: relative !important;
+                z-index: 10000000 !important;
+                box-shadow: 0 0 0 4px #ff9f0a, 0 0 25px rgba(255, 159, 10, 0.8) !important;
+                transition: all 0.3s ease !important;
+            }
+        
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
@@ -872,9 +880,14 @@
                         </div>
                         <div id="weather-history-buttons" style="display: flex; gap: 4px; margin-top: 2px; justify-content: center; width: 100%;"></div>
                     </div>
+                    <div class="settings-night-row">
+                        <i class="fa-solid fa-circle-info label-icon" title="Sprievodca"></i>
+                        <button onclick="spustiTourZnova(); event.stopPropagation();" style="width: 100%;">▶ Spustiť sprievodcu (Tour)</button>
+                    </div>
                 </div>
             </div>
          </main>
+        
     </div>
 
     <div class="weather-detail-view" id="weatherDetailView" onclick="toggleWeatherView(event)">
@@ -1301,6 +1314,11 @@
             if(element) element.classList.add('active-color');
             runClockEngine();
             resetSettingsTimer();
+        }
+        // --- FUNKCIA PRE ZNOVUSPUSENIE SPRIEVODCU ---
+        function spustiTourZnova() {
+            localStorage.removeItem('kiosk_tour_done');
+            location.reload();
         }
 
         function zmenNastavenieMesta() {
@@ -2088,6 +2106,87 @@
                 }
             }
         }
+
+        // --- SCRIPT PRE SPRIEVODCU (INTRO TOUR) ---
+            const tourKroky = [
+                {
+                    element: ".favorites-sidebar", // Prípadne .buttons-section pre starší kód
+                    title: "📻 Obľúbené stanice",
+                    desc: "Kliknutím na rádio okamžite spustíte živý stream. Opätovným kliknutím rádio vypnete."
+                },
+                {
+                    element: ".big-clock-time", // Prípadne #time pre starší kód
+                    title: "⏰ Hodiny a Nočný režim",
+                    desc: "Kliknutím na hodiny manuálne prepnete dashboard do šetriča/nočného režimu. Opätovným dotykom ho prebudíte."
+                },
+                {
+                    element: ".main-weather-container", // Prípadne .ss-left-col alebo #ss-weather-trigger
+                    title: "☀️ Počasie a Predpoveď",
+                    desc: "Kliknutím na sekciu počasia otvoríte podrobný hodinový graf. Názov mesta vás presmeruje na živú mapu Windy."
+                },
+                {
+                    element: "#settingsToggleBtn", // Prípadne .btn-settings alebo tlačidlo ozubeného kolieska
+                    title: "⚙️ Nastavenia & Prispôsobenie",
+                    desc: "Tu si môžete zmeniť farbu nočného režimu, nastaviť čas spánku alebo upraviť poradie obľúbených staníc."
+                }
+            ];
+            
+            let aktualnyKrokTour = 0;
+            
+            function spustiTourAkJePrvykrat() {
+                // Skontrolujeme, či už používateľ sprievodcu nevidel
+                if (!localStorage.getItem('kiosk_tour_done')) {
+                    setTimeout(() => {
+                        document.getElementById('tour-overlay').style.display = 'flex';
+                        zobrazKrokTour(0);
+                    }, 800); // Mierne oneskorenie po načítaní pre plynulý efekt
+                }
+            }
+            
+            function zobrazKrokTour(index) {
+                // Odstránime zvýraznenie z predošlého prvku
+                document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
+            
+                if (index >= tourKroky.length) {
+                    ukonciTour();
+                    return;
+                }
+            
+                const krok = tourKroky[index];
+                const el = document.querySelector(krok.element);
+            
+                if (el) {
+                    el.classList.add('tour-highlight');
+                }
+            
+                document.getElementById('tour-step-badge').textContent = `Krok ${index + 1} / ${tourKroky.length}`;
+                document.getElementById('tour-title').textContent = krok.title;
+                document.getElementById('tour-desc').textContent = krok.desc;
+                
+                const btnNext = document.getElementById('tour-next-btn');
+                btnNext.textContent = (index === tourKroky.length - 1) ? "Rozumiem" : "Ďalej";
+            }
+            
+            function dalsiKrokTour() {
+                aktualnyKrokTour++;
+                if (aktualnyKrokTour < tourKroky.length) {
+                    zobrazKrokTour(aktualnyKrokTour);
+                } else {
+                    ukonciTour();
+                }
+            }
+            
+            function ukonciTour() {
+                document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
+                document.getElementById('tour-overlay').style.display = 'none';
+                // Uložíme príznak, že ukážka už bola zobrazená
+                localStorage.setItem('kiosk_tour_done', 'true');
+            }
+            
+            // Spustíme kontrolu po načítaní celého DOMu
+            document.addEventListener('DOMContentLoaded', () => {
+                spustiTourAkJePrvykrat();
+            });
         
     </script>
      <!-- Vyskakujúce okno pre zoznam mien -->
@@ -2098,6 +2197,21 @@
             <button onclick="document.getElementById('namesModal').style.display='none'" style="background: #222; color: #ff9f0a; border: 1px solid #ff9f0a; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;">Zatvoriť</button>
         </div>
     </div>
+    
+<!-- INTRO TOUR PRE NOVÝCH POUŽÍVATEĽOV -->
+<div id="tour-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 9999999; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
+    <div id="tour-box" style="background: #111; border: 2px solid #ff9f0a; border-radius: 16px; padding: 20px; max-width: 320px; width: 85%; text-align: center; box-shadow: 0 0 20px rgba(255,159,10,0.3); position: relative;">
+        <div id="tour-step-badge" style="font-size: 11px; font-weight: bold; color: #ff9f0a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Krok 1 / 4</div>
+        <h3 id="tour-title" style="margin: 0 0 10px 0; color: #fff; font-size: 18px;">Vitajte v Kiosku! 📻</h3>
+        <p id="tour-desc" style="color: #ccc; font-size: 14px; line-height: 1.4; margin-bottom: 20px;">Tento prehľadný sprievodca vám v 4 rýchlych krokoch ukáže, ako dashboard používať.</p>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+            <button onclick="ukonciTour()" style="background: transparent; color: #666; border: none; font-size: 12px; cursor: pointer; padding: 5px;">Preskočiť</button>
+            <button id="tour-next-btn" onclick="dalsiKrokTour()" style="background: #ff9f0a; color: #000; border: none; padding: 8px 18px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer;">Ďalej</button>
+        </div>
+    </div>
+</div>
+    
 </body>
    
 </html>
