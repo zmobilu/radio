@@ -434,12 +434,28 @@
         .night-btn.btn-playpause { font-size: 9vw; }
 
         /* --- NOČNÝ REŽIM --- */
-        body.full-night-mode .favorites-sidebar,
+        body.full-night-mode .favorites-sidebar {
+            opacity: 0 !important;
+            width: 0 !important;
+            min-width: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            pointer-events: none !important;
+            transition: opacity 1.5s ease-in-out, width 1.5s ease-in-out !important;
+        }
+
+        body.full-night-mode .main-content-area {
+            width: 100vw !important;
+            transition: width 1.5s ease-in-out !important;
+        }
+
         body.full-night-mode .big-clock-date-wrapper,
         body.full-night-mode #settingsToggleBtn, 
         body.full-night-mode .main-weather-container { 
             opacity: 0 !important;
-            pointer-events: none !important; /* Počas noci zabráni klikaniu na skryté tlačidlá */
+            pointer-events: none !important;
+            transition: opacity 1.5s ease-in-out !important;
         }
         body.full-night-mode .workspace-container, body.full-night-mode .main-content-area { width: 100vw; height: 100vh; }
         
