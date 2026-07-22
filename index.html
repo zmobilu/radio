@@ -882,7 +882,62 @@
             .chart-icon-info:contains("⛈️"), .forecast-day-icon:contains("⛈️") {
                 animation: lightningFlash 5s infinite ease-in-out;
             }
-
+            /* --- ŠTÝLOVÝ TOOLTIP PRE POCITOVÚ TEPLOTU A VLHKOSŤ --- */
+            .sub-row-item-temp, .sub-row-item-hum {
+                position: relative;
+                cursor: pointer !important;
+            }
+    
+            /* Bublina pre pocitovú teplotu */
+            .sub-row-item-temp::after {
+                content: "Pocitová teplota";
+                position: absolute;
+                bottom: 125%;
+                left: 50%;
+                transform: translateX(-50%) scale(0.8);
+                background: #111;
+                color: #ff9f0a;
+                border: 1px solid #ff9f0a;
+                padding: 3px 8px;
+                border-radius: 6px;
+                font-size: 11px;
+                font-weight: bold;
+                white-space: nowrap;
+                opacity: 0;
+                pointer-events: none;
+                transition: all 0.2s ease-in-out;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+                z-index: 1000;
+            }
+    
+            /* Bublina pre vlhkosť vzduchu */
+            .sub-row-item-hum::after {
+                content: "Vlhkosť vzduchu";
+                position: absolute;
+                bottom: 125%;
+                left: 50%;
+                transform: translateX(-50%) scale(0.8);
+                background: #111;
+                color: #4dabff;
+                border: 1px solid #4dabff;
+                padding: 3px 8px;
+                border-radius: 6px;
+                font-size: 11px;
+                font-weight: bold;
+                white-space: nowrap;
+                opacity: 0;
+                pointer-events: none;
+                transition: all 0.2s ease-in-out;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+                z-index: 1000;
+            }
+    
+            /* Zobrazenie popisku pri najetí myšou alebo dotyku */
+            .sub-row-item-temp:hover::after,
+            .sub-row-item-hum:hover::after {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
 
         
     </style>
@@ -922,11 +977,11 @@
                         </div>
                         
                         <div class="weather-sub-row">
-                            <span class="sub-row-item-temp">
+                            <span class="sub-row-item-temp" title="Pocitová teplota">
                                 <i class="fa-solid fa-temperature-half"></i>
                                 <span id="mainApparent">--°</span>
                             </span>
-                            <span class="sub-row-item-hum">
+                            <span class="sub-row-item-hum" title="Vlhkosť vzduchu">
                                 <i class="fa-solid fa-droplet"></i>
                                 <span id="mainHumidity">--%</span>
                             </span>
