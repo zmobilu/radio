@@ -1231,7 +1231,10 @@
                         const min = Math.round(data.daily.temperature_2m_min[i]);
                         
                         const mIcon = document.getElementById(`mainFc${i}Icon`);
-                        if (mIcon) mIcon.textContent = getWeatherIcon(dCode); priradAnimaciuIkone(mIcon, dCode);
+                        if (mIcon) {
+                            mIcon.textContent = getWeatherIcon(dCode);
+                            priradAnimaciuIkone(mIcon, dCode);
+                        }
                         
                         const mTemp = document.getElementById(`mainFc${i}Temp`);
                         if (mTemp) mTemp.innerHTML = `<span style="color:${getTempColor(max)}">${max}°</span> / <span style="color:#aaa">${min}°</span>`;
@@ -1299,8 +1302,6 @@
                 
                 const cCode = codes[idx] !== undefined ? codes[idx] : 0;
                 const weatherIconHtml = `<span class="chart-icon-info">${getWeatherIcon(cCode)}</span>`;
-                const iconEl = column.querySelector('.chart-icon-info');
-                if (iconEl) priradAnimaciuIkone(iconEl, cCode);
 
                 const cloudVal = cloud[idx] ? Math.round(cloud[idx]) : 0;
                 const bgOpacity = 0.05 + (cloudVal / 100) * 0.15; 
@@ -1309,9 +1310,11 @@
                 const windVal = wind[idx] ? Math.round(wind[idx]) : 0;
                 const windHtml = windVal > 0 ? `<span style="font-size: 12px; color: #fff; margin-top: 5px;"><i class="fas fa-wind" style="font-size:0.8em; color:#aaa;"></i> ${windVal}</span>` : `<span style="min-height: 14px;"></span>`;
 
+                // 1. NAJPRV VYTVORÍME ELEMENT COLUMN
                 const column = document.createElement('div');
                 column.style.cssText = `display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; flex: 1;`;
                 
+                // 2. NAPLNÍME HO HTML OBSAHOM
                 column.innerHTML = `
                     ${rainHtml}
                     ${weatherIconHtml}
@@ -1320,6 +1323,11 @@
                     <span style="font-size: 14px; color: #fff; margin-top: 5px; font-weight: 500;">${labels[idx]}</span>
                     ${windHtml}
                 `;
+
+                // 3. AŽ TERAZ PRIRADÍME ANIMÁCIU IKONE VO VNÚTRI COLUMN
+                const iconEl = column.querySelector('.chart-icon-info');
+                if (iconEl) priradAnimaciuIkone(iconEl, cCode);
+
                 chartContainer.appendChild(column);
             });
         }
