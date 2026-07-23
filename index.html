@@ -2591,42 +2591,84 @@
                     element.style.animation = 'cloudFloat 5s infinite ease-in-out';
                 }
             }
-        // Načítame dátum poslednej aktualizácie zo pamäte prehliadača (ak neexistuje, dáme null)
-            let poslednaNocnaKontrolaDen = localStorage.getItem('poslednaNocnaAktualizacia');
-            
-            async function spravAktualizaciu() {
-                console.log("Kontrolujem a sťahujem najnovšiu verziu kiosku...");
-                try {
-                    const res = await fetch('index.html?t=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
-                    if (res.ok) {
-                        // Uložíme dnešný deň do pamäte pred reloadom
-                        localStorage.setItem('poslednaNocnaAktualizacia', new Date().getDate().toString());
-                        window.location.reload(true);
+        // --- INTELIGENTNÁ NOČNÁ AKTUALIZÁCIA SO ZNOVU-SPUSTENÍM RÁDIA ---
+
+			let poslednaNocnaKontrolaDen = localStorage.getItem('poslednaNocnaAktualizacia');
+			
+			async function spravAktualizaciu() {
+			    console.log("Sťahujem najnovšiu verziu kódu...");
+			    try {
+			        const res = await fetch('index.html?t=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
+			        if (res.ok) {
+			            // 1. Uložíme dnešný deň do pamäte
+			            localStorage.setItem('poslednaNocnaAktualizacia', new Date().getDate().toString());
+			            
+			            // 2. Ak práve hrá rádio alebo hudba, uložíme príznak, že sa má po reloade auto-spustiť
+			            if (currentPlayingType && currentPlayingType !== "" && currentPlayingType !== "none" && currentPlayingType !== "settings") {
+			                localStorage.setItem('kiosk_autorestart_radio', 'true');
+			            } else {
+			                localStorage.removeItem('kiosk_autorestart_radio');
+			            }
+			
+			            // 3. Spravíme reload stránky
+			            window.location.reload(true);
+			        }
+			    } catch (e) {
+			        console.log("Aktualizácia zlyhala (offline):", e);
+			    }
+			}
+			
+			async function skontrolujNochnuAktualizaciu() {
+			    const teraz = new Date();
+			    const aktualnyDen = teraz.getDate().toString();
+			    const hodina = teraz.getHours();
+			
+			    // Čas na aktualizáciu: presne o 3:00 ráno ALEBO ráno po 6:00 (ak bol kiosk v noci vypnutý)
+			    const jeCasNaAktualizaciu = (hodina === 3) || (hodina >= 6 && poslednaNocnaKontrolaDen !== aktualnyDen);
+			
+			    if (jeCasNaAktualizaciu && poslednaNocnaKontrolaDen !== aktualnyDen) {
+			        await spravAktualizaciu();
+			    }
+			}
+			
+			function skontrolujAutoStartRadiaPoReloadu() {
+                const chcelAutoStart = localStorage.getItem('kiosk_autorestart_radio');
+                if (chcelAutoStart === 'true') {
+                    localStorage.removeItem('kiosk_autorestart_radio');
+                    
+                    const savedRadioUrl = localStorage.getItem('kiosk_last_radio_url');
+                    const savedRadioType = localStorage.getItem('kiosk_last_radio_type');
+                    
+                    if (savedRadioUrl && savedRadioType) {
+                        setTimeout(() => {
+                            // Pokus o reštart rádia
+                            playRadio(savedRadioUrl, null, savedRadioType);
+                            
+                            // Ošetrenie pre iOS (ak prehliadač zablokuje autoplay po reloadu)
+                            const playPromise = audio.play();
+                            if (playPromise !== undefined) {
+                                playPromise.catch(error => {
+                                    console.log("Autoplay bol prehliadačom blokovaný, vyžaduje sa dotyk:", error);
+                                });
+                            }
+                        }, 800);
                     }
-                } catch (e) {
-                    console.log("Aktualizácia zlyhala (kiosk je offline):", e);
                 }
             }
-            
-            async function skontrolujNochnuAktualizaciu() {
-                const teraz = new Date();
-                const aktualnyDen = teraz.getDate().toString();
-                const hodina = teraz.getHours();
-            
-                // 1. SCENÁR: Je 3:00 ráno a dnes ešte aktualizácia neprebehla
-                // 2. SCENÁR: Kiosk bol zapnutý až po 3:00 ráno (napr. o 8:00) a dnes ešte nebol aktualizovaný
-                const jeCasNaAktualizaciu = (hodina === 3) || (hodina > 3 && poslednaNocnaKontrolaDen !== aktualnyDen);
-            
-                if (jeCasNaAktualizaciu && poslednaNocnaKontrolaDen !== aktualnyDen) {
-                    await spravAktualizaciu();
-                }
-            }
-            
-            // 1. Spustíme kontrolu IHNEĎ pri štarte/načítaní stránky (pokryje zapnutie po 3:00)
-            skontrolujNochnuAktualizaciu();
-            
-            // 2. Kontrola prebieha naďalej každú minútu (pre prípad, že kiosk beží vkuse cez noc)
-            setInterval(skontrolujNochnuAktualizaciu, 60000);
+			
+			// 1. Kontrola aktualizácie a opätovného spustenia rádia pri načítaní stránky
+			skontrolujNochnuAktualizaciu();
+			skontrolujAutoStartRadiaPoReloadu();
+			
+			// 2. Pravidelná kontrola každú minútu (pre nonstop bežiaci kiosk)
+			setInterval(skontrolujNochnuAktualizaciu, 60000);
+			
+			// 3. Kontrola pri prebudení displeja / otvorenia z plochy (pre iOS / Android)
+			document.addEventListener('visibilitychange', () => {
+			    if (document.visibilityState === 'visible') {
+			        skontrolujNochnuAktualizaciu();
+			    }
+			});
             
     </script>
      <!-- Vyskakujúce okno pre zoznam mien -->
