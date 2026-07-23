@@ -1075,7 +1075,7 @@
         <main class="main-content-area">
                                                                     
             <div class="placeholder-view" id="rightPlaceholder">
-                <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();">
+                <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();" title="Prepnúť / Prebudiť nočný režim dashboardu">
                     <span class="big-clock-hours" id="bigHours">00</span>
                     <span class="big-clock-minutes" id="bigMinutes">00</span>
                 </div>
@@ -1091,45 +1091,46 @@
                 <div id="player-now-playing" style="color: #fff; text-align: center;"></div>
                 
                 <div class="main-weather-container">
-                <div class="weather-left-side" onclick="toggleWeatherView(event)">
-                    <div class="weather-top-row">
-                        <div class="weather-core-row">
-                            <span id="mainBigIcon">☀️</span>
-                            <span id="mainBigTemp">--°C</span>
-                        </div>
-                        
-                        <div class="weather-sub-row">
-                            <span class="sub-row-item-temp">
-                                <i class="fa-solid fa-temperature-half"></i>
-                                <span id="mainApparent">--°</span>
-                            </span>
-                            <span class="sub-row-item-hum">
-                                <i class="fa-solid fa-droplet"></i>
-                                <span id="mainHumidity">--%</span>
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <!-- Popis stavu bude vždy vycentrovaný presne pod celým týmto blokom -->
-                    <div id="mainWeatherDesc">------</div>
-                </div>
-                
-                    <div class="main-mini-strip">
-                        <div class="mini-day-box">
-                            <span class="mini-label">DNES</span>
-                            <div class="mini-data-row">
-                                <span id="mainFc0Icon">--</span>
-                                <span id="mainFc0Temp">-- / --</span>
-                            </div>
-                        </div>
-                        <div class="mini-day-box">
-                            <span class="mini-label">ZAJTRA</span>
-                            <div class="mini-data-row">
-                                <span id="mainFc1Icon">--</span>
-                                <span id="mainFc1Temp">-- / --</span>
-                            </div>
-                        </div>
-                    </div>
+                <!-- KLIK NA AKTUÁLNE POČASIE -> OTVORÍ ŽIVÝ METEORADAR WINDY -->
+					<div class="weather-left-side" onclick="window.open(`https://www.windy.com/?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
+					    <div class="weather-top-row">
+					        <div class="weather-core-row">
+					            <span id="mainBigIcon">☀️</span>
+					            <span id="mainBigTemp">--°C</span>
+					        </div>
+					        
+					        <div class="weather-sub-row">
+					            <span class="sub-row-item-temp">
+					                <i class="fa-solid fa-temperature-half"></i>
+					                <span id="mainApparent">--°</span>
+					            </span>
+					            <span class="sub-row-item-hum">
+					                <i class="fa-solid fa-droplet"></i>
+					                <span id="mainHumidity">--%</span>
+					            </span>
+					        </div>
+					    </div>
+					    
+					    <div id="mainWeatherDesc">------</div>
+					</div>
+					
+					<!-- KLIK NA DNES A ZAJTRA -> OTVORÍ HODINOVÝ GRAF PRE DANÝ DEŇ -->
+					<div class="main-mini-strip">
+					    <div class="mini-day-box" onclick="otvorGrafPreDen(event, 'teraz');" title="Otvoriť podrobný hodinový graf pre DNES">
+					        <span class="mini-label">DNES</span>
+					        <div class="mini-data-row">
+					            <span id="mainFc0Icon">--</span>
+					            <span id="mainFc0Temp">-- / --</span>
+					        </div>
+					    </div>
+					    <div class="mini-day-box" onclick="otvorGrafPreDen(event, 1);" title="Otvoriť podrobný hodinový graf pre ZAJTRA">
+					        <span class="mini-label">ZAJTRA</span>
+					        <div class="mini-data-row">
+					            <span id="mainFc1Icon">--</span>
+					            <span id="mainFc1Temp">-- / --</span>
+					        </div>
+					    </div>
+					</div>
                 </div>
 
                 <div id="nightBottomInfo"></div>
@@ -1551,6 +1552,19 @@ const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${
             pocasieTimer = setTimeout(() => { toggleWeatherView(); }, 30000);
         }
 
+		// Pomocná funkcia pre priamy prechod z hlavnej plochy do grafu vybraného dňa
+		function otvorGrafPreDen(e, denMod) {
+			if (e) e.stopPropagation();
+			if (isSettingsModeActive) toggleSettingsMode();
+			
+			const weatherView = document.getElementById('weatherDetailView');
+			if (weatherView) {
+				weatherView.style.display = 'flex';
+				vygenerujSpodnuListuDni();
+				prepniDenGrafu(null, denMod);
+			}
+		}
+		
         function toggleWeatherView(e) {
             if (e && (e.target.closest('#settingsToggleBtn') || e.target.closest('#fullscreenToggleBtn'))) return;
             if (isSettingsModeActive) toggleSettingsMode();
