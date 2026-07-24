@@ -525,28 +525,34 @@
             
             /* --- ZJEDNOTENÝ REŽIM NA ŠÍRKU (LANDSCAPE) --- */
 			@media (orientation: landscape) {
-			    /* 1. Hlavné rozloženie plochy */
+			    /* Hlavná pravá plocha - musí poskladať Hodiny a Počasie vedľa seba */
+				.main-content-area {
+			        width: 70% !important;
+			        display: flex !important;
+			        flex-direction: row !important;
+			    }
+				/* 1. Hlavné rozloženie plochy */
 			    .placeholder-view {
 			        display: flex !important;
 			        flex-direction: row !important;
-			        flex-wrap: wrap !important;
-			        align-items: flex-start !important;
+			        flex-wrap: nowrap !important;
+			        align-items: center !important;
 			        justify-content: space-between !important;
-			        padding: 1vh 2vw 1vh 1vw !important;
+			        padding: 1vh 1vw !important;
 			        box-sizing: border-box !important;
+			        width: 100% !important;
 			    }
 			
-			    /* Hodiny (Ľavý dominantný blok) */
+			    /* Stredný blok: HODINY (50% celkovej šírky obrazovky / 71% z pravej časti) */
 			    .big-clock-time {
-			        font-size: 25vw !important;
-			        line-height: 0.75 !important;
+			        font-size: 16vw !important;
+			        line-height: 0.85 !important;
 			        font-weight: 800 !important;
 			        letter-spacing: -2px !important;
-			        transform: scaleY(1.75) !important; 
-			        transform-origin: top center !important;
-			        margin-top: 1vh !important;
-			        margin-bottom: 0 !important;
-			        width: 62% !important;
+			        transform: scaleY(1.3) !important; 
+			        transform-origin: center center !important;
+			        margin: 0 !important;
+			        width: 70% !important; /* cca 50% z celkovej obrazovky */
 			        display: flex !important;
 			        justify-content: center !important;
 			    }
@@ -555,33 +561,33 @@
 			        letter-spacing: -3px !important;
 			    }
 			
-			    /* Spodný riadok s dátumom a mestom */
+			    /* Dátum pod hodinami v strednom bloku */
 			    .big-clock-date-wrapper {
-			        width: 62% !important;
-			        margin-top: auto !important;
-			        margin-bottom: 1vh !important;
+			        position: absolute !important;
+			        bottom: 2vh !important;
+			        left: 30% !important;
+			        width: 50% !important;
+			        margin: 0 !important;
 			        display: flex !important;
 			        justify-content: center !important;
 			        align-items: center !important;
 			        gap: 8px !important;
 			        white-space: nowrap !important;
-			        font-size: 2.2vw !important;
+			        font-size: 1.8vw !important;
 			        font-weight: 800 !important;
-			        transform: scale(1.15, 1.3) !important; 
-			        transform-origin: bottom center !important;
 			    }
 			
-			    /* Pravý meteo stĺpik */
+			    /* Pravý blok: POČASIE (20% celkovej šírky obrazovky / 29% z pravej časti) */
 			    .main-weather-container {
-			        width: 35% !important;
+			        width: 28% !important; /* cca 20% z celkovej obrazovky */
 			        max-width: none !important;
-			        height: 98% !important;
+			        height: 100% !important;
 			        display: flex !important;
 			        flex-direction: column !important;
-			        justify-content: space-between !important;
+			        justify-content: center !important;
 			        align-items: center !important;
 			        margin: 0 !important;
-			        padding-left: 1vw !important;
+			        padding-left: 0.5vw !important;
 			        box-sizing: border-box !important;
 			    }
 			
@@ -591,14 +597,14 @@
 			
 			    .weather-top-row {
 			        flex-direction: column !important;
-			        gap: 4px !important;
+			        gap: 2px !important;
 			    }
 			
 			    .main-mini-strip {
 			        flex-direction: column !important;
 			        width: 100% !important;
-			        gap: 8px !important;
-			        margin-top: 0 !important;
+			        gap: 6px !important;
+			        margin-top: 1vh !important;
 			    }
 			
 			    .mini-day-box {
