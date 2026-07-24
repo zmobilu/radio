@@ -525,11 +525,11 @@
             
             /* --- ZJEDNOTENÝ REŽIM NA ŠÍRKU (LANDSCAPE) --- */
 			@media (orientation: landscape) {
-			    /* Hlavná pravá plocha - musí poskladať Hodiny a Počasie vedľa seba */
-				.main-content-area {
+			    /* Hlavná pravá plocha */
+			    .main-content-area {
 			        width: 70% !important;
 			    }
-				/* 1. Hlavné rozloženie plochy */
+			
 			    .placeholder-view {
 			        display: flex !important;
 			        flex-direction: row !important;
@@ -541,28 +541,28 @@
 			        width: 100% !important;
 			        height: 100% !important;
 			    }
-
-				/* --- STREDNÝ STĹPEC (HODINY + DÁTUM SPOLU) --- */
+			
+			    /* --- STREDNÝ STĹPEC (HODINY + DÁTUM + NÁZOV SKLADBY) --- */
 			    .clock-middle-container {
 			        width: 68% !important;
 			        height: 100% !important;
 			        display: flex !important;
 			        flex-direction: column !important;
-			        justify-content: space-between !important; /* Hodiny hore, dátum dole */
+			        justify-content: space-between !important;
 			        align-items: center !important;
-			        padding-top: 2vh !important;
-			        padding-bottom: 2vh !important;
+			        padding-top: 1vh !important;
+			        padding-bottom: 1vh !important;
 			        box-sizing: border-box !important;
+			        position: relative !important;
 			    }
-				
-			    /* Stredný blok: HODINY (50% celkovej šírky obrazovky / 71% z pravej časti) */
-			    /* Hodiny - štíhle a vysoké presne ako v návrhu */
+			
+			    /* Hodiny */
 			    .big-clock-time {
 			        font-size: 22vw !important;
 			        line-height: 0.75 !important;
 			        font-weight: 800 !important;
 			        letter-spacing: -4px !important;
-			        transform: scaleY(2.05) !important; /* Výrazné natiahnutie do výšky */
+			        transform: scaleY(2.05) !important;
 			        transform-origin: center top !important;
 			        margin-top: 5vh !important;
 			        width: 100% !important;
@@ -574,11 +574,11 @@
 			        letter-spacing: -6px !important;
 			    }
 			
-			    /* Dátum priamo ukotvený pod hodinami */
+			    /* Dátum ukotvený na spodku stredného bloku */
 			    .big-clock-date-wrapper {
-			        position: static !important; /* Zrušíme absolútne pozicovanie */
+			        position: static !important;
 			        width: 100% !important;
-					margin: 0 !important;
+			        margin: 0 !important;
 			        display: flex !important;
 			        justify-content: center !important;
 			        align-items: center !important;
@@ -586,11 +586,24 @@
 			        white-space: nowrap !important;
 			        font-size: 2.0vw !important;
 			        font-weight: 800 !important;
-			        transform: scaleY(1.5) !important; /* Mierne natiahnutie písma do výšky */
-					margin-bottom: 2vh !important;
+			        transform: scaleY(1.5) !important;
+			        margin-bottom: 1vh !important;
 			    }
 			
-			    /* Pravý blok: POČASIE (20% celkovej šírky obrazovky / 29% z pravej časti) */
+			    /* Úprava pre práve hrajúcu pesničku v bežnom režime (Landscape) */
+			    #player-now-playing {
+			        position: absolute !important;
+			        bottom: 7vh !important;
+			        width: 100% !important;
+			        text-align: center !important;
+			        font-size: 1.6vw !important;
+			        color: #ff9f0a !important;
+			        white-space: nowrap !important;
+			        overflow: hidden !important;
+			        text-overflow: ellipsis !important;
+			        z-index: 5 !important;
+			    }
+			
 			    /* --- PRAVÝ STĹPEC (POČASIE) --- */
 			    .main-weather-container {
 			        width: 30% !important;
@@ -609,35 +622,71 @@
 			        width: 100% !important;
 			    }
 			
+			    /* PRIPOJENIE HLAVNÉHO HLAVOLAMU: Zrušenie riadku vo vnútri počasia */
 			    .weather-top-row {
 			        display: flex !important;
-			        flex-direction: column !important; /* Ikona NAD teplotou */
+			        flex-direction: column !important;
 			        align-items: center !important;
 			        justify-content: center !important;
 			        width: 100% !important;
 			        gap: 0 !important;
 			    }
-				.main-weather-icon-img {
-			        width: 6vw !important;  /* Prispôsob veľkosť ikony podľa potreby */
-			        height: auto !important;
-			        margin-bottom: -1vh !important; /* Jemné priblíženie k teplote */
+			
+			    /* TOTO PREPÍNA IKONU A TEPLOTU NAD SEBA: */
+			    .weather-core-row {
+			        display: flex !important;
+			        flex-direction: column !important; /* Prehodí ikonu NAD teplotu */
+			        align-items: center !important;
+			        justify-content: center !important;
+			        gap: 0 !important;
 			    }
 			
-			    .main-temp {
-			        font-size: 4.5vw !important;
-			        text-align: center !important;
+			    /* Veľkosť a odstup ikony */
+			    #mainBigIcon {
+			        font-size: 8vw !important;
 			        line-height: 1 !important;
+			        margin-bottom: -1vh !important;
+			    }
+			
+			    /* Veľkosť a úprava hlavnej teploty */
+			    #mainBigTemp {
+			        font-size: 5.5vw !important;
+			        line-height: 1 !important;
+			        font-weight: 800 !important;
+			    }
+			
+			    /* Pocitový stĺpec (teplota + vlhkosť) pod hlavnou teplotou */
+			    .weather-sub-row {
+			        flex-direction: row !important; /* Dáme ich vedľa seba pod teplotu, aby šetrili miesto na výšku */
+			        gap: 12px !important;
+			        margin-top: 0.5vh !important;
+			        font-size: 2vw !important;
+			        transform: scaleY(1.1) !important;
+			    }
+			
+			    #mainWeatherDesc {
+			        font-size: 1.8vw !important;
+			        margin-top: 1vh !important;
 			    }
 			
 			    .main-mini-strip {
 			        flex-direction: column !important;
 			        width: 100% !important;
 			        gap: 6px !important;
-			        margin-top: 1vh !important;
+			        margin-top: 1.5vh !important;
 			    }
 			
 			    .mini-day-box {
 			        width: 100% !important;
+			        padding: 4px 6px !important;
+			    }
+			
+			    .mini-label {
+			        font-size: 1.6vw !important;
+			    }
+			
+			    #mainFc0Temp, #mainFc1Temp {
+			        font-size: 1.8vw !important;
 			    }
 			
 			    /* 2. Nočný režim v Landscape */
