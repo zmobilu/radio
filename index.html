@@ -605,18 +605,24 @@
 			
 			    /* Dátum priamo ukotvený pod hodinami */
 			    .big-clock-date-wrapper {
-			        position: static !important; /* Zrušíme absolútne pozicovanie */
+			        position: static !important;
 			        width: 100% !important;
-					margin-top: -1vh !important; /* Záporná hodnota pre pritiahnutie vyššie */
-					margin-bottom: 0 !important;
 			        display: flex !important;
 			        justify-content: center !important;
 			        align-items: center !important;
-			        gap: 6px !important;
+			        gap: 12px !important;                 /* Väčšia medzera medzi dátumom a meninami */
 			        white-space: nowrap !important;
-			        font-size: 1.7vw !important;
+			        
+			        /* Zväčšenie písma a roztiahnutie */
+			        font-size: 2.8vw !important;          /* Výrazné zväčšenie základného písma (pôvodne 1.7vw) */
 			        font-weight: 800 !important;
-			        transform: scaleY(1.2) !important; /* Mierne natiahnutie písma do výšky */
+			        letter-spacing: 2px !important;       /* Roztiahnutie písma do strán */
+			        transform: scaleY(1.4) !important;    /* Natiahnutie písma do výšky */
+			        transform-origin: center center !important;
+			        
+			        /* Odstupy pre presné usadenie */
+			        margin-top: -1.5vh !important;        /* Pritiahnutie vyššie k natiahnutým hodinám */
+			        margin-bottom: 1vh !important;
 			    }
 				
 				#bigClockCity {
