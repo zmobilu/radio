@@ -528,8 +528,6 @@
 			    /* Hlavná pravá plocha - musí poskladať Hodiny a Počasie vedľa seba */
 				.main-content-area {
 			        width: 70% !important;
-			        display: flex !important;
-			        flex-direction: row !important;
 			    }
 				/* 1. Hlavné rozloženie plochy */
 			    .placeholder-view {
@@ -541,45 +539,58 @@
 			        padding: 1vh 1vw !important;
 			        box-sizing: border-box !important;
 			        width: 100% !important;
+			        height: 100% !important;
 			    }
-			
+
+				/* --- STREDNÝ STĹPEC (HODINY + DÁTUM SPOLU) --- */
+			    .clock-middle-container {
+			        width: 68% !important; /* Presne vymedzený stred */
+			        height: 100% !important;
+			        display: flex !important;
+			        flex-direction: column !important;
+			        justify-content: center !important;
+			        align-items: center !important;
+			        box-sizing: border-box !important;
+			    }
+				
 			    /* Stredný blok: HODINY (50% celkovej šírky obrazovky / 71% z pravej časti) */
+			    /* Hodiny - štíhle a vysoké presne ako v návrhu */
 			    .big-clock-time {
-			        font-size: 16vw !important;
-			        line-height: 0.85 !important;
+			        font-size: 20vw !important;
+			        line-height: 0.75 !important;
 			        font-weight: 800 !important;
-			        letter-spacing: -2px !important;
-			        transform: scaleY(1.3) !important; 
+			        letter-spacing: -4px !important;
+			        transform: scaleY(1.85) !important; /* Výrazné natiahnutie do výšky */
 			        transform-origin: center center !important;
 			        margin: 0 !important;
-			        width: 70% !important; /* cca 50% z celkovej obrazovky */
+			        width: 100% !important;
 			        display: flex !important;
 			        justify-content: center !important;
 			    }
 			
 			    .big-clock-hours, .big-clock-minutes {
-			        letter-spacing: -3px !important;
+			        letter-spacing: -6px !important;
 			    }
 			
-			    /* Dátum pod hodinami v strednom bloku */
+			    /* Dátum priamo ukotvený pod hodinami */
 			    .big-clock-date-wrapper {
-			        position: absolute !important;
-			        bottom: 2vh !important;
-			        left: 30% !important;
-			        width: 50% !important;
-			        margin: 0 !important;
+			        position: static !important; /* Zrušíme absolútne pozicovanie */
+			        width: 100% !important;
+			        margin-top: 4vh !important; /* Odstup od natiahnutých hodín */
 			        display: flex !important;
 			        justify-content: center !important;
 			        align-items: center !important;
-			        gap: 8px !important;
+			        gap: 6px !important;
 			        white-space: nowrap !important;
-			        font-size: 1.8vw !important;
+			        font-size: 1.7vw !important;
 			        font-weight: 800 !important;
+			        transform: scaleY(1.2) !important; /* Mierne natiahnutie písma do výšky */
 			    }
 			
 			    /* Pravý blok: POČASIE (20% celkovej šírky obrazovky / 29% z pravej časti) */
+			    /* --- PRAVÝ STĹPEC (POČASIE) --- */
 			    .main-weather-container {
-			        width: 28% !important; /* cca 20% z celkovej obrazovky */
+			        width: 30% !important;
 			        max-width: none !important;
 			        height: 100% !important;
 			        display: flex !important;
@@ -1162,18 +1173,22 @@
         <main class="main-content-area">
                                                                     
             <div class="placeholder-view" id="rightPlaceholder">
-                <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();" title="Prepnúť / Prebudiť nočný režim dashboardu">
-                    <span class="big-clock-hours" id="bigHours">00</span>
-                    <span class="big-clock-minutes" id="bigMinutes">00</span>
-                </div>
-                
-                <div class="big-clock-date-wrapper">
-                    <span class="big-clock-city" id="bigClockCity">---</span>
-                    <span style="color: #444;">•</span>
-                    <span class="big-clock-date" id="bigDate">---</span>
-                    <span style="color: #444;" id="dateSeparator">•</span>
-                    <span class="big-clock-nameday" id="bigNameday">---</span>
-                </div>
+				
+                <!-- NOVÝ OBAL PRE STREDNÝ STĹPEC (HODINY + DÁTUM) -->
+				    <div class="clock-middle-container">
+				        <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();" title="Prepnúť / Prebudiť nočný režim dashboardu">
+				            <span class="big-clock-hours" id="bigHours">00</span>
+				            <span class="big-clock-minutes" id="bigMinutes">00</span>
+				        </div>
+				        
+				        <div class="big-clock-date-wrapper">
+				            <span class="big-clock-city" id="bigClockCity">---</span>
+				            <span style="color: #444;">•</span>
+				            <span class="big-clock-date" id="bigDate">---</span>
+				            <span style="color: #444;" id="dateSeparator">•</span>
+				            <span class="big-clock-nameday" id="bigNameday">---</span>
+				        </div>
+				    </div>
 
                 <div id="player-now-playing" style="color: #fff; text-align: center;"></div>
                 
