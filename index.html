@@ -525,7 +525,18 @@
             body.full-night-mode .night-player-container.active-playing {
                 display: flex !important;
             }
-            
+			/* Štylizácia mesta presunutého nad ikonu počasia */
+			#bigClockCity {
+			    color: #ff9f0a;
+			    font-weight: 800;
+			    letter-spacing: 2px;
+			    text-transform: uppercase;
+			    font-size: 1.8vw;           /* Prispôsob veľkosť písma podľa potreby */
+			    margin-bottom: 0.8vh;        /* Jemná medzera medzi mestom a ikonou */
+			    text-align: center;
+			    width: 100%;
+			}
+			
             /* --- ZJEDNOTENÝ REŽIM NA ŠÍRKU (LANDSCAPE) --- */
 			@media (orientation: landscape) {
 			    /* Hlavná pravá plocha - musí poskladať Hodiny a Počasie vedľa seba */
@@ -596,8 +607,8 @@
 			    .big-clock-date-wrapper {
 			        position: static !important; /* Zrušíme absolútne pozicovanie */
 			        width: 100% !important;
-					margin: 0 !important; /*dal som i ked to druhe ma byt preč */
-			        margin-top: 4vh !important; /* Odstup od natiahnutých hodín */
+					margin-top: -1vh !important; /* Záporná hodnota pre pritiahnutie vyššie */
+					margin-bottom: 0 !important;
 			        display: flex !important;
 			        justify-content: center !important;
 			        align-items: center !important;
@@ -607,8 +618,13 @@
 			        font-weight: 800 !important;
 			        transform: scaleY(1.2) !important; /* Mierne natiahnutie písma do výšky */
 			    }
-			
-			    /* Pravý blok: POČASIE (20% celkovej šírky obrazovky / 29% z pravej časti) */
+				
+				#bigClockCity {
+			        font-size: 1.6vw !important;
+			        margin-bottom: 0.5vh !important;
+			    }
+			    
+				/* Pravý blok: POČASIE (20% celkovej šírky obrazovky / 29% z pravej časti) */
 			    /* --- PRAVÝ STĹPEC (POČASIE) --- */
 			    .main-weather-container {
 			        width: 30% !important;
@@ -1219,8 +1235,7 @@
 				        </div>
 				        
 				        <div class="big-clock-date-wrapper">
-				            <span class="big-clock-city" id="bigClockCity">---</span>
-				            <span style="color: #444;">•</span>
+				           <!-- Mesto odtiaľto zmizlo, zostal len dátum a meniny -->
 				            <span class="big-clock-date" id="bigDate">---</span>
 				            <span style="color: #444;" id="dateSeparator">•</span>
 				            <span class="big-clock-nameday" id="bigNameday">---</span>
@@ -1232,7 +1247,8 @@
                 <div class="main-weather-container">
                 <!-- KLIK NA AKTUÁLNE POČASIE -> OTVORÍ ŽIVÝ METEORADAR WINDY -->
 					<div class="weather-left-side" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
-					    <div class="weather-top-row">
+					    <div class="big-clock-city" id="bigClockCity">---</div>
+						<div class="weather-top-row">
 					        <div class="weather-core-row">
 					            <span id="mainBigIcon">☀️</span>
 					            <span id="mainBigTemp">--°C</span>
