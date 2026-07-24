@@ -530,10 +530,11 @@
 			        width: 70% !important;
 			    }
 			
+			    /* Umožníme prvkom ukladať sa vedľa seba a dátumu skočiť na spodok cez flex-wrap */
 			    .placeholder-view {
 			        display: flex !important;
 			        flex-direction: row !important;
-			        flex-wrap: nowrap !important;
+			        flex-wrap: wrap !important; /* Dôležité pre presun dátumu na plnú šírku dole */
 			        align-items: center !important;
 			        justify-content: space-between !important;
 			        padding: 1vh 1vw !important;
@@ -543,16 +544,14 @@
 			    }
 			
 			    /* --- STREDNÝ STĹPEC (HODINY + DÁTUM + NÁZOV SKLADBY) --- */
+			    /* Hodiny a počasie si rozdelia horný riadok */
 			    .clock-middle-container {
 			        width: 68% !important;
-			        height: 100% !important;
+			        height: calc(100% - 40px) !important; /* Vyhradenie miesta pre dátum dole */
 			        display: flex !important;
 			        flex-direction: column !important;
-			        justify-content: space-between !important;
+			        justify-content: center !important;
 			        align-items: center !important;
-			        padding-top: 1vh !important;
-			        padding-bottom: 1vh !important;
-			        box-sizing: border-box !important;
 			        position: relative !important;
 			    }
 			
@@ -574,20 +573,20 @@
 			        letter-spacing: -6px !important;
 			    }
 			
-			    /* Dátum ukotvený na spodku stredného bloku */
+			    /* Dátum sa natiahne na 100% šírky celej pravej sekcie */
 			    .big-clock-date-wrapper {
-			        position: static !important;
 			        width: 100% !important;
+			        flex: 0 0 100% !important;
 			        margin: 0 !important;
+			        padding: 5px 0 !important;
 			        display: flex !important;
 			        justify-content: center !important;
 			        align-items: center !important;
-			        gap: 6px !important;
+			        gap: 8px !important;
 			        white-space: nowrap !important;
-			        font-size: 2.0vw !important;
+			        font-size: 1.8vw !important; /* Zachovaná presná veľkosť bez zmeny */
 			        font-weight: 800 !important;
-			        transform: scaleY(1.5) !important;
-			        margin-bottom: 1vh !important;
+			        transform: scaleY(1.3) !important;
 			    }
 			
 			    /* Úprava pre práve hrajúcu pesničku v bežnom režime (Landscape) */
@@ -607,6 +606,7 @@
 			    /* --- PRAVÝ STĹPEC (POČASIE) --- */
 			    .main-weather-container {
 			        width: 30% !important;
+					height: calc(100% - 40px) !important;
 			        max-width: none !important;
 			        height: 100% !important;
 			        display: flex !important;
@@ -1247,7 +1247,52 @@
 				            <span class="big-clock-hours" id="bigHours">00</span>
 				            <span class="big-clock-minutes" id="bigMinutes">00</span>
 				        </div>
-				        
+
+						<div class="main-weather-container">
+                <!-- KLIK NA AKTUÁLNE POČASIE -> OTVORÍ ŽIVÝ METEORADAR WINDY -->
+							<div class="weather-left-side" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
+							    <div class="weather-top-row">
+							        <div class="weather-core-row">
+							            <span id="mainBigIcon">☀️</span>
+							            <span id="mainBigTemp">--°C</span>
+							        </div>
+							        
+							        <div class="weather-sub-row">
+							            <span class="sub-row-item-temp">
+							                <i class="fa-solid fa-temperature-half"></i>
+							                <span id="mainApparent">--°</span>
+							            </span>
+							            <span class="sub-row-item-hum">
+							                <i class="fa-solid fa-droplet"></i>
+							                <span id="mainHumidity">--%</span>
+							            </span>
+							        </div>
+							    </div>
+							    
+							    <div id="mainWeatherDesc">------</div>
+							</div>
+							
+							<!-- KLIK NA DNES A ZAJTRA -> OTVORÍ HODINOVÝ GRAF PRE DANÝ DEŇ -->
+							<div class="main-mini-strip">
+							    <div class="mini-day-box" onclick="otvorGrafPreDen(event, 'teraz');" title="Otvoriť podrobný hodinový graf pre DNES">
+							        <span class="mini-label">DNES</span>
+							        <div class="mini-data-row">
+							            <span id="mainFc0Icon">--</span>
+							            <span id="mainFc0Temp">-- / --</span>
+							        </div>
+							    </div>
+							    <div class="mini-day-box" onclick="otvorGrafPreDen(event, 1);" title="Otvoriť podrobný hodinový graf pre ZAJTRA">
+							        <span class="mini-label">ZAJTRA</span>
+							        <div class="mini-data-row">
+							            <span id="mainFc1Icon">--</span>
+							            <span id="mainFc1Temp">-- / --</span>
+							        </div>
+							    </div>
+							</div>
+		                </div>
+
+						<div id="player-now-playing" style="color: #fff; text-align: center;"></div>
+						
 				        <div class="big-clock-date-wrapper">
 				            <span class="big-clock-city" id="bigClockCity">---</span>
 				            <span style="color: #444;">•</span>
@@ -1256,51 +1301,6 @@
 				            <span class="big-clock-nameday" id="bigNameday">---</span>
 				        </div>
 				    </div>
-
-                <div id="player-now-playing" style="color: #fff; text-align: center;"></div>
-                
-                <div class="main-weather-container">
-                <!-- KLIK NA AKTUÁLNE POČASIE -> OTVORÍ ŽIVÝ METEORADAR WINDY -->
-					<div class="weather-left-side" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
-					    <div class="weather-top-row">
-					        <div class="weather-core-row">
-					            <span id="mainBigIcon">☀️</span>
-					            <span id="mainBigTemp">--°C</span>
-					        </div>
-					        
-					        <div class="weather-sub-row">
-					            <span class="sub-row-item-temp">
-					                <i class="fa-solid fa-temperature-half"></i>
-					                <span id="mainApparent">--°</span>
-					            </span>
-					            <span class="sub-row-item-hum">
-					                <i class="fa-solid fa-droplet"></i>
-					                <span id="mainHumidity">--%</span>
-					            </span>
-					        </div>
-					    </div>
-					    
-					    <div id="mainWeatherDesc">------</div>
-					</div>
-					
-					<!-- KLIK NA DNES A ZAJTRA -> OTVORÍ HODINOVÝ GRAF PRE DANÝ DEŇ -->
-					<div class="main-mini-strip">
-					    <div class="mini-day-box" onclick="otvorGrafPreDen(event, 'teraz');" title="Otvoriť podrobný hodinový graf pre DNES">
-					        <span class="mini-label">DNES</span>
-					        <div class="mini-data-row">
-					            <span id="mainFc0Icon">--</span>
-					            <span id="mainFc0Temp">-- / --</span>
-					        </div>
-					    </div>
-					    <div class="mini-day-box" onclick="otvorGrafPreDen(event, 1);" title="Otvoriť podrobný hodinový graf pre ZAJTRA">
-					        <span class="mini-label">ZAJTRA</span>
-					        <div class="mini-data-row">
-					            <span id="mainFc1Icon">--</span>
-					            <span id="mainFc1Temp">-- / --</span>
-					        </div>
-					    </div>
-					</div>
-                </div>
 
                 <div id="nightBottomInfo"></div>
 
