@@ -645,9 +645,9 @@
 			
 			    /* Veľkosť a odstup ikony */
 			    #mainBigIcon {
-			        font-size: 8vw !important;
+			        font-size: 12vw !important;
 			        line-height: 1 !important;
-			        margin-bottom: -1vh !important;
+			        margin-bottom: 1vh !important;
 			    }
 			
 			    /* Veľkosť a úprava hlavnej teploty */
@@ -1258,6 +1258,8 @@
 			        <div class="weather-left-side" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
 			            <div class="weather-top-row">
 			                <div class="weather-core-row">
+								<span class="big-clock-city" id="bigClockCity">---</span>
+			        			<span style="color: #444;">•</span>
 			                    <span id="mainBigIcon">☀️</span>
 			                    <span id="mainBigTemp">--°C</span>
 			                </div>
@@ -1298,8 +1300,7 @@
 			
 			    <!-- 3. SPODNÝ RIADOK (DÁTUM, MESTO, MENINY NA PLNOU ŠÍRKU) -->
 			    <div class="big-clock-date-wrapper">
-			        <span class="big-clock-city" id="bigClockCity">---</span>
-			        <span style="color: #444;">•</span>
+			        
 			        <span class="big-clock-date" id="bigDate">---</span>
 			        <span style="color: #444;" id="dateSeparator">•</span>
 			        <span class="big-clock-nameday" id="bigNameday">---</span>
