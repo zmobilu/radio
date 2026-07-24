@@ -522,32 +522,41 @@
             body.full-night-mode .night-player-container.active-playing {
                 display: flex !important;
             }
-            
-            /* --- ZJEDNOTENÝ REŽIM NA ŠÍRKU (LANDSCAPE) --- */
+		
+        
+				
+			
+			    
+			
+			    
+			
+			    
+           /* --- ZJEDNOTENÝ REŽIM NA ŠÍRKU (LANDSCAPE) --- */
 			@media (orientation: landscape) {
-			    /* Hlavná pravá plocha */
-			    .main-content-area {
+			    /* Hlavná pravá plocha - musí poskladať Hodiny a Počasie vedľa seba */
+				.main-content-area {
 			        width: 70% !important;
+			        display: flex !important;
+			        flex-direction: row !important;
 			    }
 			
-			    /* Umožníme prvkom ukladať sa vedľa seba a dátumu skočiť na spodok cez flex-wrap */
+			    /* 1. Hlavné rozloženie plochy */
 			    .placeholder-view {
 			        display: flex !important;
 			        flex-direction: row !important;
-			        flex-wrap: wrap !important; /* Dôležité pre presun dátumu na plnú šírku dole */
+			        flex-wrap: nowrap !important;
 			        align-items: center !important;
 			        justify-content: space-between !important;
 			        padding: 1vh 1vw !important;
 			        box-sizing: border-box !important;
 			        width: 100% !important;
-			        height: 100% !important;
 			    }
 			
 			    /* --- STREDNÝ STĹPEC (HODINY + DÁTUM + NÁZOV SKLADBY) --- */
-			    /* Hodiny a počasie si rozdelia horný riadok */
+			    /* Hodiny a počasie si rozdelia horný riadok * /
 			    .clock-middle-container {
 			        width: 68% !important;
-			        height: calc(100% - 35px) !important; /* Vyhradenie miesta pre dátum dole */
+			        height: calc(100% - 35px) !important; /* Vyhradenie miesta pre dátum dole * /
 			        display: flex !important;
 			        flex-direction: column !important;
 			        justify-content: center !important;
@@ -556,41 +565,34 @@
 					overflow: hidden !important; /* Zabráni vytlačeniu bloku von */
 			    }
 			
-			    /* Hodiny */
+			    /* Stredný blok: HODINY (50% celkovej šírky obrazovky / 71% z pravej časti) */
 			    .big-clock-time {
-		            /* Zvýšený horný limit zo 140px na 240px a upravená ideálna veľkosť na 16vw a 480 pre este vacsie zobrazenie*/
-		            font-size: clamp(60px, 16vw, 480px); 
-		            line-height: 1.1;
-		            font-weight: 800;
-		            display: flex;
-		            letter-spacing: 30px;               /* Výraznejšie natiahnutie medzier medzi znakmi do strán */
-		            justify-content: center;
-		            align-items: center;
-		            width: 100%;
-		            flex: 0 1 auto; /* Umožní hodinám flexibilne sa prispôsobiť */
-		            transform: scaleY(1.8);
-		            transform-origin: center center;
-		            /* ZMENA: Stiahnutie hodín nižšie od horného okraja */
-		            margin-top: 3vh !important;          /* Odstránená horná medzera */
-		            /* margin-top: 2vh;  ZMENA: 4vh povodne Odstránená horná medzera pre pritiahnutie k hornému okraju */
-		            margin-bottom: 0vh;
-		        }
-		        .big-clock-date-wrapper {
-		            display: flex;
-		            flex-wrap: column;
-		            justify-content: center;
-		            align-items: center;
-		            text-align: center;
-		            gap: 5px 12px;
-		             /* ZMENA: Zvýšený spodný limit na 18px, ideálna veľkosť na 3.5vh a strop na 32px */
-		            font-size: clamp(18px, 3.0vh, 32px); 
-		            /* PRIDANÉ: Zvýraznenie hrúbky písma, aby nebol riadok taký tenký */
-		            font-weight: 600; 
-		            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-		            width: 100%;
-		            flex: 0 0 auto;
-		            margin: 8vh 0 0vh 0 !important;  /*Poradie: HORE (4vh) | VPRAVO (0) | DOLE (2vh) | VĽAVO (0) */
-		        }        
+			        font-size: 16vw !important;
+			        line-height: 0.85 !important;
+			        font-weight: 800 !important;
+			        letter-spacing: -2px !important;
+			        transform: scaleY(1.3) !important; 
+			        transform-origin: center center !important;
+			        margin: 0 !important;
+			        width: 70% !important; /* cca 50% z celkovej obrazovky */
+			        display: flex !important;
+			        justify-content: center !important;
+			    }
+		        /* Dátum pod hodinami v strednom bloku */
+			    .big-clock-date-wrapper {
+			        position: absolute !important;
+			        bottom: 2vh !important;
+			        left: 30% !important;
+			        width: 50% !important;
+			        margin: 0 !important;
+			        display: flex !important;
+			        justify-content: center !important;
+			        align-items: center !important;
+			        gap: 8px !important;
+			        white-space: nowrap !important;
+			        font-size: 1.8vw !important;
+			        font-weight: 800 !important;
+			    } 
 		        .big-clock-hours { color: #fff; }
 		        .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
 		        .big-clock-city { color: #ff9f0a; font-weight: bold; letter-spacing: 2px; }
@@ -598,7 +600,7 @@
 		        .big-clock-nameday { color: #ff9f0a; }
 			
 			    .big-clock-hours, .big-clock-minutes {
-			        letter-spacing: -6px !important;
+			        letter-spacing: -3px !important;
 			    }
 			
 			    /* Dátum sa natiahne na 100% šírky celej pravej sekcie 
