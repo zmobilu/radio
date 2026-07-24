@@ -447,10 +447,13 @@
             body.full-night-mode .favorites-sidebar,
             body.full-night-mode .big-clock-date-wrapper,
             body.full-night-mode #settingsToggleBtn, 
-            body.full-night-mode .main-weather-container { 
+			body.full-night-mode .main-weather-container { 
                 display: none !important;
             }
-            
+            body.full-night-mode .clock-middle-container {
+			    width: 100% !important;
+			    justify-content: center !important;
+			}
             body.full-night-mode .workspace-container, 
             body.full-night-mode .main-content-area { 
                 width: 100vw; 
@@ -645,8 +648,9 @@
 			        transform: translateY(0) !important;
 			    }
 			    body.full-night-mode .big-clock-time {
-			        transform: scaleY(1.30) translateY(-10vh) !important;
-			    }
+				    transform: scaleY(1.30) translateY(0) !important;
+				    margin-top: 0 !important;
+				}
 			    body.full-night-mode .night-player-container {
 			        flex-direction: row !important;
 			        gap: 4vw !important;
