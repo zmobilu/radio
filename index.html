@@ -121,7 +121,7 @@
             height: 100%; 
             flex-direction: column;
             align-items: center; 
-            justify-content: space-between center; /* ZMENA: Centrovanie namiesto space-between */
+            justify-content: space-between;
             gap: 2vh;                /* PRIDANÉ: Automatická medzera medzi hodinami, dátumom a počasím */
             background: #000; 
             box-sizing: border-box;
@@ -523,39 +523,120 @@
                 display: flex !important;
             }
             
-            /* Špecifické úpravy pre nočný režim na šírku (LANDSCAPE) */
-            @media (orientation: landscape) {
-                body.full-night-mode .placeholder-view {
-                    transform: translateY(0) !important;
-                }
-                body.full-night-mode .big-clock-time {
-                    transform: scaleY(1.30) translateY(-10vh) !important;
-                }
-                body.full-night-mode .night-player-container {
-                    flex-direction: row !important;
-                    gap: 4vw !important;
-                    position: absolute !important;
-                    bottom: 18vh;
-                    width: auto !important;
-                }
-                body.full-night-mode #player-now-playing {
-                    bottom: 11vh !important;
-                    font-size: 2.2vw !important; /* Mierne zmenšenie písma na šírku */
-                }
-                body.full-night-mode .night-player-station {
-                    font-size: 3.5vw !important;
-                    margin-bottom: 0 !important;
-                    border-right: 1px solid rgba(255,255,255,0.15);
-                    padding-right: 4vw;
-                }
-                body.full-night-mode .night-player-station img { height: 4vw !important; }
-                body.full-night-mode .night-player-controls { gap: 5vw !important; }
-                body.full-night-mode .night-btn { font-size: 4.5vw !important; padding: 5px; }
-                body.full-night-mode .night-btn.btn-playpause { font-size: 5.5vw !important; }
-                body.full-night-mode #nightBottomInfo {
-                    font-size: 3.2vw !important;
-                }
-            }
+            /* --- ZJEDNOTENÝ REŽIM NA ŠÍRKU (LANDSCAPE) --- */
+			@media (orientation: landscape) {
+			    /* 1. Hlavné rozloženie plochy */
+			    .placeholder-view {
+			        display: flex !important;
+			        flex-direction: row !important;
+			        flex-wrap: wrap !important;
+			        align-items: flex-start !important;
+			        justify-content: space-between !important;
+			        padding: 1vh 2vw 1vh 1vw !important;
+			        box-sizing: border-box !important;
+			    }
+			
+			    /* Hodiny (Ľavý dominantný blok) */
+			    .big-clock-time {
+			        font-size: 25vw !important;
+			        line-height: 0.75 !important;
+			        font-weight: 800 !important;
+			        letter-spacing: -2px !important;
+			        transform: scaleY(1.75) !important; 
+			        transform-origin: top center !important;
+			        margin-top: 1vh !important;
+			        margin-bottom: 0 !important;
+			        width: 62% !important;
+			        display: flex !important;
+			        justify-content: center !important;
+			    }
+			
+			    .big-clock-hours, .big-clock-minutes {
+			        letter-spacing: -3px !important;
+			    }
+			
+			    /* Spodný riadok s dátumom a mestom */
+			    .big-clock-date-wrapper {
+			        width: 62% !important;
+			        margin-top: auto !important;
+			        margin-bottom: 1vh !important;
+			        display: flex !important;
+			        justify-content: center !important;
+			        align-items: center !important;
+			        gap: 8px !important;
+			        white-space: nowrap !important;
+			        font-size: 2.2vw !important;
+			        font-weight: 800 !important;
+			        transform: scale(1.15, 1.3) !important; 
+			        transform-origin: bottom center !important;
+			    }
+			
+			    /* Pravý meteo stĺpik */
+			    .main-weather-container {
+			        width: 35% !important;
+			        max-width: none !important;
+			        height: 98% !important;
+			        display: flex !important;
+			        flex-direction: column !important;
+			        justify-content: space-between !important;
+			        align-items: center !important;
+			        margin: 0 !important;
+			        padding-left: 1vw !important;
+			        box-sizing: border-box !important;
+			    }
+			
+			    .weather-left-side {
+			        width: 100% !important;
+			    }
+			
+			    .weather-top-row {
+			        flex-direction: column !important;
+			        gap: 4px !important;
+			    }
+			
+			    .main-mini-strip {
+			        flex-direction: column !important;
+			        width: 100% !important;
+			        gap: 8px !important;
+			        margin-top: 0 !important;
+			    }
+			
+			    .mini-day-box {
+			        width: 100% !important;
+			    }
+			
+			    /* 2. Nočný režim v Landscape */
+			    body.full-night-mode .placeholder-view {
+			        transform: translateY(0) !important;
+			    }
+			    body.full-night-mode .big-clock-time {
+			        transform: scaleY(1.30) translateY(-10vh) !important;
+			    }
+			    body.full-night-mode .night-player-container {
+			        flex-direction: row !important;
+			        gap: 4vw !important;
+			        position: absolute !important;
+			        bottom: 18vh;
+			        width: auto !important;
+			    }
+			    body.full-night-mode #player-now-playing {
+			        bottom: 11vh !important;
+			        font-size: 2.2vw !important;
+			    }
+			    body.full-night-mode .night-player-station {
+			        font-size: 3.5vw !important;
+			        margin-bottom: 0 !important;
+			        border-right: 1px solid rgba(255,255,255,0.15);
+			        padding-right: 4vw;
+			    }
+			    body.full-night-mode .night-player-station img { height: 4vw !important; }
+			    body.full-night-mode .night-player-controls { gap: 5vw !important; }
+			    body.full-night-mode .night-btn { font-size: 4.5vw !important; padding: 5px; }
+			    body.full-night-mode .night-btn.btn-playpause { font-size: 5.5vw !important; }
+			    body.full-night-mode #nightBottomInfo {
+			        font-size: 3.2vw !important;
+			    }
+			}
             
             /* Špecifické úpravy pre nočný režim na výšku (PORTRAIT) */
             @media (orientation: portrait) {
