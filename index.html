@@ -560,18 +560,33 @@
 				
 			    /* Stredný blok: HODINY (50% celkovej šírky obrazovky / 71% z pravej časti) */
 			    /* Hodiny - štíhle a vysoké presne ako v návrhu */
-			    .big-clock-time {
-			        font-size: 20vw !important;
-			        line-height: 0.75 !important;
-			        font-weight: 800 !important;
-			        letter-spacing: -4px !important;
-			        transform: scaleY(1.85) !important; /* Výrazné natiahnutie do výšky */
-			        transform-origin: center top !important;
-			        margin-top: 5vh !important;
-			        width: 100% !important;
-			        display: flex !important;
-			        justify-content: center !important;
-			    }
+			    /* 1. DENNÉ HODINY (Režim na šírku - zväčšené podľa potreby) */
+				body:not(.full-night-mode) .big-clock-time {
+				    font-size: 24vw !important;           /* Zväčšená základná veľkosť pre deň */
+				    line-height: 0.75 !important;
+				    font-weight: 800 !important;
+				    letter-spacing: -4px !important;
+				    transform: scaleY(2.15) !important;   /* Natiahnutie denno hodín do výšky */
+				    transform-origin: center top !important;
+				    margin-top: 1vh !important;
+				    width: 100% !important;
+				    display: flex !important;
+				    justify-content: center !important;
+				}
+				
+				/* 2. NOČNÉ HODINY (Režim na šírku - pevne pod kontrolou) */
+				body.full-night-mode .big-clock-time {
+				    font-size: 28vw !important;           /* Samostatná veľkosť pre noc */
+				    line-height: 1 !important;
+				    font-weight: 800 !important;
+				    letter-spacing: -2px !important;
+				    transform: scaleY(1.35) !important;   /* Samostatné natiahnutie pre noc */
+				    transform-origin: center center !important;
+				    margin-top: 0 !important;
+				    width: 100% !important;
+				    display: flex !important;
+				    justify-content: center !important;
+				}
 			
 			    .big-clock-hours, .big-clock-minutes {
 			        letter-spacing: -6px !important;
