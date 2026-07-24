@@ -641,10 +641,21 @@
 			        justify-content: center !important;
 			        align-items: center !important;
 			        margin: 0 !important;
+					margin-top: auto !important;          /* Odstčí počasie nadol pod hodiny */
+			        margin-bottom: 2vh !important;
+			        width: 100% !important;
 			        padding-left: 0.5vw !important;
 			        box-sizing: border-box !important;
 			    }
-			
+				/* Pocitový stĺpec (teplota + vlhkosť) pod hlavnou teplotou */
+			    .weather-sub-row {
+			        flex-direction: row !important; /* Dáme ich vedľa seba pod teplotu, aby šetrili miesto na výšku */
+			        gap: 12px !important;
+			        margin-top: 0.5vh !important;
+			        font-size: 2vw !important;
+			        transform: scaleY(1.1) !important;
+			    }
+
 			    .weather-left-side {
 			        width: 100% !important;
 			    }
