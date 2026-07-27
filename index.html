@@ -183,29 +183,34 @@
             overflow: hidden;
         }
         
+        /* Veľké hodiny */
         .big-clock-time {
             font-size: clamp(60px, 16vw, 480px);
-            line-height: 1.1;
+            line-height: 1.0 !important; /* Oprava pretekania textu */
             font-weight: 800;
             display: flex;
-            letter-spacing: 20px;
+            letter-spacing: 5px;
             justify-content: center;
             align-items: center;
             width: 100%;
-            margin-top: 1vh !important;
-            margin-bottom: 0vh;
+            margin: 0 !important;
+            transform: none !important; /* Odstránenie kolíznych transformácií */
         }
         
+        /* Riadok s dátumom a meninami */
         .big-clock-date-wrapper {
-            display: flex;
+            display: flex !important;
             justify-content: center;
             align-items: center;
             text-align: center;
-            gap: 5px 12px;
-            font-size: clamp(18px, 3.0vh, 32px);
+            gap: 8px 12px;
+            font-size: clamp(16px, 2.8vh, 28px);
             font-weight: 600;
             width: 100%;
-            margin: 2vh 0 0 0 !important;
+            margin-top: 15px !important; /* Bezpečné odsadenie pod hodiny */
+            margin-bottom: 0 !important;
+            position: relative !important;
+            transform: none !important;
         }
         
         .big-clock-hours { color: #fff; }
@@ -583,24 +588,23 @@
                 height: 100% !important;
             }
 
+            /* Stredný kontajner hodín a dátumu */
             .clock-middle-container {
-                width: 68% !important;
-                height: 100% !important;
                 display: flex !important;
                 flex-direction: column !important;
-                justify-content: center !important;
                 align-items: center !important;
+                justify-content: center !important;
+                width: 100% !important;
+                margin: 0 !important;
                 padding: 0 !important;
-                box-sizing: border-box !important;
             }
             
             body:not(.full-night-mode) .big-clock-time {
-                font-size: 20vw !important;
-                line-height: 0.8 !important;
+                font-size: 16vw !important;
+                line-height: 1.0 !important;
                 font-weight: 800 !important;
                 letter-spacing: -2px !important;
-                transform: scaleY(1.6) !important;
-                transform-origin: center top !important;
+                transform: none !important; /* Aby netlačil na dátum */
                 margin-top: 0vh !important;
                 width: 100% !important;
                 display: flex !important;
