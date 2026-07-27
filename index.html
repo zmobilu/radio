@@ -100,7 +100,7 @@
             gap: 10px;
             cursor: pointer !important;
             background: rgba(0, 0, 0, 0.4);
-            padding: 4px 10px 4px 4px;
+            padding: 6x 16px 6px 6px;
             border-radius: 8px;
             transition: background 0.2s;
         }
@@ -110,12 +110,12 @@
         }
         
         .radio-trigger-icon {
-            font-size: 26px;
+            font-size: 32px;
             line-height: 1;
         }
         
         .radio-trigger-text {
-            font-size: 1.8vw;
+            font-size: 2.2vw;
             font-weight: 800;
             color: #ff9f0a;
             text-transform: uppercase;
@@ -769,6 +769,26 @@
             body.full-night-mode .night-btn.btn-playpause { font-size: 5.5vw !important; }
             body.full-night-mode #nightBottomInfo {
                 font-size: 3.2vw !important;
+            }
+            /* Panel nastavení - vymedzený presne od pravej hrany rádií na zvyšok obrazovky */
+            .settings-grid-view {
+                display: none; 
+                position: absolute !important;
+                top: 0 !important;
+                left: 280px !important; /* Začína presne tam, kde končí 280px panel rádií */
+                width: calc(100vw - 280px) !important; /* Zaberá zvyšných ~70% šírky */
+                height: 100vh !important;
+                overflow-y: auto !important;
+                
+                /* Odsadenie zhora pre tlačidlá (ozubené koliesko/fullscreen) a prirodzený okraj */
+                padding: 65px 70px 20px 20px !important; 
+                box-sizing: border-box !important;
+                
+                grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)) !important;
+                gap: 8px !important;
+                align-content: start !important;
+                background: #090909 !important;
+                z-index: 10000 !important;
             }
         }
             
