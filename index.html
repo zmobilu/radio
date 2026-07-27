@@ -414,22 +414,23 @@
             box-shadow: 0 0 4px rgba(255,255,255,0.6);
         }
 
+        /* Posun celej mriežky nastavení doprava vedľa 280px panela rádií */
         .settings-grid-view {
-            display: none; 
-            width: 100%; 
-            height: 100%; 
-            overflow-y: auto;
-            padding: 60px 10px 10px 10px; /* Horné odsadenie, aby obsah nebol pod tlačidlom nastavení */
-            box-sizing: border-box; 
-            grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
-            gap: 8px; 
-            align-content: start; 
-            background: #090909; 
-            position: absolute; /* Garantuje plné pokrytie plochy */
-            top: 0;
-            left: 0;
+            display: none;
+            position: absolute !important;
+            top: 0 !important;
+            left: 280px !important; /* Presne šírka vysunutého panela */
+            width: calc(100vw - 280px) !important; /* Zvyšok šírky obrazovky */
+            height: 100vh !important;
+            overflow-y: auto !important;
+            padding: 20px 80px 20px 20px !important; /* Pravé odsadenie 80px vytvorí priestor pre tlačidlá vpravo hore */
+            box-sizing: border-box !important;
+            grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)) !important;
+            gap: 8px !important;
+            align-content: start !important;
+            background: #090909 !important;
             z-index: 10000 !important;
-        }
+        }                                                    
         .cfg-mini-card {
             background: #151515; border: 1px solid #252525; border-radius: 10px; aspect-ratio: 1 / 1; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; cursor: pointer; box-sizing: border-box; position: relative;
@@ -988,7 +989,12 @@
             }
         }
 
-        .settings-grid-view { padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important; }
+        .settings-grid-view {
+            left: 0 !important;
+            width: 100vw !important;
+            padding-top: 290px !important; /* Posunie mriežku pod panel rádií pri zobrazení na výšku */
+            padding-right: 20px !important;
+        }
 
         @keyframes antiBurnIn {
             0%   { transform: translate(0, 0); }
@@ -1910,7 +1916,13 @@
             if (!isSettingsModeActive) return;
             clearTimeout(settingsTimeout);
             settingsTimeout = setTimeout(() => {
-                if (isSettingsModeActive) toggleSettingsMode();
+                if (isSettingsModeActive) {
+                    toggleSettingsMode();
+                } else {
+                    // Poistka: ak by nastavenia už neboli aktívne, zatvorí vysunutý panel
+                    const favSidebar = document.getElementById('favSidebarContainer');
+                    if (favSidebar) favSidebar.classList.remove('open');
+                }
             }, 10000);
         }
 
