@@ -85,25 +85,25 @@
             right: 15px !important;
             z-index: 999999 !important;
         }
+
         /* --- TLAČIDLO PRE REŽIM ÚPRAV V NASTAVENIACH --- */
-            .edit-mode-btn {
-                background: #111 !important;
-                border: 1px solid #222 !important;
-                color: #666 !important;
-                padding: 8px 16px;
-                font-size: 14px;
-                font-weight: bold;
-                border-radius: 6px;
-                cursor: pointer;
-                transition: color 0.2s, background 0.2s, border-color 0.2s;
-            }
-            
-            /* Aktívny stav s tvojou oranžovou (#ff9f0a) */
-            .edit-mode-btn.active {
-                color: #ff9f0a !important;
-                border-color: #ff9f0a !important;
-                background: #1a1a1a !important;
-            }
+        .edit-mode-btn {
+            background: #111 !important;
+            border: 1px solid #222 !important;
+            color: #666 !important;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: color 0.2s, background 0.2s, border-color 0.2s;
+        }
+        
+        .edit-mode-btn.active {
+            color: #ff9f0a !important;
+            border-color: #ff9f0a !important;
+            background: #1a1a1a !important;
+        }
 
         /* --- HLAVNÁ ROZDELENÁ PLOCHA --- */
         .workspace-container { display: flex; flex: 1; width: 100vw; overflow: hidden; position: relative; }
@@ -119,7 +119,7 @@
             gap: 10px;
             cursor: pointer !important;
             background: rgba(0, 0, 0, 0.4);
-            padding: 6x 16px 6px 6px;
+            padding: 6px 16px 6px 6px;
             border-radius: 8px;
             transition: background 0.2s;
         }
@@ -185,8 +185,6 @@
         .fav-card.empty { border: 1px dashed #222; background: transparent; cursor: default; }
         .fav-card.empty i { color: #333; font-size: 22px; }
 
-        /* Zabezpečenie správneho vrstvenia pre panel nastavení */
-        /* Obal musí byť východiskovým bodom pre absolutnú pozíciu */
         .main-content-area {
             position: relative !important;
             width: 100vw !important;
@@ -194,9 +192,9 @@
             overflow: hidden !important;
         }
         
-        /* Mriežka nastavení vynútená natvrdo do ľavého horného rohu za panel rádií */
-        #settingsGridView.settings-grid-view {
-            display: grid !important; /* Necháme grid trvalo zapnutý pre správne rozloženie */
+        /* Mriežka nastavení */
+        .settings-grid-view {
+            display: grid !important;
             position: absolute !important;
             top: 0 !important;
             bottom: 0 !important;
@@ -210,16 +208,18 @@
             box-sizing: border-box !important;
             background: #090909 !important;
             z-index: 999999 !important;
-        
-            /* Plynulý efekt (Smooth effect) */
+            grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+            gap: 8px;
+            align-content: start;
+            overflow-y: auto !important;
+
             opacity: 0;
             visibility: hidden;
-            transform: translateX(15px); /* Jemný posun doprava v skrytom stave */
+            transform: translateX(15px);
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.3s;
         }
         
-        /* Trieda pre viditeľný stav, ktorú zapína JavaScript */
-        #settingsGridView.settings-grid-view.active {
+        .settings-grid-view.active {
             opacity: 1;
             visibility: visible;
             transform: translateX(0);
@@ -242,7 +242,7 @@
         /* Veľké hodiny */
         .big-clock-time {
             font-size: clamp(60px, 16vw, 480px);
-            line-height: 1.0 !important; /* Oprava pretekania textu */
+            line-height: 1.0 !important;
             font-weight: 800;
             display: flex;
             letter-spacing: 5px;
@@ -250,7 +250,7 @@
             align-items: center;
             width: 100%;
             margin: 0 !important;
-            transform: none !important; /* Odstránenie kolíznych transformácií */
+            transform: none !important;
         }
         
         /* Riadok s dátumom a meninami */
@@ -263,7 +263,7 @@
             font-size: clamp(16px, 2.8vh, 28px);
             font-weight: 600;
             width: 100%;
-            margin-top: 15px !important; /* Bezpečné odsadenie pod hodiny */
+            margin-top: 15px !important;
             margin-bottom: -3vh !important;
             position: relative !important;
             transform: none !important;
@@ -275,7 +275,7 @@
         .big-clock-date { color: #fff; }
         .big-clock-nameday { color: #ff9f0a; }
 
-        /* 1. Hlavný a jediný obal celého počasia */
+        /* Hlavný obal celého počasia */
         .main-weather-container {
             display: flex;
             flex-direction: column;
@@ -288,7 +288,6 @@
             box-sizing: border-box;
         }
         
-        /* 2. Zjednotený vnútorný blok pre aktuálne počasie */
         .weather-left-side {
             display: flex !important;
             flex-direction: column;
@@ -300,7 +299,6 @@
             box-sizing: border-box;
         }
 
-        /* 3. Spoločný riadok pre ikonu, teplotu a pocitový stĺpec */
         .weather-top-row {
             display: flex;
             flex-direction: row;
@@ -313,7 +311,6 @@
             box-sizing: border-box;
         }
         
-        /* Jadro s ikonou a hlavnou teplotou */
         .weather-core-row {
             display: flex;
             flex-direction: column;
@@ -324,7 +321,6 @@
         #mainBigIcon { font-size: 14vmin !important; line-height: 1; }
         #mainBigTemp { font-size: 13vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
 
-        /* 4. Pocitový stĺpec (Teplota + Vlhkosť) */
         .weather-sub-row { 
             font-size: 3.6vmin !important; 
             font-weight: 600; 
@@ -339,7 +335,6 @@
             transform-origin: left center;
         }
 
-        /* 5. Textový popis stavu */
         #mainWeatherDesc {
             font-size: 3.2vmin !important;
             font-weight: 800;
@@ -355,7 +350,6 @@
             transform-origin: center center;
         }
         
-        /* 6. Spodný pás predpovede (DNES a ZAJTRA) */
         .main-mini-strip {
             display: flex !important;
             flex-direction: row !important; 
@@ -441,7 +435,7 @@
         .sub-row-item-temp i { color: #ffa500; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }
         .sub-row-item-hum i { color: #4dabff; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }        
 
-        /* --- EXTRA KOMPAKTNÝ PANEL NASTAVENÍ (ÚPRAVA PÍSMA A IKON) --- */
+        /* --- EXTRA KOMPAKTNÝ PANEL NASTAVENÍ --- */
         .settings-night-panel {
             background: #0d0d0d; 
             padding: 10px; 
@@ -464,12 +458,11 @@
             gap: 8px; 
             flex: 1; 
             min-width: calc(50% - 8px); 
-            height: 48px; /* Zväčšená výška pre lepšiu klikateľnosť */
+            height: 48px;
             justify-content: center; 
             box-sizing: border-box;
         }
         
-        /* Zväčšenie ikoniek v hornej lište */
         .settings-night-row i.label-icon { 
             font-size: 18px !important; 
             color: #888; 
@@ -477,7 +470,6 @@
             text-align: center; 
         }
         
-        /* Zjednotenie fontu tlačidiel: VEĽKÉ PÍSMENÁ (UPPERCASE), väčší a tučnejší text */
         .settings-night-row button { 
             background: #222; 
             color: #fff; 
@@ -486,12 +478,11 @@
             border-radius: 6px; 
             font-size: 13px !important; 
             font-weight: 700 !important; 
-            text-transform: uppercase !important; /* Všetky písmená veľké ako na rádia */
+            text-transform: uppercase !important;
             letter-spacing: 0.8px;
             cursor: pointer; 
         }
         
-        /* Úprava histórie miest (malé tlačidlá pod mestom) */
         #weather-history-buttons button {
             font-size: 11px !important;
             font-weight: 700 !important;
@@ -509,26 +500,7 @@
             transform: scale(1.25); 
             box-shadow: 0 0 4px rgba(255,255,255,0.6);
         }
-
-        /* Posun celej mriežky nastavení doprava vedľa 280px panela rádií */
-        .settings-grid-view {
-            display: none; 
-            position: absolute;
-            top: 0;
-            left: 280px;
-            width: calc(100% - 280px); 
-            height: 100%; 
-            overflow-y: auto;
-            padding: 10px; 
-            box-sizing: border-box; 
-            grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
-            gap: 8px; 
-            align-content: start; 
-            background: #090909; 
-            padding-right: calc(10px + env(safe-area-inset-right));
-            z-index: 10000;
-        }
-                                                    
+                                                        
         .cfg-mini-card {
             background: #151515; border: 1px solid #252525; border-radius: 10px; aspect-ratio: 1 / 1; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; cursor: pointer; box-sizing: border-box; position: relative;
@@ -704,20 +676,18 @@
                 height: 100% !important;
             }
 
-            /* Stredný kontajner pre hodiny a dátum */
             .clock-middle-container {
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
                 justify-content: center !important;
-                width: 68%; /* Odstránené !important, aby JS mohol meniť šírku */
+                width: 68%;
                 height: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 box-sizing: border-box !important;
             }
             
-            /* Vrátenie pôvodného natiahnutia hodín s úpravou kotvy (origin) */
             body:not(.full-night-mode) .big-clock-time {
                 font-size: 28vw !important;
                 line-height: 0.8 !important;
@@ -725,7 +695,7 @@
                 letter-spacing: -2px !important;
                 transform: scaleY(1.8) !important;
                 transform-origin: center center !important;
-                margin-top: 0vh !important; /* Dvihne hodiny mierne nahor */
+                margin-top: 0vh !important;
                 width: 100% !important;
                 display: flex !important;
                 justify-content: center !important;
@@ -738,7 +708,7 @@
                 letter-spacing: -2px !important;
                 transform: scaleY(1.75) !important;
                 transform-origin: center center !important;
-                margin-top: -3vh !important; /* Dvihne hodiny mierne nahor */
+                margin-top: -3vh !important;
                 width: 100% !important;
                 display: flex !important;
                 justify-content: center !important;
@@ -784,7 +754,7 @@
             }
 
             .main-weather-container {
-                width: 32%; /* Odstránené !important, aby JS mohol meniť šírku */
+                width: 32%;
                 max-width: none !important;
                 height: 100% !important;
                 display: flex !important;
@@ -870,25 +840,11 @@
             body.full-night-mode #nightBottomInfo {
                 font-size: 3.2vw !important;
             }
-            /* Panel nastavení - vymedzený presne od pravej hrany rádií na zvyšok obrazovky */
             .settings-grid-view {
-                display: none; 
-                position: absolute !important;
-                top: 0 !important;
-                left: 280px !important; /* Začína presne tam, kde končí 280px panel rádií */
-                width: calc(100vw - 280px) !important; /* Zaberá zvyšných ~70% šírky */
+                left: 280px !important;
+                width: calc(100vw - 280px) !important;
                 height: 100vh !important;
-                overflow-y: auto !important;
-                
-                /* Odsadenie zhora pre tlačidlá (ozubené koliesko/fullscreen) a prirodzený okraj */
                 padding: 65px 70px 20px 20px !important; 
-                box-sizing: border-box !important;
-                
-                grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)) !important;
-                gap: 8px !important;
-                align-content: start !important;
-                background: #090909 !important;
-                z-index: 10000 !important;
             }
         }
             
@@ -900,6 +856,12 @@
                 position: absolute !important;
                 bottom: 18vh !important;
                 width: 100% !important;
+            }
+            .settings-grid-view {
+                left: 0 !important;
+                width: 100vw !important;
+                padding-top: 290px !important;
+                padding-right: 20px !important;
             }
         }
             
@@ -1061,7 +1023,7 @@
         .forecast-day-icon { font-size: 6vmin !important; margin: 6px 0 !important; }
         .forecast-day-temp { font-size: 2.6vmin !important; font-weight: 600 !important; white-space: nowrap !important; line-height: 1.1 !important; }
 
-        /* PORTRAIT RESPONSIVITA (MOBIL NA VÝŠKU) */
+        /* PORTRAIT RESPONSIVITA */
         @media (orientation: portrait) {
             .workspace-container { flex-direction: column; }
             .main-content-area { width: 100vw; flex: 1; order: 1; }
@@ -1105,13 +1067,6 @@
                 margin-bottom: 2vh !important; 
                 flex: 0 0 auto !important;
             }
-        }
-
-        .settings-grid-view {
-            left: 0 !important;
-            width: 100vw !important;
-            padding-top: 290px !important; /* Posunie mriežku pod panel rádií pri zobrazení na výšku */
-            padding-right: 20px !important;
         }
 
         @keyframes antiBurnIn {
@@ -1315,83 +1270,59 @@
             box-sizing: border-box;
             transition: height 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
-            /* --- DELIACI PÁSIK MEDZI HODINAMI A POČASÍM --- */
-            .workspace-resizer {
-                display: none; /* Na výšku je skrytý */
-            }
-           /* V bežnom stave je deliaci pásik skrytý a neaktívny */
-            #mainWorkspaceResizer {
-                display: none !important;
-                pointer-events: none !important;
-            }
-            
-            /* Len keď je aktívny Edit Mode NA ŠÍRKU, pásik sa zobrazí */
-            @media (orientation: landscape) {
-                body.edit-mode #mainWorkspaceResizer {
-                    display: block !important;
-                    pointer-events: auto !important;
-                    width: 12px;
-                    height: 100%;
-                    cursor: col-resize !important;
-                    position: relative;
-                    z-index: 999;
-                    margin: 0 4px;
-                    background: transparent;
-                    transition: background 0.2s;
-                }
-            
-            body.edit-mode .resizable-block {
-                resize: both;
-                overflow: auto;
-                border: 1px dashed #4CAF50; /* Vizualizácia, že blok sa dá upravovať */
+
+        /* --- DELIACI PÁSIK MEDZI HODINAMI A POČASÍM --- */
+        #mainWorkspaceResizer {
+            display: none !important;
+            pointer-events: none !important;
+        }
+        
+        @media (orientation: landscape) {
+            body.edit-mode #mainWorkspaceResizer {
+                display: block !important;
+                pointer-events: auto !important;
+                width: 12px;
+                height: 100%;
+                cursor: col-resize !important;
+                position: relative;
+                z-index: 999;
+                margin: 0 4px;
+                background: transparent;
+                transition: background 0.2s;
             }
             
-            @media (orientation: landscape) {
-                .workspace-resizer {
-                    display: block !important;
-                    width: 12px;
-                    height: 100%;
-                    cursor: col-resize !important;
-                    position: relative;
-                    z-index: 999;
-                    margin: 0 4px;
-                    background: transparent;
-                    transition: background 0.2s;
-                }
-            
-                .workspace-resizer:hover,
-                .workspace-resizer.is-dragging {
-                    background: rgba(255, 159, 10, 0.4);
-                    border-radius: 6px;
-                }
-            
-                /* Rukoväť v strede pásika */
-                .workspace-resizer::after {
-                    content: "";
-                    position: absolute;
-                    top: 50%;
-                    left: 5px;
-                    transform: translateY(-50%);
-                    width: 2px;
-                    height: 40px;
-                    background: rgba(255, 255, 255, 0.3);
-                    border-radius: 2px;
-                }
-                /* Zvýraznenie upraviteľných blokov pri zapnutom režime úprav */
-                body.edit-mode .clock-middle-container,
-                body.edit-mode .main-weather-container,
-                body.edit-mode .big-clock-date-wrapper {
-                    outline: 1px dashed #ff9f0a;
-                    outline-offset: -2px;
-                }
-                /* Zabezpečenie plynulého zväčšovania od stredu prvku */
-                .big-clock-time, 
-                .big-clock-date-wrapper, 
-                .main-weather-container {
-                    transform-origin: center center !important;
-                    transition: transform 0.1s ease-out;
-                }
+            body.edit-mode #mainWorkspaceResizer:hover,
+            body.edit-mode #mainWorkspaceResizer.is-dragging {
+                background: rgba(255, 159, 10, 0.4);
+                border-radius: 6px;
             }
+
+            body.edit-mode #mainWorkspaceResizer::after {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 5px;
+                transform: translateY(-50%);
+                width: 2px;
+                height: 40px;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 2px;
+            }
+
+            body.edit-mode .clock-middle-container,
+            body.edit-mode .main-weather-container,
+            body.edit-mode .big-clock-date-wrapper {
+                outline: 1px dashed #ff9f0a;
+                outline-offset: -2px;
+            }
+
+            .big-clock-time, 
+            .big-clock-date-wrapper, 
+            .main-weather-container {
+                transform-origin: center center !important;
+                transition: transform 0.1s ease-out;
+            }
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
@@ -2117,16 +2048,21 @@
         }
 
         function resetSettingsTimer() {
-    if (settingsTimeout) clearTimeout(settingsTimeout);
-    
-    settingsTimeout = setTimeout(() => {
-        if (isSettingsModeActive) {
-            // Pri vypršaní času skryjeme panel
-            document.getElementById('settingsGridView').classList.remove('active');
-            isSettingsModeActive = false;
+            if (settingsTimeout) clearTimeout(settingsTimeout);
+            
+            settingsTimeout = setTimeout(() => {
+                if (isSettingsModeActive) {
+                    document.getElementById('settingsGridView').classList.remove('active');
+                    isSettingsModeActive = false;
+                    const btn = document.getElementById('settingsToggleBtn');
+                    if (btn) btn.classList.remove('active');
+                    const placeholder = document.getElementById('rightPlaceholder');
+                    if (placeholder) placeholder.style.display = 'flex';
+                    const favSidebar = document.getElementById('favSidebarContainer');
+                    if (favSidebar) favSidebar.classList.remove('open');
+                }
+            }, 40000);
         }
-    }, 40000); // Čas zobrazenia nastavení (napr. 40 sekúnd)
-}
 
         function renderSidebarFavorites() {
             const container = document.getElementById('favSidebarContainer');
@@ -2255,8 +2191,6 @@
                 if (placeholder) placeholder.style.display = 'none';
                 if (weatherView) weatherView.style.display = 'none';
                 if (gridView) gridView.classList.add('active');
-                
-                // Vysunie panel s rádiami súčasne s otváraním nastavení
                 if (favSidebar) favSidebar.classList.add('open');
                 
                 renderSettingsGrid();
@@ -2267,8 +2201,6 @@
                 if (placeholder) placeholder.style.display = 'flex';
                 if (gridView) gridView.classList.remove('active');
                 if (weatherView) weatherView.style.display = 'none';
-                
-                // Zasunie panel s rádiami pri zatvorení nastavení
                 if (favSidebar) favSidebar.classList.remove('open');
             }
         }
@@ -2588,66 +2520,6 @@
             modal.style.display = "flex";
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const sep = document.getElementById('dateSeparator');
-            if(sep) sep.style.display = "none";
-
-            skontrolujAObnovMeniny();
-            document.addEventListener('click', skontrolujAObnovMeniny);
-            
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible') {
-                    skontrolujAObnovMeniny();
-                }
-            });
-            
-            audio.addEventListener('play', () => {
-                clearTimeout(globalPauseToStopTimeout); 
-                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
-                renderSidebarFavorites();
-                aktualizujNochnyPrehravacVizual();
-            });
-
-            audio.addEventListener('pause', () => {
-                document.getElementById("player-now-playing").innerText = "";
-                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
-                renderSidebarFavorites();
-                aktualizujNochnyPrehravacVizual();
-
-                clearTimeout(globalPauseToStopTimeout);
-                console.log("Audio pozastavené, spúšťam 5-minútový limit pre automatický STOP...");
-                globalPauseToStopTimeout = setTimeout(() => {
-                    console.log("Limit vypršal: Vykonávam automatický HARD STOP na uvoľnenie streamu.");
-                    audio.src = "";
-                    audio.load();
-                    currentPlayingType = "";
-                    if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
-                    renderSidebarFavorites();
-                    runClockEngine();
-                    aktualizujNochnyPrehravacVizual();
-                    if (metadataController) metadataController.abort();
-                    if (bauerIntervalId) {
-                        clearInterval(bauerIntervalId);
-                        bauerIntervalId = null;
-                    }
-                    document.getElementById("player-now-playing").innerText = "";
-                }, CAS_PRE_HARD_STOP);
-            });
-                
-            fetchWeatherData();
-            setInterval(fetchWeatherData, 15 * 60 * 1000);
-            runClockEngine();
-            setInterval(runClockEngine, 1000);
-            fetchNamedayData();
-            renderSidebarFavorites();
-            inicializujPlochuNastaveni();
-            aktualizujTlacidloMesta();
-        });
-
-        document.addEventListener('touchstart', function (event) {
-            if (event.touches.length > 1) event.preventDefault();
-        }, { passive: false });
-
         let metadataController = null; 
         let bauerIntervalId = null;    
 
@@ -2930,10 +2802,6 @@
             localStorage.removeItem('kiosk_tour_done');
             location.reload();
         }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            spustiTourAkJePrvykrat();
-        });
 
         function priradAnimaciuIkone(element, wCode) {
             if (!element) return;
@@ -2984,151 +2852,112 @@
             if (jeCasNaAktualizaciu && poslednaNocnaKontrolaDen !== aktualnyDen) {
                 await spravAktualizaciu();
             }
-    }
-            function inicializujMainWorkspaceResizer() {
-                const resizer = document.getElementById('mainWorkspaceResizer');
-                const clockBox = document.querySelector('.clock-middle-container');
-                const weatherBox = document.querySelector('.main-weather-container');
-                
-                if (!resizer || !clockBox || !weatherBox) return;
+        }
+
+        function inicializujMainWorkspaceResizer() {
+            const resizer = document.getElementById('mainWorkspaceResizer');
+            const clockBox = document.querySelector('.clock-middle-container');
+            const weatherBox = document.querySelector('.main-weather-container');
             
-                let isDragging = false;
-            
-                // Načítanie uloženej šírky hodín (predvolená je 68%)
-                const savedClockWidth = localStorage.getItem('cfg_clock_width_pct');
-                if (savedClockWidth && window.innerWidth > window.innerHeight) {
-                    aplikujPomer(parseFloat(savedClockWidth));
+            if (!resizer || !clockBox || !weatherBox) return;
+        
+            let isDragging = false;
+        
+            const savedClockWidth = localStorage.getItem('cfg_clock_width_pct');
+            if (savedClockWidth && window.innerWidth > window.innerHeight) {
+                aplikujPomer(parseFloat(savedClockWidth));
+            }
+        
+            function aplikujPomer(clockPct) {
+                const clampedClock = Math.max(35, Math.min(clockPct, 80));
+                const weatherPct = 100 - clampedClock;
+        
+                clockBox.style.width = clampedClock + '%';
+                weatherBox.style.width = weatherPct + '%';
+            }
+        
+            function startDrag(e) {
+                if (window.innerWidth <= window.innerHeight) return;
+                if (!document.body.classList.contains('edit-mode')) return;
+        
+                isDragging = true;
+                resizer.classList.add('is-dragging');
+                document.body.style.userSelect = 'none';
+            }
+        
+            function doDrag(e) {
+                if (!isDragging) return;
+                if (!document.body.classList.contains('edit-mode')) {
+                    stopDrag();
+                    return;
                 }
+        
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const totalWidth = window.innerWidth;
+                const clockPct = (clientX / totalWidth) * 100;
+        
+                aplikujPomer(clockPct);
+            }
+        
+            function stopDrag() {
+                if (!isDragging) return;
+                isDragging = false;
+                resizer.classList.remove('is-dragging');
+                document.body.style.userSelect = '';
             
-                function aplikujPomer(clockPct) {
-                    // Bezpečnostný limit: Hodiny 35% až 80% šírky
-                    const clampedClock = Math.max(35, Math.min(clockPct, 80));
-                    const weatherPct = 100 - clampedClock;
-            
-                    clockBox.style.width = clampedClock + '%';
-                    weatherBox.style.width = weatherPct + '%';
+                const finalPct = parseFloat(clockBox.style.width);
+                if (finalPct) {
+                    localStorage.setItem('cfg_clock_width_pct', finalPct);
                 }
-            
-                function startDrag(e) {
-                    if (window.innerWidth <= window.innerHeight) return;
-                    // Ak nie je zapnutý Edit Mode, posúvanie sa vôbec nespustí
+            }
+        
+            resizer.addEventListener('mousedown', startDrag);
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+        
+            resizer.addEventListener('touchstart', startDrag, { passive: true });
+            window.addEventListener('touchmove', doDrag, { passive: true });
+            window.addEventListener('touchend', stopDrag);
+        }
+
+        function inicializujZmenuVelkostiBlokov() {
+            const savedClockScale = localStorage.getItem('cfg_clock_scale');
+            const savedDateScale = localStorage.getItem('cfg_date_scale');
+            const savedWeatherScale = localStorage.getItem('cfg_weather_scale');
+        
+            const clockEl = document.querySelector('.big-clock-time');
+            const dateEl = document.querySelector('.big-clock-date-wrapper');
+            const weatherEl = document.querySelector('.main-weather-container');
+        
+            if (savedClockScale && clockEl) clockEl.style.transform = `scaleY(${savedClockScale})`;
+            if (savedDateScale && dateEl) dateEl.style.transform = `scaleY(${savedDateScale})`;
+            if (savedWeatherScale && weatherEl) weatherEl.style.transform = `scale(${savedWeatherScale})`;
+        
+            function pridajWheelZmenu(element, storageKey, min, max, isScaleYOnly = true) {
+                if (!element) return;
+                element.addEventListener('wheel', (e) => {
                     if (!document.body.classList.contains('edit-mode')) return;
-            
-                    isDragging = true;
-                    resizer.classList.add('is-dragging');
-                    document.body.style.userSelect = 'none';
-                }
-            
-                function doDrag(e) {
-                    if (!isDragging) return;
-                    if (!document.body.classList.contains('edit-mode')) {
-                        stopDrag();
-                        return;
+                    e.preventDefault();
+        
+                    let currentScale = parseFloat(localStorage.getItem(storageKey) || (isScaleYOnly ? "1.8" : "1.0"));
+                    const delta = e.deltaY < 0 ? 0.05 : -0.05;
+                    currentScale += delta;
+                    currentScale = Math.max(min, Math.min(currentScale, max));
+                    currentScale = parseFloat(currentScale.toFixed(2));
+        
+                    if (isScaleYOnly) {
+                        element.style.transform = `scaleY(${currentScale})`;
+                    } else {
+                        element.style.transform = `scale(${currentScale})`;
                     }
-            
-                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                    const totalWidth = window.innerWidth;
-                    const clockPct = (clientX / totalWidth) * 100;
-            
-                    aplikujPomer(clockPct);
-                }
-            
-                function stopDrag() {
-                    if (!isDragging) return;
-                    isDragging = false;
-                    resizer.classList.remove('is-dragging');
-                    document.body.style.userSelect = '';
-            
-                    const finalPct = parseFloat(clockBox.style.width);
-                    if (finalPct) {
-                        localStorage.setItem('cfg_clock_width_pct', finalPct);
-                    }
-                  function inicializujZmenuVelkostiBlokov() {
-                    // 1. Aplikácia uložených mierok pri načítaní stránky
-                    const savedClockScale = localStorage.getItem('cfg_clock_scale');
-                    const savedDateScale = localStorage.getItem('cfg_date_scale');
-                    const savedWeatherScale = localStorage.getItem('cfg_weather_scale');
-                
-                    const clockEl = document.querySelector('.big-clock-time');
-                    const dateEl = document.querySelector('.big-clock-date-wrapper');
-                    const weatherEl = document.querySelector('.main-weather-container');
-                
-                    if (savedClockScale && clockEl) {
-                        clockEl.style.transform = `scaleY(${savedClockScale})`;
-                    }
-                    if (savedDateScale && dateEl) {
-                        dateEl.style.transform = `scaleY(${savedDateScale})`;
-                    }
-                    if (savedWeatherScale && weatherEl) {
-                        weatherEl.style.transform = `scale(${savedWeatherScale})`;
-                    }
-                
-                    // 2. Pomocná funkcia pre obsluhu zmeny mierky kolieskom
-                    function pridajWheelZmenu(element, storageKey, min, max, isScaleYOnly = true) {
-                        if (!element) return;
-                
-                        element.addEventListener('wheel', (e) => {
-                            // Kontrola: funguje IBA v Edit Mode
-                            if (!document.body.classList.contains('edit-mode')) return;
-                            e.preventDefault();
-                
-                            // Zistenie aktuálnej hodnoty z inline štýlu alebo predvolenej hodnoty
-                            let currentScale = parseFloat(localStorage.getItem(storageKey) || (isScaleYOnly ? "1.8" : "1.0"));
-                            
-                            // Určenie smeru otáčania (nahor = zväčšiť, nadol = zmenšiť)
-                            const delta = e.deltaY < 0 ? 0.05 : -0.05;
-                            currentScale += delta;
-                            
-                            // Orezanie na bezpečné limity
-                            currentScale = Math.max(min, Math.min(currentScale, max));
-                            currentScale = parseFloat(currentScale.toFixed(2));
-                
-                            // Aplikácia štýlu
-                            if (isScaleYOnly) {
-                                element.style.transform = `scaleY(${currentScale})`;
-                            } else {
-                                element.style.transform = `scale(${currentScale})`;
-                            }
-                
-                            // Uloženie nastavenia
-                            localStorage.setItem(storageKey, currentScale);
-                        }, { passive: false });
-                    }
-                
-                    // 3. Registrácia prvkov pre zmenu veľkosti
-                    // Hodiny: výškový pomer scaleY (min: 1.0, max: 2.5)
-                    pridajWheelZmenu(clockEl, 'cfg_clock_scale', 1.0, 2.5, true);
-                
-                    // Dátum a meniny: výškový pomer scaleY (min: 0.8, max: 2.0)
-                    pridajWheelZmenu(dateEl, 'cfg_date_scale', 0.8, 2.0, true);
-                
-                    // Hlavné počasie: celkové meradlo scale (min: 0.7, max: 1.4)
-                    pridajWheelZmenu(weatherEl, 'cfg_weather_scale', 0.7, 1.4, false);
-                }
-                
-                // Spustenie po načítaní DOM
-                document.addEventListener('DOMContentLoaded', inicializujZmenuVelkostiBlokov);
-                }
-            
-                resizer.addEventListener('mousedown', startDrag);
-                window.addEventListener('mousemove', doDrag);
-                window.addEventListener('mouseup', stopDrag);
-            
-                resizer.addEventListener('touchstart', startDrag, { passive: true });
-                window.addEventListener('touchmove', doDrag, { passive: true });
-                window.addEventListener('touchend', stopDrag);
+                    localStorage.setItem(storageKey, currentScale);
+                }, { passive: false });
             }
-            
-            document.addEventListener('DOMContentLoaded', inicializujMainWorkspaceResizer);
-    // Načítanie uloženého stavu pri štarte
-        document.addEventListener('DOMContentLoaded', () => {
-            const editModeSaved = localStorage.getItem('editModeActive') === 'true';
-            const toggle = document.getElementById('editModeToggle');
-            if (toggle) {
-                toggle.checked = editModeSaved;
-                toggleEditMode(editModeSaved);
-            }
-        });
+        
+            pridajWheelZmenu(clockEl, 'cfg_clock_scale', 1.0, 2.5, true);
+            pridajWheelZmenu(dateEl, 'cfg_date_scale', 0.8, 2.0, true);
+            pridajWheelZmenu(weatherEl, 'cfg_weather_scale', 0.7, 1.4, false);
+        }
         
         function toggleEditMode() {
             const btn = document.getElementById('editModeToggleBtn');
@@ -3145,32 +2974,6 @@
             }
         
             localStorage.setItem('editModeActive', isEditMode);
-        }
-        
-        // Načítanie stavu pri spustení
-        document.addEventListener('DOMContentLoaded', () => {
-            const editModeSaved = localStorage.getItem('editModeActive') === 'true';
-            if (editModeSaved) {
-                document.body.classList.add('edit-mode');
-                const btn = document.getElementById('editModeToggleBtn');
-                if (btn) {
-                    btn.classList.add('active');
-                    btn.innerText = 'REŽIM ÚPRAV: ZAPNUTÝ';
-                }
-            }
-        });
-        
-        function ulozRozmeryBlokov() {
-            const clockBox = document.querySelector('.clock-middle-container');
-            const weatherBox = document.querySelector('.main-weather-container');
-        
-            if (clockBox && weatherBox) {
-                const layoutData = {
-                    clockWidth: clockBox.style.width,
-                    weatherWidth: weatherBox.style.width
-                };
-                localStorage.setItem('dashboardLayout', JSON.stringify(layoutData));
-            }
         }
         
         function skontrolujAutoStartRadiaPoReloadu() {
@@ -3194,16 +2997,86 @@
                 }
             }
         }
-        
-        skontrolujNochnuAktualizaciu();
-        skontrolujAutoStartRadiaPoReloadu();
-        setInterval(skontrolujNochnuAktualizaciu, 60000);
-        
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                skontrolujNochnuAktualizaciu();
+
+        /* --- HLAVNÁ INICIALIZÁCIA PRI NAČÍTANÍ STRÁNKY --- */
+        document.addEventListener('DOMContentLoaded', () => {
+            const sep = document.getElementById('dateSeparator');
+            if(sep) sep.style.display = "none";
+
+            skontrolujAObnovMeniny();
+            document.addEventListener('click', skontrolujAObnovMeniny);
+            
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    skontrolujAObnovMeniny();
+                    skontrolujNochnuAktualizaciu();
+                }
+            });
+            
+            audio.addEventListener('play', () => {
+                clearTimeout(globalPauseToStopTimeout); 
+                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
+                renderSidebarFavorites();
+                aktualizujNochnyPrehravacVizual();
+            });
+
+            audio.addEventListener('pause', () => {
+                document.getElementById("player-now-playing").innerText = "";
+                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
+                renderSidebarFavorites();
+                aktualizujNochnyPrehravacVizual();
+
+                clearTimeout(globalPauseToStopTimeout);
+                globalPauseToStopTimeout = setTimeout(() => {
+                    audio.src = "";
+                    audio.load();
+                    currentPlayingType = "";
+                    if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
+                    renderSidebarFavorites();
+                    runClockEngine();
+                    aktualizujNochnyPrehravacVizual();
+                    if (metadataController) metadataController.abort();
+                    if (bauerIntervalId) {
+                        clearInterval(bauerIntervalId);
+                        bauerIntervalId = null;
+                    }
+                    document.getElementById("player-now-playing").innerText = "";
+                }, CAS_PRE_HARD_STOP);
+            });
+                
+            fetchWeatherData();
+            setInterval(fetchWeatherData, 15 * 60 * 1000);
+            runClockEngine();
+            setInterval(runClockEngine, 1000);
+            fetchNamedayData();
+            renderSidebarFavorites();
+            inicializujPlochuNastaveni();
+            aktualizujTlacidloMesta();
+
+            // Inicializácia rozmerov a škálovania blokov
+            inicializujMainWorkspaceResizer();
+            inicializujZmenuVelkostiBlokov();
+
+            // Načítanie stavu Režimu Úprav
+            const editModeSaved = localStorage.getItem('editModeActive') === 'true';
+            if (editModeSaved) {
+                document.body.classList.add('edit-mode');
+                const btn = document.getElementById('editModeToggleBtn');
+                if (btn) {
+                    btn.classList.add('active');
+                    btn.innerText = 'REŽIM ÚPRAV: ZAPNUTÝ';
+                }
             }
+
+            spustiTourAkJePrvykrat();
+            skontrolujNochnuAktualizaciu();
+            skontrolujAutoStartRadiaPoReloadu();
+            setInterval(skontrolujNochnuAktualizaciu, 60000);
         });
+
+        document.addEventListener('touchstart', function (event) {
+            if (event.touches.length > 1) event.preventDefault();
+        }, { passive: false });
     </script>
 
     <!-- Modal pre zoznam mien -->
