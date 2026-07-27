@@ -167,12 +167,30 @@
         .fav-card.empty i { color: #333; font-size: 22px; }
 
         /* Zabezpečenie správneho vrstvenia pre panel nastavení */
-        .main-content-area { 
-            width: 100vw !important; 
-            background: #000; 
-            position: relative; 
-            overflow: hidden; 
-            z-index: 1000 !important; /* Pridaný z-index */
+        /* Obal musí byť východiskovým bodom pre absolutnú pozíciu */
+        .main-content-area {
+            position: relative !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            overflow: hidden !important;
+        }
+        
+        /* Mriežka nastavení vynútená natvrdo do ľavého horného rohu za panel rádií */
+        #settingsGridView.settings-grid-view {
+            display: none;
+            position: absolute !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            left: 280px !important;
+            right: 0 !important;
+            width: auto !important;
+            height: 100vh !important;
+            margin: 0 !important;
+            padding: 10px !important;
+            padding-right: calc(10px + env(safe-area-inset-right)) !important;
+            box-sizing: border-box !important;
+            background: #090909 !important;
+            z-index: 999999 !important;
         }
         
         /* --- HLAVNÝ CONTAINER A OBSAH --- */
