@@ -1276,6 +1276,43 @@
             display: none !important;
             pointer-events: none !important;
         }
+
+        /* --- DELIACI PÁSIK MEDZI HODINAMI A DÁTUMOM --- */
+        #clockDateResizer {
+            display: none !important;
+            pointer-events: none !important;
+        }
+        
+        body.edit-mode #clockDateResizer {
+            display: block !important;
+            pointer-events: auto !important;
+            width: 100%;
+            height: 12px;
+            cursor: row-resize !important;
+            position: relative;
+            z-index: 999;
+            margin: 4px 0;
+            background: transparent;
+            transition: background 0.2s;
+        }
+        
+        body.edit-mode #clockDateResizer:hover,
+        body.edit-mode #clockDateResizer.is-dragging {
+            background: rgba(255, 159, 10, 0.4);
+            border-radius: 6px;
+        }
+        
+        body.edit-mode #clockDateResizer::after {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
         
         @media (orientation: landscape) {
             body.edit-mode #mainWorkspaceResizer {
@@ -1320,17 +1357,19 @@
             .big-clock-date-wrapper,
             .main-weather-container {
                 transform-origin: center center !important;
-                transition: transform 0.1s ease-out;
+                transition: transform 0.05s ease-out;
+                touch-action: none; /* Zaujmeme kontrolu nad dotykovými gestami v režime úprav */
             }
             
-            /* Zvýraznenie prvkov, ktoré sa dajú škálovať v Režime Úprav */
+            /* Zvýraznenie blokov v Režime Úprav */
             body.edit-mode .big-clock-time,
             body.edit-mode .big-clock-date-wrapper,
             body.edit-mode .main-weather-container {
-                outline: 1px dashed #ff9f0a;
+                outline: 2px dashed #ff9f0a !important;
                 outline-offset: 4px;
-                cursor: ns-resize !important; /* Ukáže kurzor pre zmenu veľkosti */
+                cursor: ns-resize !important;
             }
+            
         }
         
     </style>
@@ -1362,6 +1401,9 @@
                         <span class="big-clock-hours" id="bigHours">00</span>
                         <span class="big-clock-minutes" id="bigMinutes">00</span>
                     </div>
+
+                    <!-- NOVÝ DELIACI PÁSIK MEDZI HODINAMI A DÁTUMOM -->
+                    <div id="clockDateResizer" class="workspace-resizer-v"></div>
                     
                     <div class="big-clock-date-wrapper">
                         <span class="big-clock-date" id="bigDate">---</span>
@@ -2983,46 +3025,139 @@
             window.addEventListener('touchmove', doDrag, { passive: true });
             window.addEventListener('touchend', stopDrag);
         }
+            function inicializujClockDateResizer() {
+                const resizer = document.getElementById('clockDateResizer');
+                const clockEl = document.querySelector('.big-clock-time');
+                const dateEl = document.querySelector('.big-clock-date-wrapper');
+    
+                if (!resizer || !clockEl || !dateEl) return;
+    
+                let isDragging = false;
+    
+                const savedMargin = localStorage.getItem('cfg_clock_date_gap');
+                if (savedMargin) {
+                    dateEl.style.marginTop = savedMargin + 'px';
+                }
+    
+                function startDrag(e) {
+                    if (!document.body.classList.contains('edit-mode')) return;
+                    isDragging = true;
+                    resizer.classList.add('is-dragging');
+                    document.body.style.userSelect = 'none';
+                }
+    
+                function doDrag(e) {
+                    if (!isDragging || !document.body.classList.contains('edit-mode')) return;
+    
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    const clockRect = clockEl.getBoundingClientRect();
+                    
+                    let newGap = clientY - clockRect.bottom;
+                    newGap = Math.max(-20, Math.min(newGap, 120));
+    
+                    dateEl.style.marginTop = newGap + 'px';
+                }
+    
+                function stopDrag() {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    resizer.classList.remove('is-dragging');
+                    document.body.style.userSelect = '';
+    
+                    localStorage.setItem('cfg_clock_date_gap', parseInt(dateEl.style.marginTop || '0'));
+                }
+    
+                resizer.addEventListener('mousedown', startDrag);
+                window.addEventListener('mousemove', doDrag);
+                window.addEventListener('mouseup', stopDrag);
+    
+                resizer.addEventListener('touchstart', startDrag, { passive: true });
+                window.addEventListener('touchmove', doDrag, { passive: true });
+                window.addEventListener('touchend', stopDrag);
+            }
 
         function inicializujZmenuVelkostiBlokov() {
-            // Načítanie uložených škál z pamäte (predvolená hodnota 1.0)
-            const savedClockScale = localStorage.getItem('cfg_clock_scale') || "1.0";
-            const savedDateScale = localStorage.getItem('cfg_date_scale') || "1.0";
-            const savedWeatherScale = localStorage.getItem('cfg_weather_scale') || "1.0";
-        
             const clockEl = document.querySelector('.big-clock-time');
             const dateEl = document.querySelector('.big-clock-date-wrapper');
             const weatherEl = document.querySelector('.main-weather-container');
         
-            // Aplikovanie uložených hodnôt pri štarte
-            if (clockEl) clockEl.style.transform = `scale(${savedClockScale})`;
-            if (dateEl) dateEl.style.transform = `scale(${savedDateScale})`;
-            if (weatherEl) weatherEl.style.transform = `scale(${savedWeatherScale})`;
+            // Načítanie a aplikovanie uložených hodnôt
+            const applyScale = (el, key) => {
+                if (!el) return;
+                const val = localStorage.getItem(key) || "1.0";
+                el.style.transform = `scale(${val})`;
+            };
         
-            // Pomocná funkcia pre reakciu na kolečko myši
-            function pridajWheelZmenu(element, storageKey, min, max) {
+            applyScale(clockEl, 'cfg_clock_scale');
+            applyScale(dateEl, 'cfg_date_scale');
+            applyScale(weatherEl, 'cfg_weather_scale');
+        
+            function pridajInterakciuZmenyVelkosti(element, storageKey, min, max) {
                 if (!element) return;
-                
+        
+                // --- 1. KOLEČKO MYŠI (PC) ---
                 element.addEventListener('wheel', (e) => {
-                    // Zmena veľkosti funguje len pri zapnutom Režime Úprav
                     if (!document.body.classList.contains('edit-mode')) return;
                     e.preventDefault();
         
                     let currentScale = parseFloat(localStorage.getItem(storageKey) || "1.0");
-                    const delta = e.deltaY < 0 ? 0.05 : -0.05; // Posun hore = zväčšenie, dole = zmenšenie
-                    currentScale += delta;
-                    currentScale = Math.max(min, Math.min(currentScale, max)); // Ochrana proti extréme
+                    const delta = e.deltaY < 0 ? 0.05 : -0.05;
+                    currentScale = Math.max(min, Math.min(currentScale + delta, max));
                     currentScale = parseFloat(currentScale.toFixed(2));
         
                     element.style.transform = `scale(${currentScale})`;
                     localStorage.setItem(storageKey, currentScale);
                 }, { passive: false });
+        
+                // --- 2. GESTO DVOCH PRSTOV / PINCH-TO-ZOOM (MOBIL & TABLET) ---
+                let initialDistance = 0;
+                let startScale = 1.0;
+        
+                element.addEventListener('touchstart', (e) => {
+                    if (!document.body.classList.contains('edit-mode')) return;
+                    
+                    if (e.touches.length === 2) {
+                        // Vypočíta vzdialenosť medzi dvoma prstami na začiatku dotyku
+                        initialDistance = Math.hypot(
+                            e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY
+                        );
+                        startScale = parseFloat(localStorage.getItem(storageKey) || "1.0");
+                    }
+                }, { passive: true });
+        
+                element.addEventListener('touchmove', (e) => {
+                    if (!document.body.classList.contains('edit-mode')) return;
+        
+                    if (e.touches.length === 2 && initialDistance > 0) {
+                        e.preventDefault(); // Zabráni nežiaducemu posunu celej stránky
+        
+                        const currentDistance = Math.hypot(
+                            e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY
+                        );
+        
+                        const factor = currentDistance / initialDistance;
+                        let newScale = startScale * factor;
+                        newScale = Math.max(min, Math.min(newScale, max));
+                        newScale = parseFloat(newScale.toFixed(2));
+        
+                        element.style.transform = `scale(${newScale})`;
+                        localStorage.setItem(storageKey, newScale);
+                    }
+                }, { passive: false });
+        
+                element.addEventListener('touchend', (e) => {
+                    if (e.touches.length < 2) {
+                        initialDistance = 0;
+                    }
+                });
             }
         
-            // Nastavenie rozsahov škálovania (min: 0.5x, max: 2.5x)
-            pridajWheelZmenu(clockEl, 'cfg_clock_scale', 0.5, 2.5);
-            pridajWheelZmenu(dateEl, 'cfg_date_scale', 0.5, 2.0);
-            pridajWheelZmenu(weatherEl, 'cfg_weather_scale', 0.5, 1.8);
+            // Aplikovanie na jednotlivé prvky (rozsah 0.5x až 2.5x)
+            pridajInterakciuZmenyVelkosti(clockEl, 'cfg_clock_scale', 0.5, 2.5);
+            pridajInterakciuZmenyVelkosti(dateEl, 'cfg_date_scale', 0.5, 2.0);
+            pridajInterakciuZmenyVelkosti(weatherEl, 'cfg_weather_scale', 0.5, 2.0);
         }
         
         function toggleEditMode() {
@@ -3121,6 +3256,7 @@
 
             // Inicializácia rozmerov a škálovania blokov
             inicializujMainWorkspaceResizer();
+            inicializujClockDateResizer();
             inicializujZmenuVelkostiBlokov();
 
             // Načítanie stavu Režimu Úprav
