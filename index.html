@@ -691,7 +691,7 @@
                 flex-direction: column !important;
                 align-items: center !important;
                 justify-content: center !important;
-                width: 68% !important;
+                width: 68%; /* Odstránené !important, aby JS mohol meniť šírku */
                 height: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
@@ -765,7 +765,7 @@
             }
 
             .main-weather-container {
-                width: 32% !important;
+                width: 32%; /* Odstránené !important, aby JS mohol meniť šírku */
                 max-width: none !important;
                 height: 100% !important;
                 display: flex !important;
@@ -2922,8 +2922,10 @@
     }
             function inicializujMainWorkspaceResizer() {
                 const resizer = document.getElementById('mainWorkspaceResizer');
-                const clockBox = document.getElementById('clockContainer');
-                const weatherBox = document.getElementById('weatherContainer');
+                // Opravené: Použijeme querySelector namiesto getElementById
+                const clockBox = document.querySelector('.clock-middle-container');
+                const weatherBox = document.querySelector('.main-weather-container');
+                
                 if (!resizer || !clockBox || !weatherBox) return;
             
                 let isDragging = false;
