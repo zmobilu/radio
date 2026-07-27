@@ -602,7 +602,7 @@
 			@media (orientation: landscape) {
 			    /* Hlavná pravá plocha - musí poskladať Hodiny a Počasie vedľa seba */
 				.main-content-area {
-			        width: 70% !important;
+			        width: 100% !important;
 			    }
 				/* 1. Hlavné rozloženie plochy */
 			    .placeholder-view {
@@ -611,7 +611,7 @@
 			        flex-wrap: nowrap !important;
 			        align-items: center !important;
 			        justify-content: space-between !important;
-			        padding: 1vh 1vw !important;
+			        padding: 2vh 4vw !important;
 			        box-sizing: border-box !important;
 			        width: 100% !important;
 			        height: 100% !important;
@@ -623,10 +623,9 @@
 			        height: 100% !important;
 			        display: flex !important;
 			        flex-direction: column !important;
-			        justify-content: space-between !important; /* Hodiny hore, dátum dole */
+			        justify-content: center !important;
 			        align-items: center !important;
-			        padding-top: 2vh !important;
-			        padding-bottom: 2vh !important;
+			        padding: 1vh 0 !important;
 			        box-sizing: border-box !important;
 			    }
 				
@@ -661,7 +660,7 @@
 				}
 			
 			    .big-clock-hours, .big-clock-minutes {
-			        letter-spacing: -6px !important;
+			        letter-spacing: -4px !important; /* bolo -6*/
 			    }
 			
 			    /* Dátum priamo ukotvený pod hodinami */
@@ -707,7 +706,7 @@
 				/* Pravý blok: POČASIE (20% celkovej šírky obrazovky / 29% z pravej časti) */
 			    /* --- PRAVÝ STĹPEC (POČASIE) --- */
 			    .main-weather-container {
-			        width: 30% !important;
+			        width: 32% !important;                /* Jasne vymedzená šírka pre pravú stranu */
 			        max-width: none !important;
 			        height: 100% !important;
 			        display: flex !important;
@@ -715,10 +714,7 @@
 			        justify-content: center !important;
 			        align-items: center !important;
 			        margin: 0 !important;
-					margin-top: auto !important;          /* Odstčí počasie nadol pod hodiny */
-			        margin-bottom: 2vh !important;
-			        width: 100% !important;
-			        padding-left: 0.5vw !important;
+			        padding-right: 2vw !important;       /* Posunie počasie ďalej od pravého okraja */
 			        box-sizing: border-box !important;
 			    }
 				/* Pocitový stĺpec (teplota + vlhkosť) pod hlavnou teplotou */
@@ -744,8 +740,8 @@
 			    }
 				.main-weather-icon-img {
 			        width: 6vw !important;  /* Prispôsob veľkosť ikony podľa potreby */
-			        height: auto !important;
-			        margin-bottom: -1vh !important; /* Jemné priblíženie k teplote */
+			        height: center !important;
+			        margin-bottom: 1 !important; /* Jemné priblíženie k teplote */
 			    }
 			
 			    .main-temp {
