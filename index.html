@@ -588,24 +588,28 @@
                 height: 100% !important;
             }
 
-            /* Stredný kontajner hodín a dátumu */
+            /* Stredný kontajner pre hodiny a dátum */
             .clock-middle-container {
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
                 justify-content: center !important;
-                width: 100% !important;
+                width: 68% !important;
+                height: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                box-sizing: border-box !important;
             }
             
+            /* Vrátenie pôvodného natiahnutia hodín s úpravou kotvy (origin) */
             body:not(.full-night-mode) .big-clock-time {
-                font-size: 16vw !important;
-                line-height: 1.0 !important;
+                font-size: 24vw !important;
+                line-height: 0.8 !important;
                 font-weight: 800 !important;
                 letter-spacing: -2px !important;
-                transform: none !important; /* Aby netlačil na dátum */
-                margin-top: 0vh !important;
+                transform: scaleY(1.6) !important;
+                transform-origin: center center !important;
+                margin-top: -3vh !important; /* Dvihne hodiny mierne nahor */
                 width: 100% !important;
                 display: flex !important;
                 justify-content: center !important;
@@ -616,9 +620,9 @@
                 line-height: 1 !important;
                 font-weight: 800 !important;
                 letter-spacing: -2px !important;
-                transform: scaleY(1.35) !important;
+                transform: scaleY(1.45) !important;
                 transform-origin: center center !important;
-                margin-top: 0 !important;
+                margin-top: -3vh !important; /* Dvihne hodiny mierne nahor */
                 width: 100% !important;
                 display: flex !important;
                 justify-content: center !important;
@@ -641,7 +645,7 @@
                 letter-spacing: 2px !important;
                 transform: scaleY(1.4) !important;
                 transform-origin: center center !important;
-                margin-top: 1.5vh !important;
+                margin-top: 5.5vh !important;
                 margin-bottom: 0vh !important;
             }
             
