@@ -85,6 +85,25 @@
             right: 15px !important;
             z-index: 999999 !important;
         }
+        /* --- TLAČIDLO PRE REŽIM ÚPRAV V NASTAVENIACH --- */
+            .edit-mode-btn {
+                background: #111 !important;
+                border: 1px solid #222 !important;
+                color: #666 !important;
+                padding: 8px 16px;
+                font-size: 14px;
+                font-weight: bold;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: color 0.2s, background 0.2s, border-color 0.2s;
+            }
+            
+            /* Aktívny stav s tvojou oranžovou (#ff9f0a) */
+            .edit-mode-btn.active {
+                color: #ff9f0a !important;
+                border-color: #ff9f0a !important;
+                background: #1a1a1a !important;
+            }
 
         /* --- HLAVNÁ ROZDELENÁ PLOCHA --- */
         .workspace-container { display: flex; flex: 1; width: 100vw; overflow: hidden; position: relative; }
@@ -1300,16 +1319,26 @@
             .workspace-resizer {
                 display: none; /* Na výšku je skrytý */
             }
-        /* V bežnom režime skryjeme deliaci pásik alebo zakážeme zmenu veľkosti */
+           /* V bežnom stave je deliaci pásik skrytý a neaktívny */
             #mainWorkspaceResizer {
-                display: none; /* Vypnuté v bežnom režime */
+                display: none !important;
+                pointer-events: none !important;
             }
             
-            /* Keď je zapnutý Edit Mode */
-            body.edit-mode #mainWorkspaceResizer {
-                display: flex; /* Deliaci pásik sa zobrazí len pri úpravách */
-                cursor: col-resize;
-            }
+            /* Len keď je aktívny Edit Mode NA ŠÍRKU, pásik sa zobrazí */
+            @media (orientation: landscape) {
+                body.edit-mode #mainWorkspaceResizer {
+                    display: block !important;
+                    pointer-events: auto !important;
+                    width: 12px;
+                    height: 100%;
+                    cursor: col-resize !important;
+                    position: relative;
+                    z-index: 999;
+                    margin: 0 4px;
+                    background: transparent;
+                    transition: background 0.2s;
+                }
             
             body.edit-mode .resizable-block {
                 resize: both;
@@ -1347,6 +1376,20 @@
                     height: 40px;
                     background: rgba(255, 255, 255, 0.3);
                     border-radius: 2px;
+                }
+                /* Zvýraznenie upraviteľných blokov pri zapnutom režime úprav */
+                body.edit-mode .clock-middle-container,
+                body.edit-mode .main-weather-container,
+                body.edit-mode .big-clock-date-wrapper {
+                    outline: 1px dashed #ff9f0a;
+                    outline-offset: -2px;
+                }
+                /* Zabezpečenie plynulého zväčšovania od stredu prvku */
+                .big-clock-time, 
+                .big-clock-date-wrapper, 
+                .main-weather-container {
+                    transform-origin: center center !important;
+                    transition: transform 0.1s ease-out;
                 }
             }
     </style>
@@ -1486,8 +1529,9 @@
                     </div>
                     
                     <div class="setting-item">
-                        <label for="editModeToggle">Režim úprav rozloženia (Edit Mode)</label>
-                        <input type="checkbox" id="editModeToggle" onchange="toggleEditMode(this.checked)">
+                       <button type="button" id="editModeToggleBtn" class="edit-mode-btn" onclick="toggleEditMode()">
+                            REŽIM ÚPRAV: VYPNUTÝ
+                       </button>
                     </div>
                 </div>
             </div>
@@ -2943,7 +2987,6 @@
     }
             function inicializujMainWorkspaceResizer() {
                 const resizer = document.getElementById('mainWorkspaceResizer');
-                // Opravené: Použijeme querySelector namiesto getElementById
                 const clockBox = document.querySelector('.clock-middle-container');
                 const weatherBox = document.querySelector('.main-weather-container');
                 
@@ -2951,15 +2994,15 @@
             
                 let isDragging = false;
             
-                // Načítanie uloženej šírky hodín (v percentách, predvolená je 68%)
+                // Načítanie uloženej šírky hodín (predvolená je 68%)
                 const savedClockWidth = localStorage.getItem('cfg_clock_width_pct');
                 if (savedClockWidth && window.innerWidth > window.innerHeight) {
                     aplikujPomer(parseFloat(savedClockWidth));
                 }
             
                 function aplikujPomer(clockPct) {
-                    // Bezpečnostný limit: Hodiny 40% až 80% šírky
-                    const clampedClock = Math.max(40, Math.min(clockPct, 80));
+                    // Bezpečnostný limit: Hodiny 35% až 80% šírky
+                    const clampedClock = Math.max(35, Math.min(clockPct, 80));
                     const weatherPct = 100 - clampedClock;
             
                     clockBox.style.width = clampedClock + '%';
@@ -2967,7 +3010,10 @@
                 }
             
                 function startDrag(e) {
-                    if (window.innerWidth <= window.innerHeight) return; // Neriešime na výšku
+                    if (window.innerWidth <= window.innerHeight) return;
+                    // Ak nie je zapnutý Edit Mode, posúvanie sa vôbec nespustí
+                    if (!document.body.classList.contains('edit-mode')) return;
+            
                     isDragging = true;
                     resizer.classList.add('is-dragging');
                     document.body.style.userSelect = 'none';
@@ -2975,10 +3021,15 @@
             
                 function doDrag(e) {
                     if (!isDragging) return;
+                    if (!document.body.classList.contains('edit-mode')) {
+                        stopDrag();
+                        return;
+                    }
+            
                     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                     const totalWidth = window.innerWidth;
                     const clockPct = (clientX / totalWidth) * 100;
-                    
+            
                     aplikujPomer(clockPct);
                 }
             
@@ -2988,11 +3039,75 @@
                     resizer.classList.remove('is-dragging');
                     document.body.style.userSelect = '';
             
-                    // Uloženie pomeru do pamäte
                     const finalPct = parseFloat(clockBox.style.width);
                     if (finalPct) {
                         localStorage.setItem('cfg_clock_width_pct', finalPct);
                     }
+                  function inicializujZmenuVelkostiBlokov() {
+                    // 1. Aplikácia uložených mierok pri načítaní stránky
+                    const savedClockScale = localStorage.getItem('cfg_clock_scale');
+                    const savedDateScale = localStorage.getItem('cfg_date_scale');
+                    const savedWeatherScale = localStorage.getItem('cfg_weather_scale');
+                
+                    const clockEl = document.querySelector('.big-clock-time');
+                    const dateEl = document.querySelector('.big-clock-date-wrapper');
+                    const weatherEl = document.querySelector('.main-weather-container');
+                
+                    if (savedClockScale && clockEl) {
+                        clockEl.style.transform = `scaleY(${savedClockScale})`;
+                    }
+                    if (savedDateScale && dateEl) {
+                        dateEl.style.transform = `scaleY(${savedDateScale})`;
+                    }
+                    if (savedWeatherScale && weatherEl) {
+                        weatherEl.style.transform = `scale(${savedWeatherScale})`;
+                    }
+                
+                    // 2. Pomocná funkcia pre obsluhu zmeny mierky kolieskom
+                    function pridajWheelZmenu(element, storageKey, min, max, isScaleYOnly = true) {
+                        if (!element) return;
+                
+                        element.addEventListener('wheel', (e) => {
+                            // Kontrola: funguje IBA v Edit Mode
+                            if (!document.body.classList.contains('edit-mode')) return;
+                            e.preventDefault();
+                
+                            // Zistenie aktuálnej hodnoty z inline štýlu alebo predvolenej hodnoty
+                            let currentScale = parseFloat(localStorage.getItem(storageKey) || (isScaleYOnly ? "1.8" : "1.0"));
+                            
+                            // Určenie smeru otáčania (nahor = zväčšiť, nadol = zmenšiť)
+                            const delta = e.deltaY < 0 ? 0.05 : -0.05;
+                            currentScale += delta;
+                            
+                            // Orezanie na bezpečné limity
+                            currentScale = Math.max(min, Math.min(currentScale, max));
+                            currentScale = parseFloat(currentScale.toFixed(2));
+                
+                            // Aplikácia štýlu
+                            if (isScaleYOnly) {
+                                element.style.transform = `scaleY(${currentScale})`;
+                            } else {
+                                element.style.transform = `scale(${currentScale})`;
+                            }
+                
+                            // Uloženie nastavenia
+                            localStorage.setItem(storageKey, currentScale);
+                        }, { passive: false });
+                    }
+                
+                    // 3. Registrácia prvkov pre zmenu veľkosti
+                    // Hodiny: výškový pomer scaleY (min: 1.0, max: 2.5)
+                    pridajWheelZmenu(clockEl, 'cfg_clock_scale', 1.0, 2.5, true);
+                
+                    // Dátum a meniny: výškový pomer scaleY (min: 0.8, max: 2.0)
+                    pridajWheelZmenu(dateEl, 'cfg_date_scale', 0.8, 2.0, true);
+                
+                    // Hlavné počasie: celkové meradlo scale (min: 0.7, max: 1.4)
+                    pridajWheelZmenu(weatherEl, 'cfg_weather_scale', 0.7, 1.4, false);
+                }
+                
+                // Spustenie po načítaní DOM
+                document.addEventListener('DOMContentLoaded', inicializujZmenuVelkostiBlokov);
                 }
             
                 resizer.addEventListener('mousedown', startDrag);
@@ -3015,16 +3130,35 @@
             }
         });
         
-        function toggleEditMode(enabled) {
-            if (enabled) {
-                document.body.classList.add('edit-mode');
-            } else {
-                document.body.classList.remove('edit-mode');
-                // Pri vypnutí uložíme aktuálne rozmery blokov do localStorage
-                ulozRozmeryBlokov();
+        function toggleEditMode() {
+            const btn = document.getElementById('editModeToggleBtn');
+            const isEditMode = document.body.classList.toggle('edit-mode');
+        
+            if (btn) {
+                if (isEditMode) {
+                    btn.classList.add('active');
+                    btn.innerText = 'REŽIM ÚPRAV: ZAPNUTÝ';
+                } else {
+                    btn.classList.remove('active');
+                    btn.innerText = 'REŽIM ÚPRAV: VYPNUTÝ';
+                }
             }
-            localStorage.setItem('editModeActive', enabled);
+        
+            localStorage.setItem('editModeActive', isEditMode);
         }
+        
+        // Načítanie stavu pri spustení
+        document.addEventListener('DOMContentLoaded', () => {
+            const editModeSaved = localStorage.getItem('editModeActive') === 'true';
+            if (editModeSaved) {
+                document.body.classList.add('edit-mode');
+                const btn = document.getElementById('editModeToggleBtn');
+                if (btn) {
+                    btn.classList.add('active');
+                    btn.innerText = 'REŽIM ÚPRAV: ZAPNUTÝ';
+                }
+            }
+        });
         
         function ulozRozmeryBlokov() {
             const clockBox = document.querySelector('.clock-middle-container');
