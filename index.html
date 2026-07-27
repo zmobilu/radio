@@ -1300,6 +1300,22 @@
             .workspace-resizer {
                 display: none; /* Na výšku je skrytý */
             }
+        /* V bežnom režime skryjeme deliaci pásik alebo zakážeme zmenu veľkosti */
+            #mainWorkspaceResizer {
+                display: none; /* Vypnuté v bežnom režime */
+            }
+            
+            /* Keď je zapnutý Edit Mode */
+            body.edit-mode #mainWorkspaceResizer {
+                display: flex; /* Deliaci pásik sa zobrazí len pri úpravách */
+                cursor: col-resize;
+            }
+            
+            body.edit-mode .resizable-block {
+                resize: both;
+                overflow: auto;
+                border: 1px dashed #4CAF50; /* Vizualizácia, že blok sa dá upravovať */
+            }
             
             @media (orientation: landscape) {
                 .workspace-resizer {
@@ -1467,6 +1483,11 @@
                     <div class="settings-night-row">
                         <i class="fa-solid fa-circle-info label-icon" title="Sprievodca"></i>
                         <button onclick="spustiTourZnova(); event.stopPropagation();" style="width: 100%;">▶ Spustiť sprievodcu (Tour)</button>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label for="editModeToggle">Režim úprav rozloženia (Edit Mode)</label>
+                        <input type="checkbox" id="editModeToggle" onchange="toggleEditMode(this.checked)">
                     </div>
                 </div>
             </div>
@@ -2984,7 +3005,39 @@
             }
             
             document.addEventListener('DOMContentLoaded', inicializujMainWorkspaceResizer);
-
+    // Načítanie uloženého stavu pri štarte
+        document.addEventListener('DOMContentLoaded', () => {
+            const editModeSaved = localStorage.getItem('editModeActive') === 'true';
+            const toggle = document.getElementById('editModeToggle');
+            if (toggle) {
+                toggle.checked = editModeSaved;
+                toggleEditMode(editModeSaved);
+            }
+        });
+        
+        function toggleEditMode(enabled) {
+            if (enabled) {
+                document.body.classList.add('edit-mode');
+            } else {
+                document.body.classList.remove('edit-mode');
+                // Pri vypnutí uložíme aktuálne rozmery blokov do localStorage
+                ulozRozmeryBlokov();
+            }
+            localStorage.setItem('editModeActive', enabled);
+        }
+        
+        function ulozRozmeryBlokov() {
+            const clockBox = document.querySelector('.clock-middle-container');
+            const weatherBox = document.querySelector('.main-weather-container');
+        
+            if (clockBox && weatherBox) {
+                const layoutData = {
+                    clockWidth: clockBox.style.width,
+                    weatherWidth: weatherBox.style.width
+                };
+                localStorage.setItem('dashboardLayout', JSON.stringify(layoutData));
+            }
+        }
         
         function skontrolujAutoStartRadiaPoReloadu() {
             const chcelAutoStart = localStorage.getItem('kiosk_autorestart_radio');
