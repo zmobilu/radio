@@ -417,7 +417,10 @@
         /* Posun celej mriežky nastavení doprava vedľa 280px panela rádií */
         .settings-grid-view {
             display: none; 
-            width: 100%; 
+            position: absolute;
+            top: 0;
+            left: 280px;
+            width: calc(100% - 280px); 
             height: 100%; 
             overflow-y: auto;
             padding: 10px; 
@@ -427,6 +430,7 @@
             align-content: start; 
             background: #090909; 
             padding-right: calc(10px + env(safe-area-inset-right));
+            z-index: 10000;
         }
                                                     
         .cfg-mini-card {
@@ -1979,14 +1983,14 @@
         function renderSettingsGrid() {
             const grid = document.getElementById('settingsGridView');
             if(!grid) return;
-            
+        
             const nightPanel = grid.querySelector('.settings-night-panel');
             while (grid.lastChild && grid.lastChild !== nightPanel) {
                 grid.removeChild(grid.lastChild);
             }
-            
+        
             let currentCategory = "";
-
+        
             DATABASE.forEach(item => {
                 if (item.category !== currentCategory) {
                     currentCategory = item.category;
@@ -1995,15 +1999,15 @@
                     separator.textContent = currentCategory;
                     grid.appendChild(separator);
                 }
-
+        
                 const card = document.createElement('div');
                 card.className = "cfg-mini-card";
-                
+        
                 const isSelected = slotFavorites.includes(item.id);
                 if (isSelected) card.classList.add("selected");
-
+        
                 card.onclick = (e) => { handleChannelSelectionToggle(item.id); e.stopPropagation(); };
-
+        
                 if (item.img) {
                     card.innerHTML = `<img src="${item.img}"><span>${item.name}</span>`;
                 } else if (item.icon) {
@@ -2011,7 +2015,7 @@
                 }
                 grid.appendChild(card);
             });
-            
+        
             inicializujPlochuNastaveni();
             aktualizujTlacidloMesta(); 
         }
