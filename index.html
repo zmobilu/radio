@@ -115,57 +115,74 @@
         .main-content-area { width: 70%; background: #000; position: relative; overflow: hidden; }
         
         /* --- PROFI DIZAJN EXTRA VÝRAZNÝCH HODÍN A POČASIA --- */
-        .placeholder-view {
-            display: flex; 
-            width: 100%; 
-            height: 100%; 
-            flex-direction: column;
-            align-items: center; 
-            justify-content: space-between;
-            gap: 2vh;                /* PRIDANÉ: Automatická medzera medzi hodinami, dátumom a počasím */
-            background: #000; 
-            box-sizing: border-box;
-            padding: 2vh 3vw; 
-            padding-right: calc(3vw + env(safe-area-inset-right));
-            padding-bottom: 1vh; /* Zmenší čiernu dieru na spodku stiahnutím obsahu nižšie */
-            overflow: hidden;
-        }
-        
-        /* Hodiny na celú šírku pravého bloku */
-        .big-clock-time {
-            /* Zvýšený horný limit zo 140px na 240px a upravená ideálna veľkosť na 16vw a 480 pre este vacsie zobrazenie*/
-            font-size: clamp(60px, 16vw, 480px); 
-            line-height: 1.1;
-            font-weight: 800;
-            display: flex;
-            letter-spacing: 30px;               /* Výraznejšie natiahnutie medzier medzi znakmi do strán */
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            flex: 0 1 auto; /* Umožní hodinám flexibilne sa prispôsobiť */
-            transform: scaleY(1.8);
-            transform-origin: center center;
-            /* ZMENA: Stiahnutie hodín nižšie od horného okraja */
-            margin-top: 3vh !important;          /* Odstránená horná medzera */
-            /* margin-top: 2vh;  ZMENA: 4vh povodne Odstránená horná medzera pre pritiahnutie k hornému okraju */
-            margin-bottom: 0vh;
-        }
-        .big-clock-date-wrapper {
-            display: flex;
-            flex-wrap: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            gap: 5px 12px;
-             /* ZMENA: Zvýšený spodný limit na 18px, ideálna veľkosť na 3.5vh a strop na 32px */
-            font-size: clamp(18px, 3.0vh, 32px); 
-            /* PRIDANÉ: Zvýraznenie hrúbky písma, aby nebol riadok taký tenký */
-            font-weight: 600; 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-            width: 100%;
-            flex: 0 0 auto;
-            margin: 8vh 0 0vh 0 !important;  /*Poradie: HORE (4vh) | VPRAVO (0) | DOLE (2vh) | VĽAVO (0) */
-        }        
+        /* --- ÚPRAVA PRE HLAVNÝ CONTAINER A OBSAH --- */
+		.placeholder-view {
+		    display: flex;
+		    width: 100%;
+		    height: 100%;
+		    flex-direction: column;
+		    align-items: center;
+		    justify-content: space-between !important; /* Rozloží hodiny a počasie rovnomerne */
+		    background: #000;
+		    box-sizing: border-box;
+		    padding: 3vh 3vw 2vh 3vw;
+		    overflow: hidden;
+		}
+		
+		.big-clock-time {
+		    font-size: clamp(60px, 16vw, 480px);
+		    line-height: 1.1;
+		    font-weight: 800;
+		    display: flex;
+		    letter-spacing: 20px;
+		    justify-content: center;
+		    align-items: center;
+		    width: 100%;
+		    margin-top: 1vh !important; /* Vrátený prirodzený horný odstup */
+		    margin-bottom: 0vh;
+		}
+		
+		.big-clock-date-wrapper {
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    text-align: center;
+		    gap: 5px 12px;
+		    font-size: clamp(18px, 3.0vh, 32px);
+		    font-weight: 600;
+		    width: 100%;
+		    margin: 2vh 0 0 0 !important; /* Miernejší odstup od hodin */
+		}
+		
+		/* --- PANEL RÁDIÍ AKO PREKRYTIE (OVERLAY) - OPRAVA ROZLOŽENIA --- */
+		.favorites-sidebar {
+		    position: absolute !important;
+		    top: 0;
+		    left: 0;
+		    width: 280px !important; /* Šírka pre 2 stĺpce rádií */
+		    height: 100vh !important;
+		    z-index: 99999 !important;
+		    background: rgba(5, 5, 5, 0.95) !important;
+		    border-right: 1px solid #222;
+		    box-shadow: 10px 0 25px rgba(0,0,0,0.8);
+		    
+		    /* Mriežka pre 2 stĺpce x 3 riadky s možnosťou scrollovania */
+		    display: grid !important;
+		    grid-template-columns: 1fr 1fr !important;
+		    grid-template-rows: repeat(3, minmax(100px, 1fr)) !important;
+		    gap: 10px !important;
+		    padding: 60px 10px 20px 10px !important; /* Horný padding vytvára miesto pod spúšťacou lištou */
+		    box-sizing: border-box !important;
+		    overflow-y: auto !important;
+		
+		    /* Plynulé zasúvanie doľava mimo obrazovku */
+		    transform: translateX(-100%);
+		    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+		}
+		
+		.favorites-sidebar.open {
+		    transform: translateX(0) !important;
+		}        
         .big-clock-hours { color: #fff; }
         .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
         .big-clock-city { color: #ff9f0a; font-weight: bold; letter-spacing: 2px; }
@@ -625,7 +642,7 @@
 			        flex-direction: column !important;
 			        justify-content: center !important;
 			        align-items: center !important;
-			        padding: 1vh 0 !important;
+			        padding: 0 !important;
 			        box-sizing: border-box !important;
 			    }
 				
@@ -633,13 +650,13 @@
 			    /* Hodiny - štíhle a vysoké presne ako v návrhu */
 			    /* 1. DENNÉ HODINY (Režim na šírku - zväčšené podľa potreby) */
 				body:not(.full-night-mode) .big-clock-time {
-				    font-size: 22vw !important;           /* Zväčšená základná veľkosť pre deň */
-				    line-height: 0.75 !important;
+				    font-size: 20vw !important;           /* Zväčšená základná veľkosť pre deň */
+				    line-height: 0.0 !important;
 				    font-weight: 800 !important;
 				    letter-spacing: -2px !important;
-				    transform: scaleY(2.0) !important;   /* Natiahnutie denno hodín do výšky */
+				    transform: scaleY(1.6) !important;   /* Natiahnutie denno hodín do výšky */
 				    transform-origin: center top !important;
-				    margin-top: 1vh !important;
+				    margin-top: 0vh !important;
 				    width: 100% !important;
 				    display: flex !important;
 				    justify-content: center !important;
@@ -681,8 +698,8 @@
 			        transform-origin: center center !important;
 			        
 			        /* Odstupy pre presné usadenie */
-			        margin-top: -1.5vh !important;        /* Pritiahnutie vyššie k natiahnutým hodinám */
-			        margin-bottom: 1vh !important;
+			        margin-top: 1.5vh !important;        /* Pritiahnutie vyššie k natiahnutým hodinám */
+			        margin-bottom: 0vh !important;
 			    }
 				
 				#bigClockCity {
