@@ -177,7 +177,7 @@
         
         /* Mriežka nastavení vynútená natvrdo do ľavého horného rohu za panel rádií */
         #settingsGridView.settings-grid-view {
-            display: none;
+            display: grid !important; /* Necháme grid trvalo zapnutý pre správne rozloženie */
             position: absolute !important;
             top: 0 !important;
             bottom: 0 !important;
@@ -191,6 +191,19 @@
             box-sizing: border-box !important;
             background: #090909 !important;
             z-index: 999999 !important;
+        
+            /* Plynulý efekt (Smooth effect) */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(15px); /* Jemný posun doprava v skrytom stave */
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.3s;
+        }
+        
+        /* Trieda pre viditeľný stav, ktorú zapína JavaScript */
+        #settingsGridView.settings-grid-view.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
         }
         
         /* --- HLAVNÝ CONTAINER A OBSAH --- */
@@ -457,10 +470,10 @@
         }
         .cfg-mini-card img { width: 60%; height: 60%; object-fit: contain; }
         .cfg-mini-card i { font-size: 22px; }
-        .cfg-mini-card span { font-size: 9px; text-transform: uppercase; font-weight: 600; text-align: center; color: #888; margin-top: 3px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cfg-mini-card span { font-size: 13px; text-transform: uppercase; font-weight: 600; text-align: center; color: #888; margin-top: 3px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .cfg-mini-card.selected { border: 3px solid #ff9f0a !important; background: #1a1a1a; }
         .cfg-mini-card.selected span { color: #ff9f0a; }
-        .settings-label-separator { grid-column: 1 / -1; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #555; margin: 12px 0 2px 4px; font-weight: 700; border-bottom: 1px solid #1a1a1a; padding-bottom: 3px; }
+        .settings-label-separator { grid-column: 1 / -1; font-size: 16px; text-transform: uppercase; letter-spacing: 1.5px; color: #555; margin: 12px 0 2px 4px; font-weight: 700; border-bottom: 1px solid #1a1a1a; padding-bottom: 3px; }
     
         #nightBottomInfo { display: none; }
 
@@ -1953,18 +1966,16 @@
         }
 
         function resetSettingsTimer() {
-            if (!isSettingsModeActive) return;
-            clearTimeout(settingsTimeout);
-            settingsTimeout = setTimeout(() => {
-                if (isSettingsModeActive) {
-                    toggleSettingsMode();
-                } else {
-                    // Poistka: ak by nastavenia už neboli aktívne, zatvorí vysunutý panel
-                    const favSidebar = document.getElementById('favSidebarContainer');
-                    if (favSidebar) favSidebar.classList.remove('open');
-                }
-            }, 10000);
+    if (settingsTimeout) clearTimeout(settingsTimeout);
+    
+    settingsTimeout = setTimeout(() => {
+        if (isSettingsModeActive) {
+            // Pri vypršaní času skryjeme panel
+            document.getElementById('settingsGridView').classList.remove('active');
+            isSettingsModeActive = false;
         }
+    }, 40000); // Čas zobrazenia nastavení (napr. 40 sekúnd)
+}
 
         function renderSidebarFavorites() {
             const container = document.getElementById('favSidebarContainer');
@@ -2092,7 +2103,7 @@
                 btn.classList.add('active');
                 if (placeholder) placeholder.style.display = 'none';
                 if (weatherView) weatherView.style.display = 'none';
-                if (gridView) gridView.style.display = 'grid';
+                if (gridView) gridView.classList.add('active');
                 
                 // Vysunie panel s rádiami súčasne s otváraním nastavení
                 if (favSidebar) favSidebar.classList.add('open');
@@ -2103,7 +2114,7 @@
                 clearTimeout(settingsTimeout);
                 btn.classList.remove('active');
                 if (placeholder) placeholder.style.display = 'flex';
-                if (gridView) gridView.style.display = 'none';
+                if (gridView) gridView.classList.remove('active');
                 if (weatherView) weatherView.style.display = 'none';
                 
                 // Zasunie panel s rádiami pri zatvorení nastavení
