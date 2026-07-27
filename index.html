@@ -688,27 +688,14 @@
                 box-sizing: border-box !important;
             }
             
-            body:not(.full-night-mode) .big-clock-time {
-                font-size: 28vw !important;
-                line-height: 0.8 !important;
-                font-weight: 800 !important;
-                letter-spacing: -2px !important;
-                transform: scaleY(1.8) !important;
-                transform-origin: center center !important;
-                margin-top: 0vh !important;
-                width: 100% !important;
-                display: flex !important;
-                justify-content: center !important;
-            }
-            
+            body:not(.full-night-mode) .big-clock-time,
             body.full-night-mode .big-clock-time {
-                font-size: 28vw !important;
-                line-height: 1 !important;
+                font-size: 20vw !important;
+                line-height: 0.9 !important;
                 font-weight: 800 !important;
                 letter-spacing: -2px !important;
-                transform: scaleY(1.75) !important;
-                transform-origin: center center !important;
-                margin-top: -3vh !important;
+                transform: scale(1) !important; /* Odstránené scaleY */
+                margin-top: 0 !important;
                 width: 100% !important;
                 display: flex !important;
                 justify-content: center !important;
@@ -718,22 +705,13 @@
                 letter-spacing: 6px !important;
             }
         
+            /* Zároveň vyčistíme obrovský margin z dátumu */
             .big-clock-date-wrapper {
-                position: static !important;
-                width: 100% !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-                gap: 12px !important;
-                white-space: nowrap !important;
-                font-size: 2.8vw !important;
-                font-weight: 800 !important;
-                letter-spacing: 6px !important;
-                transform: scaleY(1.4) !important;
-                transform-origin: center center !important;
-                margin-top: 25vh !important;
-                margin-bottom: -20vh !important;
+                margin-top: 10px !important;
+                margin-bottom: 0 !important;
+                transform: scale(1) !important;
             }
+        }
             
             #bigClockCity {
                 font-size: 2.5vw !important;
@@ -1037,16 +1015,11 @@
                 box-sizing: border-box;
                 gap: 0; 
             }
-            .big-clock-time { 
-                font-size: 26vmin; 
-                line-height: 0.8; 
-                transform: scaleY(1.60) !important; 
-                transform-origin: center center !important;
-                margin-top: 8vh !important; 
-                margin-bottom: 0 !important;
-                width: 100%; 
-                display: flex;
-                justify-content: center; 
+            .big-clock-time {
+                font-size: 24vmin !important;
+                line-height: 0.9 !important;
+                transform: scale(1) !important; /* Pôvodne tu bolo scaleY(1.60) */
+                margin-top: 2vh !important;
             }
             .big-clock-date-wrapper { 
                 margin-top: 5vh !important; 
@@ -1287,13 +1260,12 @@
             display: block !important;
             pointer-events: auto !important;
             width: 100%;
-            height: 12px;
+            height: 14px;
             cursor: row-resize !important;
             position: relative;
-            z-index: 999;
-            margin: 4px 0;
+            z-index: 999 !important;
+            margin: 6px 0 !important;
             background: transparent;
-            transition: background 0.2s;
         }
         
         body.edit-mode #clockDateResizer:hover,
@@ -3027,52 +2999,56 @@
         }
             function inicializujClockDateResizer() {
                 const resizer = document.getElementById('clockDateResizer');
-                const clockEl = document.querySelector('.big-clock-time');
                 const dateEl = document.querySelector('.big-clock-date-wrapper');
-    
-                if (!resizer || !clockEl || !dateEl) return;
-    
+            
+                if (!resizer || !dateEl) return;
+            
                 let isDragging = false;
-    
+                let startY = 0;
+                let startMargin = 0;
+            
                 const savedMargin = localStorage.getItem('cfg_clock_date_gap');
-                if (savedMargin) {
+                if (savedMargin !== null) {
                     dateEl.style.marginTop = savedMargin + 'px';
                 }
-    
+            
                 function startDrag(e) {
                     if (!document.body.classList.contains('edit-mode')) return;
                     isDragging = true;
                     resizer.classList.add('is-dragging');
                     document.body.style.userSelect = 'none';
+            
+                    startY = e.touches ? e.touches[0].clientY : e.clientY;
+                    startMargin = parseInt(window.getComputedStyle(dateEl).marginTop) || 0;
                 }
-    
+            
                 function doDrag(e) {
                     if (!isDragging || !document.body.classList.contains('edit-mode')) return;
-    
-                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                    const clockRect = clockEl.getBoundingClientRect();
-                    
-                    let newGap = clientY - clockRect.bottom;
-                    newGap = Math.max(-20, Math.min(newGap, 120));
-    
-                    dateEl.style.marginTop = newGap + 'px';
+            
+                    const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+                    const deltaY = currentY - startY;
+            
+                    let newMargin = startMargin + deltaY;
+                    newMargin = Math.max(-30, Math.min(newMargin, 150));
+            
+                    dateEl.style.marginTop = newMargin + 'px';
                 }
-    
+            
                 function stopDrag() {
                     if (!isDragging) return;
                     isDragging = false;
                     resizer.classList.remove('is-dragging');
                     document.body.style.userSelect = '';
-    
+            
                     localStorage.setItem('cfg_clock_date_gap', parseInt(dateEl.style.marginTop || '0'));
                 }
-    
+            
                 resizer.addEventListener('mousedown', startDrag);
                 window.addEventListener('mousemove', doDrag);
                 window.addEventListener('mouseup', stopDrag);
-    
+            
                 resizer.addEventListener('touchstart', startDrag, { passive: true });
-                window.addEventListener('touchmove', doDrag, { passive: true });
+                window.addEventListener('touchmove', doDrag, { passive: false });
                 window.addEventListener('touchend', stopDrag);
             }
 
