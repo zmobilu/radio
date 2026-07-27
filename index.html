@@ -1296,6 +1296,43 @@
             box-sizing: border-box;
             transition: height 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
+            /* --- DELIACI PÁSIK MEDZI HODINAMI A POČASÍM --- */
+            .workspace-resizer {
+                display: none; /* Na výšku je skrytý */
+            }
+            
+            @media (orientation: landscape) {
+                .workspace-resizer {
+                    display: block !important;
+                    width: 12px;
+                    height: 100%;
+                    cursor: col-resize !important;
+                    position: relative;
+                    z-index: 999;
+                    margin: 0 4px;
+                    background: transparent;
+                    transition: background 0.2s;
+                }
+            
+                .workspace-resizer:hover,
+                .workspace-resizer.is-dragging {
+                    background: rgba(255, 159, 10, 0.4);
+                    border-radius: 6px;
+                }
+            
+                /* Rukoväť v strede pásika */
+                .workspace-resizer::after {
+                    content: "";
+                    position: absolute;
+                    top: 50%;
+                    left: 5px;
+                    transform: translateY(-50%);
+                    width: 2px;
+                    height: 40px;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 2px;
+                }
+            }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
@@ -1334,6 +1371,9 @@
                 </div>
 
                 <div id="player-now-playing" style="color: #fff; text-align: center;"></div>
+                
+                <!-- DELIACI PÁSIK MEDZI HODINAMI A POČASÍM -->
+                <div id="mainWorkspaceResizer" class="workspace-resizer"></div>
                 
                 <div class="main-weather-container">
                     <div class="weather-left-side" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
@@ -2879,7 +2919,70 @@
             if (jeCasNaAktualizaciu && poslednaNocnaKontrolaDen !== aktualnyDen) {
                 await spravAktualizaciu();
             }
-        }
+    }
+            function inicializujMainWorkspaceResizer() {
+                const resizer = document.getElementById('mainWorkspaceResizer');
+                const clockBox = document.getElementById('clockContainer');
+                const weatherBox = document.getElementById('weatherContainer');
+                if (!resizer || !clockBox || !weatherBox) return;
+            
+                let isDragging = false;
+            
+                // Načítanie uloženej šírky hodín (v percentách, predvolená je 68%)
+                const savedClockWidth = localStorage.getItem('cfg_clock_width_pct');
+                if (savedClockWidth && window.innerWidth > window.innerHeight) {
+                    aplikujPomer(parseFloat(savedClockWidth));
+                }
+            
+                function aplikujPomer(clockPct) {
+                    // Bezpečnostný limit: Hodiny 40% až 80% šírky
+                    const clampedClock = Math.max(40, Math.min(clockPct, 80));
+                    const weatherPct = 100 - clampedClock;
+            
+                    clockBox.style.width = clampedClock + '%';
+                    weatherBox.style.width = weatherPct + '%';
+                }
+            
+                function startDrag(e) {
+                    if (window.innerWidth <= window.innerHeight) return; // Neriešime na výšku
+                    isDragging = true;
+                    resizer.classList.add('is-dragging');
+                    document.body.style.userSelect = 'none';
+                }
+            
+                function doDrag(e) {
+                    if (!isDragging) return;
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const totalWidth = window.innerWidth;
+                    const clockPct = (clientX / totalWidth) * 100;
+                    
+                    aplikujPomer(clockPct);
+                }
+            
+                function stopDrag() {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    resizer.classList.remove('is-dragging');
+                    document.body.style.userSelect = '';
+            
+                    // Uloženie pomeru do pamäte
+                    const finalPct = parseFloat(clockBox.style.width);
+                    if (finalPct) {
+                        localStorage.setItem('cfg_clock_width_pct', finalPct);
+                    }
+                }
+            
+                resizer.addEventListener('mousedown', startDrag);
+                window.addEventListener('mousemove', doDrag);
+                window.addEventListener('mouseup', stopDrag);
+            
+                resizer.addEventListener('touchstart', startDrag, { passive: true });
+                window.addEventListener('touchmove', doDrag, { passive: true });
+                window.addEventListener('touchend', stopDrag);
+            }
+            
+            document.addEventListener('DOMContentLoaded', inicializujMainWorkspaceResizer);
+
         
         function skontrolujAutoStartRadiaPoReloadu() {
             const chcelAutoStart = localStorage.getItem('kiosk_autorestart_radio');
