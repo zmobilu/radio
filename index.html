@@ -247,20 +247,29 @@
             overflow: hidden;
         }
         
-        /* Veľké hodiny */
+        /* Samotné hodiny */
         .big-clock-time {
             font-size: var(--clock-font-size, 140px) !important;
-            line-height: 1.0 !important;
+            line-height: 0.9 !important; /* Mierne znížený line-height odstrihne prázdne okraje nad/pod číslami */
             font-weight: 800;
             display: flex;
-            letter-spacing: 5px;
+            letter-spacing: -2px;
             justify-content: center;
             align-items: center;
             width: 100%;
             margin: 0 !important;
         }
         
-        /* Riadok s dátumom a meninami */
+        /* Obal pre dátum s tlačidlami */
+        .date-row-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: var(--clock-date-gap, 15px); /* Dynamická medzera medzi hodinami a dátumom */
+        }
+        
         .big-clock-date-wrapper {
             display: flex !important;
             justify-content: center;
@@ -270,8 +279,9 @@
             font-size: var(--date-font-size, 24px) !important;
             font-weight: 600;
             width: 100%;
-            margin-top: var(--clock-date-gap, 15px); 
             position: relative !important;
+            /* Odstránime margin-top odtiaľto, prenáša sa na .date-row-container */
+            margin-top: 0 !important; 
         }
         
         .big-clock-hours { color: #fff; }
@@ -681,6 +691,7 @@
                 height: 100% !important;
             }
 
+            /* Stredný stĺpec – usporiada hodiny, resizer a dátum pod seba */
             .clock-middle-container {
                 display: flex !important;
                 flex-direction: column !important;
@@ -691,6 +702,17 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 box-sizing: border-box !important;
+            }
+            
+            /* Obal pre hodiny – zamedzí pretekaniu číslic */
+            .clock-row-container {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                /* Zabezpečí, že hodiny nepustia obsah cez svoju spodnú hranicu */
+                flex: 0 0 auto; 
             }
             
             body:not(.full-night-mode) .big-clock-time,
