@@ -702,23 +702,26 @@
                 line-height: 0.9 !important;
                 font-weight: 800 !important;
                 letter-spacing: -2px !important;
-                transform: scale(1) !important; /* Odstránené scaleY */
                 margin-top: 0 !important;
                 width: 100% !important;
                 display: flex !important;
                 justify-content: center !important;
+                transform-origin: center center !important;
+                transition: transform 0.1s ease-out;
+            }
+            
+            .big-clock-date-wrapper {
+                margin-top: 10px !important;
+                margin-bottom: 0 !important;
+                display: inline-block !important;
+                transform-origin: center center !important;
+                transition: transform 0.1s ease-out;
             }
         
             .big-clock-hours, .big-clock-minutes {
                 letter-spacing: 6px !important;
             }
         
-            /* Zároveň vyčistíme obrovský margin z dátumu */
-            .big-clock-date-wrapper {
-                margin-top: 10px !important;
-                margin-bottom: 0 !important;
-                transform: scale(1) !important;
-            }
         }
             
             #bigClockCity {
@@ -1028,7 +1031,7 @@
             .big-clock-time {
                 font-size: 24vmin !important;
                 line-height: 0.9 !important;
-                transform: scale(1) !important; /* Pôvodne tu bolo scaleY(1.60) */
+                /* transform: scale(1) !important; /* Pôvodne tu bolo scaleY(1.60) */
                 margin-top: 2vh !important;
             }
             .big-clock-date-wrapper { 
@@ -3069,10 +3072,11 @@
             const dateEl = document.querySelector('.big-clock-date-wrapper');
             const weatherEl = document.querySelector('.main-weather-container');
         
-            // Načítanie a aplikovanie uložených hodnôt
+            // Načítanie a aplikovanie uložených hodnôt so zachovaním origin bodu
             const applyScale = (el, key) => {
                 if (!el) return;
                 const val = localStorage.getItem(key) || "1.0";
+                el.style.transformOrigin = "center center";
                 el.style.transform = `scale(${val})`;
             };
         
@@ -3089,9 +3093,12 @@
                     e.preventDefault();
         
                     let currentScale = parseFloat(localStorage.getItem(storageKey) || "1.0");
-                    const delta = e.deltaY < 0 ? 0.05 : -0.05;
-                    currentScale = Math.max(min, Math.min(currentScale + delta, max));
-                    currentScale = parseFloat(currentScale.toFixed(2));
+                    currentScale += delta;
+                    currentScale = Math.min(Math.max(currentScale, 0.5), 2.5);
+                    
+                    element.style.transformOrigin = "center center";
+                    element.style.transform = `scale(${currentScale})`;
+                    localStorage.setItem(storageKey, currentScale.toFixed(2));
         
                     element.style.transform = `scale(${currentScale})`;
                     localStorage.setItem(storageKey, currentScale);
