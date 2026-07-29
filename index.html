@@ -249,7 +249,7 @@
         
         /* Veľké hodiny */
         .big-clock-time {
-            font-size: clamp(60px, 16vw, 480px);
+            font-size: var(--clock-font-size, 140px) !important;
             line-height: 1.0 !important;
             font-weight: 800;
             display: flex;
@@ -267,11 +267,10 @@
             align-items: center;
             text-align: center;
             gap: 8px 12px;
-            font-size: clamp(16px, 2.8vh, 28px);
+            font-size: var(--date-font-size, 24px) !important;
             font-weight: 600;
             width: 100%;
-            /* Zrušenie !important blokovania marginu */
-            margin-top: var(--clock-gap, 15px); 
+            margin-top: var(--clock-date-gap, 15px); 
             position: relative !important;
         }
         
@@ -696,7 +695,7 @@
             
             body:not(.full-night-mode) .big-clock-time,
             body.full-night-mode .big-clock-time {
-                font-size: 20vw !important;
+                /* Odtiaľto sme odstránili pevný font-size: 20vw, aby hodiny počúvali tlačidlá +/- */
                 line-height: 0.9 !important;
                 font-weight: 800 !important;
                 letter-spacing: -2px !important;
@@ -708,8 +707,7 @@
                 transition: transform 0.1s ease-out;
             }
             
-            .big-clock-date-wrapper {
-                /* Umožní JavaScriptu meniť margin-top pomocou premennej alebo inline štýlu */
+            big-clock-date-wrapper {
                 margin-top: var(--clock-date-gap, 10px);
                 margin-bottom: 0 !important;
                 display: inline-block !important;
