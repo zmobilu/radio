@@ -778,12 +778,12 @@
             .main-weather-icon-img {
                 width: 8vw !important;
                 height: center !important;
-                margin-bottom: 1 !important;
+                margin-bottom: 1vh !important;
             }
         
             .main-temp {
                 font-size: 8vw !important;
-                text-align: center !important;
+                text-align: auto !important;
                 line-height: 1 !important;
             }
         
@@ -2612,8 +2612,7 @@
 
         async function sledujStreamMetadat(streamUrl) {
             const textElement = document.getElementById("player-now-playing");
-            // Príklad v rámci funkcie pri nájdení skladby:
-            textElement.innerText = (artist || song) ? `${artist} - ${song}` : "";
+            if (textElement) textElement.innerText = "";
             
             if (metadataController) {
                 metadataController.abort();
