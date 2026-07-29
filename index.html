@@ -270,8 +270,8 @@
             font-size: clamp(16px, 2.8vh, 28px);
             font-weight: 600;
             width: 100%;
-            margin-top: 15px !important;
-            margin-bottom: -3vh !important;
+            /* Zrušenie !important blokovania marginu */
+            margin-top: var(--clock-gap, 15px); 
             position: relative !important;
         }
         
@@ -1400,7 +1400,7 @@
                 <div id="mainWorkspaceResizer" class="workspace-resizer"></div>
                 
                 <div class="main-weather-container">
-                    <div class="weather-left-side" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
+                    <div class="weather-left-side">
                         <div class="big-clock-city" id="bigClockCity" onclick="prepniDalsieMestoZHistorie(event);" title="Kliknutím prelistujete na ďalšie uložené mesto">---</div>
                         <div class="weather-top-row">
                             <div class="weather-core-row">
@@ -1420,7 +1420,7 @@
                             </div>
                         </div>
                         
-                        <div id="mainWeatherDesc">------</div>
+                        <div id="mainWeatherDesc" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">------</div>
                     </div>
                     
                     <div class="main-mini-strip">
@@ -3098,7 +3098,8 @@
                     currentScale = parseFloat(currentScale.toFixed(2));
                 
                     element.style.transformOrigin = "center center";
-                    element.style.transform = `scale(${currentScale})`;
+                    // Šírka (X) ostáva 1, mení sa iba výška (Y)
+                    element.style.transform = `scale(1, ${currentScale})`;
                     localStorage.setItem(storageKey, currentScale);
                 }, { passive: false });
         
