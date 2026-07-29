@@ -1353,6 +1353,47 @@
                 outline-offset: 4px;
                 cursor: ns-resize !important;
             }
+            /* Kontajnery pre relatívne polohovanie tlačidiel */
+            .clock-row-container, 
+            .date-row-container {
+              position: relative;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 100%;
+            }
+            
+            /* Ovládacie tlačidlá sú predvolene skryté */
+            .edit-controls {
+              display: none;
+              position: absolute;
+              right: 10px;
+              gap: 6px;
+              z-index: 10;
+            }
+            
+            /* Zobrazenie tlačidiel LEN pri zapnutom Režime úprav */
+            body.edit-mode .edit-controls {
+              display: flex;
+            }
+            
+            /* Vzhľad tlačidiel */
+            .edit-controls button {
+              background: rgba(51, 65, 85, 0.8);
+              color: #fff;
+              border: 1px solid rgba(255, 255, 255, 0.3);
+              border-radius: 6px;
+              width: 32px;
+              height: 32px;
+              font-size: 18px;
+              font-weight: bold;
+              cursor: pointer;
+              backdrop-filter: blur(4px);
+            }
+            
+            .edit-controls button:active {
+              background: #0284c7;
+            }
             
         }
         
@@ -1382,21 +1423,35 @@
                 
                 <!-- STREDNÝ STĹPEC (HODINY + DÁTUM) -->
                 <div class="clock-middle-container">
-                    <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();" title="Prepnúť / Prebudiť nočný režim dashboardu">
-                        <span class="big-clock-hours" id="bigHours">00</span>
-                        <span class="big-clock-minutes" id="bigMinutes">00</span>
+                    <!-- Hodiny s tlačidlami úprav -->
+                    <div class="clock-row-container">
+                        <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();" title="Prepnúť / Prebudiť nočný režim dashboardu">
+                            <span class="big-clock-hours" id="bigHours">00</span>
+                            <span class="big-clock-minutes" id="bigMinutes">00</span>
+                        </div>
+                        <div class="edit-controls clock-controls">
+                            <button onclick="zmenVelkostPisma('clock', -4); event.stopPropagation();">-</button>
+                            <button onclick="zmenVelkostPisma('clock', 4); event.stopPropagation();">+</button>
+                        </div>
                     </div>
-
-                    <!-- NOVÝ DELIACI PÁSIK MEDZI HODINAMI A DÁTUMOM -->
+                    
+                    <!-- DELIACI PÁSIK MEDZI HODINAMI A DÁTUMOM -->
                     <div id="clockDateResizer" class="workspace-resizer-v"></div>
                     
-                    <div class="big-clock-date-wrapper">
-                        <span class="big-clock-date" id="bigDate">---</span>
-                        <span style="color: #444;" id="dateSeparator">•</span>
-                        <span class="big-clock-nameday" id="bigNameday">---</span>
+                    <!-- Dátum s tlačidlami úprav -->
+                    <div class="date-row-container">
+                        <div class="big-clock-date-wrapper" id="clock-date-wrapper">
+                            <span class="big-clock-date" id="bigDate">---</span>
+                            <span style="color: #444;" id="dateSeparator">•</span>
+                            <span class="big-clock-nameday" id="bigNameday">---</span>
+                        </div>
+                        <div class="edit-controls date-controls">
+                            <button onclick="zmenVelkostPisma('date', -2); event.stopPropagation();">-</button>
+                            <button onclick="zmenVelkostPisma('date', 2); event.stopPropagation();">+</button>
+                        </div>
                     </div>
-                </div>
-
+                </div>    
+                
                <!-- DELIACI PÁSIK MEDZI HODINAMI A POČASÍM -->
                 <div id="mainWorkspaceResizer" class="workspace-resizer"></div>
                 
@@ -1550,7 +1605,28 @@
     
     <script>
         let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v2')) || ["slovensko", "funchill", "rock", "blanik", "fun", "spotify"];
+        // Správa dynamickej veľkosti písma cez tlačidlá v režime úprav
+        let cfgClockFontSize = parseInt(localStorage.getItem('cfg_clock_font_size') || "140");
+        let cfgDateFontSize = parseInt(localStorage.getItem('cfg_date_font_size') || "24");
         
+        function aplikujVelkostiPisma() {
+            const clockEl = document.querySelector('.big-clock-time');
+            const dateEl = document.querySelector('.big-clock-date-wrapper');
+            
+            if (clockEl) clockEl.style.setProperty('--clock-font-size', cfgClockFontSize + 'px');
+            if (dateEl) dateEl.style.setProperty('--date-font-size', cfgDateFontSize + 'px');
+        }
+        
+        function zmenVelkostPisma(typ, delta) {
+            if (typ === 'clock') {
+                cfgClockFontSize = Math.max(40, Math.min(cfgClockFontSize + delta, 380));
+                localStorage.setItem('cfg_clock_font_size', cfgClockFontSize);
+            } else if (typ === 'date') {
+                cfgDateFontSize = Math.max(12, Math.min(cfgDateFontSize + delta, 100));
+                localStorage.setItem('cfg_date_font_size', cfgDateFontSize);
+            }
+            aplikujVelkostiPisma();
+        }
         const audio = document.getElementById('audioPlayer');
         let currentPlayingType = "";
         let isSettingsModeActive = false;
@@ -3253,6 +3329,7 @@
             inicializujMainWorkspaceResizer();
             inicializujClockDateResizer();
             inicializujZmenuVelkostiBlokov();
+            aplikujVelkostiPisma();
 
             // Načítanie stavu Režimu Úprav
             const editModeSaved = localStorage.getItem('editModeActive') === 'true';
