@@ -184,7 +184,15 @@
         
         .fav-card.empty { border: 1px dashed #222; background: transparent; cursor: default; }
         .fav-card.empty i { color: #333; font-size: 22px; }
-
+        
+        /* Globálne povolenie kontroly dotykov pre bloky v režime úprav */
+        body.edit-mode .big-clock-time,
+        body.edit-mode .big-clock-date-wrapper,
+        body.edit-mode .main-weather-container,
+        body.edit-mode .workspace-resizer,
+        body.edit-mode .workspace-resizer-v {
+            touch-action: none !important;
+        }
         .main-content-area {
             position: relative !important;
             width: 100vw !important;
@@ -3026,6 +3034,9 @@
             
                 function doDrag(e) {
                     if (!isDragging || !document.body.classList.contains('edit-mode')) return;
+                    
+                    // Zabraňuje scrollovaniu okna pri ťahaní posúvača prstom
+                    if (e.cancelable) e.preventDefault();
             
                     const currentY = e.touches ? e.touches[0].clientY : e.clientY;
                     const deltaY = currentY - startY;
@@ -3050,7 +3061,7 @@
                 window.addEventListener('mouseup', stopDrag);
             
                 resizer.addEventListener('touchstart', startDrag, { passive: true });
-                window.addEventListener('touchmove', doDrag, { passive: false });
+                window.addEventListener('touchmove', doDrag, { passive: false }); // Vyžaduje passive: false
                 window.addEventListener('touchend', stopDrag);
             }
 
@@ -3254,9 +3265,19 @@
             setInterval(skontrolujNochnuAktualizaciu, 60000);
         });
 
+        // Pôvodne:
+        // document.addEventListener('touchstart', function (event) {
+        //     if (event.touches.length > 1) event.preventDefault();
+        // }, { passive: false });
+        
+        // NAHRADIŤ TÝMTO:
         document.addEventListener('touchstart', function (event) {
-            if (event.touches.length > 1) event.preventDefault();
+            if (event.touches.length > 1 && !document.body.classList.contains('edit-mode')) {
+                event.preventDefault();
+            }
         }, { passive: false });
+
+        
     </script>
 
     <!-- Modal pre zoznam mien -->
