@@ -719,16 +719,19 @@
             }
 
             #player-now-playing {
-                position: absolute !important;
-                bottom: 17vh !important;
-                width: 100% !important;
-                text-align: center !important;
-                font-size: 1.9vw !important;
-                color: #ff9f0a !important;
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                z-index: 5 !important;
+                font-size: 1.6vw;
+                font-weight: 600;
+                color: #ccc;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 35vw;
+            }
+            
+            #player-now-playing:not(:empty)::before {
+                content: " - ";
+                color: #ff9f0a;
+                margin: 0 4px;
             }
 
             .main-weather-container {
@@ -802,8 +805,7 @@
                 width: auto !important;
             }
             body.full-night-mode #player-now-playing {
-                bottom: 11vh !important;
-                font-size: 2.2vw !important;
+                color: var(--night-color) !important;
             }
             body.full-night-mode .night-player-station {
                 font-size: 3.5vw !important;
@@ -1353,12 +1355,13 @@
 
     <div class="workspace-container">
     
-        <!-- Spúšťací infopásik vľavo hore -->
+       <!-- Spúšťací infopásik vľavo hore -->
         <div class="radio-trigger-bar" onclick="toggleRadioPanel(); event.stopPropagation();">
             <span class="radio-trigger-icon">📻</span>
             <span class="radio-trigger-text" id="radioTriggerText"></span>
+            <div id="player-now-playing"></div>
         </div>
-
+                        
         <!-- JEDINÝ Prekrývajúci vysúvací panel pre 2x3 rádia -->
         <aside class="favorites-sidebar" id="favSidebarContainer">
             <!-- JS vygeneruje 6 dlaždíc rádií -->
@@ -1384,9 +1387,7 @@
                     </div>
                 </div>
 
-                <div id="player-now-playing" style="color: #fff; text-align: center;"></div>
-                
-                <!-- DELIACI PÁSIK MEDZI HODINAMI A POČASÍM -->
+               <!-- DELIACI PÁSIK MEDZI HODINAMI A POČASÍM -->
                 <div id="mainWorkspaceResizer" class="workspace-resizer"></div>
                 
                 <div class="main-weather-container">
@@ -2603,7 +2604,8 @@
 
         async function sledujStreamMetadat(streamUrl) {
             const textElement = document.getElementById("player-now-playing");
-            textElement.innerText = ""; 
+            // Príklad v rámci funkcie pri nájdení skladby:
+            textElement.innerText = (artist || song) ? `${artist} - ${song}` : "";
             
             if (metadataController) {
                 metadataController.abort();
