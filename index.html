@@ -709,7 +709,8 @@
             }
             
             .big-clock-date-wrapper {
-                margin-top: 10px !important;
+                /* Umožní JavaScriptu meniť margin-top pomocou premennej alebo inline štýlu */
+                margin-top: var(--clock-date-gap, 10px);
                 margin-bottom: 0 !important;
                 display: inline-block !important;
                 transform-origin: center center !important;
@@ -3034,8 +3035,6 @@
             
                 function doDrag(e) {
                     if (!isDragging || !document.body.classList.contains('edit-mode')) return;
-                    
-                    // Zabraňuje scrollovaniu okna pri ťahaní posúvača prstom
                     if (e.cancelable) e.preventDefault();
             
                     const currentY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -3061,7 +3060,7 @@
                 window.addEventListener('mouseup', stopDrag);
             
                 resizer.addEventListener('touchstart', startDrag, { passive: true });
-                window.addEventListener('touchmove', doDrag, { passive: false }); // Vyžaduje passive: false
+                window.addEventListener('touchmove', doDrag, { passive: false });
                 window.addEventListener('touchend', stopDrag);
             }
 
@@ -3075,7 +3074,7 @@
                 if (!el) return;
                 const val = localStorage.getItem(key) || "1.0";
                 el.style.transformOrigin = "center center";
-                el.style.transform = `scale(${val})`;
+                el.style.transform = `scale(1, ${val})`;// Škálovanie iba v osi Y pri načítaní
             };
         
             applyScale(clockEl, 'cfg_clock_scale');
@@ -3135,7 +3134,9 @@
                         let newScale = startScale * factor;
                         newScale = Math.max(min, Math.min(newScale, max));
                         newScale = parseFloat(newScale.toFixed(2));
-        
+                        
+                        element.style.transformOrigin = "center center";
+                            // Os X = 1 (bez zmeny šírky), Os Y = newScale
                         element.style.transform = `scale(${newScale})`;
                         localStorage.setItem(storageKey, newScale);
                     }
