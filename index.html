@@ -679,6 +679,11 @@
             .main-content-area {
                 width: 100% !important;
             }
+            /* Stredný stĺpec v landscape zaberá vymedzených 68% šírky */
+            .clock-middle-container {
+                width: 68% !important;
+                height: 100% !important;
+            }
             .placeholder-view {
                 display: flex !important;
                 flex-direction: row !important;
@@ -729,7 +734,7 @@
                 transition: transform 0.1s ease-out;
             }
             
-            big-clock-date-wrapper {
+            .big-clock-date-wrapper {
                 margin-top: var(--clock-date-gap, 10px);
                 margin-bottom: 0 !important;
                 display: inline-block !important;
@@ -1037,7 +1042,40 @@
         @media (orientation: portrait) {
             .workspace-container { flex-direction: column; }
             .main-content-area { width: 100vw; flex: 1; order: 1; }
-            
+            /* --- ZÁKLADNÝ STREDNÝ STĹPEC (PORTRAIT / DEFAULT) --- */
+        .clock-middle-container {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important; /* Hodiny hore, dátum dole */
+            align-items: center !important;
+            width: 100%;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 10px 0 !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* Obal hodín - zaberie voľný priestor a nepustí čísla cez hranicu */
+        .clock-row-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            flex: 1 1 auto !important;
+            overflow: hidden;
+        }
+        
+        /* Obal dátumu - upevnený pevne na spodku */
+        .date-row-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            flex: 0 0 auto !important;
+            margin-top: auto !important;
+        }
             .placeholder-view { 
                 padding: 2vh 3vw; 
                 display: flex;
