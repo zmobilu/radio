@@ -39,7 +39,7 @@
             cursor: pointer !important;
         }
 
-        /* Okamžitá reakcia na dotyk prsta na tablete */
+        /* Okamžitá reakcia na dotyk prsta */
         .fav-card:active,
         .forecast-day-box:active,
         .btn-settings:active,
@@ -86,27 +86,14 @@
             z-index: 999999 !important;
         }
 
-        /* --- TLAČIDLO PRE REŽIM ÚPRAV V NASTAVENIACH --- */
-        .edit-mode-btn {
-            background: #111 !important;
-            border: 1px solid #222 !important;
-            color: #666 !important;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: color 0.2s, background 0.2s, border-color 0.2s;
-        }
-        
-        .edit-mode-btn.active {
-            color: #ff9f0a !important;
-            border-color: #ff9f0a !important;
-            background: #1a1a1a !important;
-        }
-
         /* --- HLAVNÁ ROZDELENÁ PLOCHA --- */
-        .workspace-container { display: flex; flex: 1; width: 100vw; overflow: hidden; position: relative; }
+        .workspace-container { display: flex; flex: 1; width: 100vw; height: 100vh; overflow: hidden; position: relative; }
+        .main-content-area {
+            position: relative !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            overflow: hidden !important;
+        }
 
         /* --- INFOPÁSIK VĽAVO HORE (IKONA + NÁZOV HRAJÚCEHO RÁDIA) --- */
         .radio-trigger-bar {
@@ -134,7 +121,7 @@
         }
         
         .radio-trigger-text {
-            font-size: 2.2vw;
+            font-size: 1.4rem;
             font-weight: 800;
             color: #ff9f0a;
             text-transform: uppercase;
@@ -177,29 +164,12 @@
             transition: transform 0.1s, border-color 0.15s;
         }
         .fav-card:not(.empty):active { transform: scale(0.97); }
-        .fav-card.playing { border: 2px solid #ff9f0a !important; background: #151515; }
         .fav-card img { width: 75%; height: 75%; object-fit: contain; }
         .fav-card i { font-size: 30px; }
         .fav-card span { font-size: 11px; font-weight: 600; text-transform: uppercase; text-align: center; margin-top: 2px; }
-        
         .fav-card.empty { border: 1px dashed #222; background: transparent; cursor: default; }
         .fav-card.empty i { color: #333; font-size: 22px; }
-        
-        /* Globálne povolenie kontroly dotykov pre bloky v režime úprav */
-        body.edit-mode .big-clock-time,
-        body.edit-mode .big-clock-date-wrapper,
-        body.edit-mode .main-weather-container,
-        body.edit-mode .workspace-resizer,
-        body.edit-mode .workspace-resizer-v {
-            touch-action: none !important;
-        }
-        .main-content-area {
-            position: relative !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            overflow: hidden !important;
-        }
-        
+
         /* Mriežka nastavení */
         .settings-grid-view {
             display: grid !important;
@@ -232,84 +202,96 @@
             visibility: visible;
             transform: translateX(0);
         }
-        
-        /* --- HLAVNÝ CONTAINER A OBSAH --- */
+
+        /* --- HLAVNÝ CONTAINER A OBSAH (ZÁKLAD) --- */
         .placeholder-view {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between !important;
+            display: flex !important;
+            width: 100% !important;
+            height: 100% !important;
+            box-sizing: border-box !important;
+            padding: 3vh 3vw !important;
+            overflow: hidden !important;
             background: #000;
-            box-sizing: border-box;
-            padding: 3vh 3vw 2vh 3vw;
-            overflow: hidden;
         }
-        
+
+        /* Stredný stĺpec hodín a dátumu */
+        .clock-middle-container {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100%;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+        }
+
+        .clock-row-container {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            line-height: 1 !important;
+        }
+
+        .date-row-container {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            margin-top: 2vh !important;
+        }
+
         /* Samotné hodiny */
         .big-clock-time {
-            font-size: var(--clock-font-size, 140px) !important;
-            line-height: 0.9 !important; /* Mierne znížený line-height odstrihne prázdne okraje nad/pod číslami */
-            font-weight: 800;
-            display: flex;
-            letter-spacing: -2px;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
+            font-weight: 800 !important;
+            display: flex !important;
+            letter-spacing: -2px !important;
+            justify-content: center !important;
+            align-items: center !important;
+            width: 100% !important;
             margin: 0 !important;
+            line-height: 0.9 !important;
+            transform: none !important;
         }
-        
-        /* Obal pre dátum s tlačidlami */
-        .date-row-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            margin-top: var(--clock-date-gap, 15px); /* Dynamická medzera medzi hodinami a dátumom */
-        }
-        
+
+        .big-clock-hours { color: #fff; letter-spacing: 2px !important; }
+        .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; letter-spacing: 2px !important; }
+
+        /* Obal pre dátum a meniny */
         .big-clock-date-wrapper {
             display: flex !important;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            gap: 8px 12px;
-            font-size: var(--date-font-size, 24px) !important;
-            font-weight: 600;
-            width: 100%;
-            position: relative !important;
-            /* Odstránime margin-top odtiaľto, prenáša sa na .date-row-container */
-            margin-top: 0 !important; 
+            justify-content: center !important;
+            align-items: center !important;
+            text-align: center !important;
+            gap: 8px 12px !important;
+            font-weight: 700 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            transform: none !important;
+            white-space: nowrap !important;
         }
-        
-        .big-clock-hours { color: #fff; }
-        .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
+
         .big-clock-city { color: #ff9f0a; font-weight: bold; letter-spacing: 2px; }
         .big-clock-date { color: #fff; }
         .big-clock-nameday { color: #ff9f0a; }
 
-        /* Hlavný obal celého počasia */
+        /* --- HLAVNÝ POČASIE CONTAINER --- */
         .main-weather-container {
             display: flex;
             flex-direction: column;
-            width: 100%;
-            max-width: 680px;
-            margin: 0 auto;
             align-items: center;
             justify-content: center;
-            gap: 0;
             box-sizing: border-box;
         }
-        
+
         .weather-left-side {
             display: flex !important;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100% !important;
-            border-right: none !important;
             padding: 0 !important;
             box-sizing: border-box;
         }
@@ -317,7 +299,6 @@
         .weather-top-row {
             display: flex;
             flex-direction: row;
-            flex-wrap: nowrap;
             align-items: center;
             justify-content: center;
             gap: 5px;
@@ -333,48 +314,41 @@
             justify-content: center;
             gap: 2px;
         }
-        #mainBigIcon { font-size: 14vmin !important; line-height: 1; }
-        #mainBigTemp { font-size: 13vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
+        #mainBigIcon { font-size: clamp(3rem, 12vh, 7rem) !important; line-height: 1; }
+        #mainBigTemp { font-size: clamp(2.5rem, 10vh, 6rem) !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
 
         .weather-sub-row { 
-            font-size: 3.6vmin !important; 
+            font-size: clamp(1rem, 2.5vh, 1.8rem) !important; 
             font-weight: 600; 
             display: flex;
-            flex-direction: column;   
-            align-items: flex-start;
+            flex-direction: row;   
+            align-items: center;
             justify-content: center;
-            gap: 2px;                
-            margin-top: 0 !important;
-            letter-spacing: 0px !important;
-            transform: scaleY(1.25);
-            transform-origin: left center;
+            gap: 12px;                
+            margin-top: 1vh !important;
         }
 
         #mainWeatherDesc {
-            font-size: 3.2vmin !important;
+            font-size: clamp(0.9rem, 2.2vh, 1.5rem) !important;
             font-weight: 800;
             color: #aaa;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             margin-top: 1.5vh !important;
             margin-bottom: 0 !important;
             text-align: center;
             width: 100%;
             display: inline-block;
-            transform: scaleY(1.3);
-            transform-origin: center center;
         }
         
         .main-mini-strip {
             display: flex !important;
             flex-direction: row !important; 
-            flex-wrap: nowrap;
             justify-content: space-between;
-            width: 100% !important;                   
+            width: 100% !important;                    
             margin-top: 2vh !important;
-            gap: 12px !important;
+            gap: 10px !important;
             padding: 0 !important;
-            height: auto !important;
         }
         
         .mini-day-box {
@@ -385,70 +359,41 @@
             flex: 1;
             background: #080808;
             border: 1px solid #111;
-            padding: 1vh 10px !important;
+            padding: 8px 6px !important;
             border-radius: 10px;
             box-sizing: border-box;
             min-width: 0;
-            width: auto !important;
-            height: auto !important;
         }
         
         .mini-label { 
-            font-size: 3.2vmin !important; 
+            font-size: clamp(0.75rem, 1.8vh, 1.1rem) !important; 
             color: #888; 
             font-weight: 800; 
             letter-spacing: 1px; 
-            display: flex !important;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 6px !important; 
+            margin-bottom: 4px !important; 
             width: 100% !important;
             text-align: center !important;
-            transform: scaleY(1.3);
-            transform-origin: center center;
         }
         
         .mini-data-row {
             display: flex !important;
             flex-direction: row !important;
-            flex-wrap: nowrap !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 5px !important;
+            gap: 4px !important;
             width: 100% !important;
-            box-sizing: border-box !important;
         }
         
-        #mainFc0Icon, #mainFc1Icon { font-size: 5vmin !important; line-height: 1; }
+        #mainFc0Icon, #mainFc1Icon { font-size: clamp(1.2rem, 3vh, 2rem) !important; line-height: 1; }
         #mainFc0Temp, #mainFc1Temp { 
-            font-size: 3.6vmin !important; 
+            font-size: clamp(0.85rem, 2.2vh, 1.3rem) !important; 
             font-weight: 800; 
             white-space: nowrap !important; 
             text-align: center !important;
-            display: inline-block;
-            transform: scaleY(1.25);
-            transform-origin: center center;
-            letter-spacing: 0.3px;
         }
-        
-        .weather-wrapper-block {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;     
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .sub-row-item-temp i, .sub-row-item-hum i {
-            font-size: 0.8em;
-            width: 24px;
-            text-align: center;
-            margin-right: 4px !important;
-            letter-spacing: 0px !important;
-        }
-        
-        .sub-row-item-temp i { color: #ffa500; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }
-        .sub-row-item-hum i { color: #4dabff; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }        
+
+        .sub-row-item-temp i { color: #ffa500; margin-right: 4px; }
+        .sub-row-item-hum i { color: #4dabff; margin-right: 4px; }        
 
         /* --- EXTRA KOMPAKTNÝ PANEL NASTAVENÍ --- */
         .settings-night-panel {
@@ -529,7 +474,7 @@
     
         #nightBottomInfo { display: none; }
 
-        /* --- INTEGROVANÝ NOČNÝ PREHRÁVAČ --- */
+        /* --- INTEGRATNÝ NOČNÝ PREHRÁVAČ --- */
         .night-player-container {
             display: none;
             flex-direction: column;
@@ -540,7 +485,7 @@
             margin-top: 1.5vh;
         }
         .night-player-station {
-            font-size: 5.5vw;
+            font-size: 1.8rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -551,7 +496,7 @@
             gap: 12px;
         }
         .night-player-station img {
-            height: 6vw;
+            height: 2.2rem;
             width: auto;
             object-fit: contain;
             filter: grayscale(1) brightness(1.5);
@@ -560,22 +505,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8vw;
+            gap: 30px;
         }
         .night-btn {
             background: transparent;
             border: none;
             color: var(--night-color);
-            font-size: 7vw;
+            font-size: 2.2rem;
             cursor: pointer;
-            padding: 10px;
+            padding: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: transform 0.1s;
         }
         .night-btn:active { transform: scale(0.9); }
-        .night-btn.btn-playpause { font-size: 9vw; }
+        .night-btn.btn-playpause { font-size: 2.8rem; }
 
         /* --- NOČNÝ REŽIM (S PLYNULÝM STMIEVANÍM) --- */
         body .placeholder-view,
@@ -591,34 +536,7 @@
         body.full-night-mode .main-weather-container { 
             display: none !important;
         }
-        body.full-night-mode .clock-middle-container {
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-        body.full-night-mode .workspace-container, 
-        body.full-night-mode .main-content-area { 
-            width: 100vw !important; 
-            height: 100vh !important; 
-        }
-        
-        body.full-night-mode .placeholder-view { 
-            width: 100vw !important; 
-            height: 100vh !important; 
-            transform: translateY(-4dvh) !important; 
-            justify-content: center !important; 
-            align-items: center !important; 
-            padding: 0 !important; 
-            position: relative !important;
-            opacity: 1 !important;
-        }
-        
-        body.full-night-mode .big-clock-time { 
-            font-size: 30vw !important; 
-            letter-spacing: 0px !important; 
-            margin: 0 !important; 
-            transform: scaleY(1.20) !important; 
-        }
-        
+
         body.full-night-mode .big-clock-hours, 
         body.full-night-mode .big-clock-minutes, 
         body.full-night-mode #nightBottomInfo, 
@@ -628,12 +546,10 @@
         
         body.full-night-mode #player-now-playing {
             display: block !important;
-            position: absolute !important;
-            bottom: 13vh !important;
-            left: 0;
+            position: relative !important;
             width: 100% !important;
             text-align: center !important;
-            font-size: 3.5vw !important;
+            font-size: 1.4rem !important;
             font-weight: 500 !important;
             color: var(--night-color) !important;
             z-index: 10 !important;
@@ -642,23 +558,9 @@
             text-overflow: ellipsis;
             padding: 0 20px;
             box-sizing: border-box;
+            margin-top: 1vh !important;
         }
-        
-        body.full-night-mode #nightBottomInfo { 
-            display: block !important; 
-            position: absolute !important; 
-            bottom: 5vh !important; 
-            padding-bottom: env(safe-area-inset-bottom) !important; 
-            font-size: 5.5vw !important; 
-            font-weight: 500; 
-            letter-spacing: 1px; 
-            opacity: 1; 
-            text-align: center; 
-            width: 100%; 
-            left: 0; 
-            z-index: 10;
-        }
-        
+
         body.full-night-mode .night-player-container.active-playing {
             display: flex !important;
         }
@@ -668,193 +570,115 @@
             font-weight: 800;
             letter-spacing: 2px;
             text-transform: uppercase;
-            font-size: 1.8vw;
+            font-size: clamp(1rem, 2.5vh, 1.8rem);
             margin-bottom: 0.8vh;
             text-align: center;
             width: 100%;
         }
 
-        /* --- ZJEDNOTENÝ REŽIM NA ŠÍRKU (LANDSCAPE) --- */
+        /* =========================================================
+           ZOBRAZENIE NA ŠÍRKU (LANDSCAPE) - DENNÝ A NOČNÝ REŽIM
+           ========================================================= */
         @media (orientation: landscape) {
-            .main-content-area {
-                width: 100% !important;
-            }
-            /* Stredný stĺpec v landscape zaberá vymedzených 68% šírky */
-            .clock-middle-container {
-                width: 68% !important;
-                height: 100% !important;
-            }
+
+            /* --- DENNÝ REŽIM --- */
             .placeholder-view {
                 display: flex !important;
                 flex-direction: row !important;
-                flex-wrap: nowrap !important;
                 align-items: center !important;
                 justify-content: space-between !important;
-                padding: 2vh 4vw !important;
+                padding: 3vh 3vw !important;
                 box-sizing: border-box !important;
-                width: 100% !important;
-                height: 100% !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                gap: 20px !important;
             }
 
-            /* Stredný stĺpec – usporiada hodiny, resizer a dátum pod seba */
+            /* Stredný blok pre Hodiny + Dátum */
             .clock-middle-container {
                 display: flex !important;
                 flex-direction: column !important;
-                align-items: center !important;
                 justify-content: center !important;
-                width: 68%;
+                align-items: center !important;
+                flex: 1 1 auto !important;
                 height: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                box-sizing: border-box !important;
+                min-width: 0 !important;
             }
-            
-            /* Obal pre hodiny – zamedzí pretekaniu číslic */
-            .clock-row-container {
-                position: relative;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 100%;
-                /* Zabezpečí, že hodiny nepustia obsah cez svoju spodnú hranicu */
-                flex: 0 0 auto; 
+
+            /* Pravý blok pre Počasie (vždy chránená šírka) */
+            .main-weather-container {
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                width: 320px !important;
+                max-width: 35vw !important;
+                height: 100% !important;
+                flex-shrink: 0 !important;
             }
-            
-            body:not(.full-night-mode) .big-clock-time,
-            body.full-night-mode .big-clock-time {
-                /* Odtiaľto sme odstránili pevný font-size: 20vw, aby hodiny počúvali tlačidlá +/- */
+
+            /* Hodiny v dennom režime */
+            body:not(.full-night-mode) .big-clock-time {
+                font-size: clamp(5rem, 26vh, 16rem) !important;
                 line-height: 0.9 !important;
                 font-weight: 800 !important;
-                letter-spacing: -2px !important;
-                margin-top: 0 !important;
-                width: 100% !important;
-                display: flex !important;
-                justify-content: center !important;
-                transform-origin: center center !important;
-                transition: transform 0.1s ease-out;
-            }
-            
-            .big-clock-date-wrapper {
-                margin-top: var(--clock-date-gap, 10px);
-                margin-bottom: 0 !important;
-                display: inline-block !important;
-                transform-origin: center center !important;
-                transition: transform 0.1s ease-out;
-            }
-        
-            .big-clock-hours, .big-clock-minutes {
-                letter-spacing: 6px !important;
-            }
-        
-        }
-            
-            #bigClockCity {
-                font-size: 2.5vw !important;
-                margin-bottom: 0.5vh !important;
-            }
-
-            #player-now-playing {
-                font-size: 1.6vw;
-                font-weight: 600;
-                color: #ccc;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 35vw;
-            }
-            
-            #player-now-playing:not(:empty)::before {
-                content: " - ";
-                color: #ff9f0a;
-                margin: 0 4px;
-            }
-
-            .main-weather-container {
-                width: 32%;
-                max-width: none !important;
-                height: 100% !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: center !important;
-                align-items: center !important;
                 margin: 0 !important;
-                padding-right: 2vw !important;
-                box-sizing: border-box !important;
+                transform: none !important;
             }
 
-            .weather-sub-row {
-                flex-direction: row !important;
-                gap: 12px !important;
-                margin-top: 1.5vh !important;
-                font-size: 2vw !important;
-                transform: scaleY(1.1) !important;
+            /* Dátum pod hodinami */
+            .big-clock-date-wrapper {
+                margin-top: 2vh !important;
+                font-size: clamp(1.2rem, 3.8vh, 2.8rem) !important;
+                font-weight: 700 !important;
+                transform: none !important;
+                white-space: nowrap !important;
             }
 
-            .weather-left-side {
-                width: 100% !important;
-            }
-        
-            .weather-top-row {
+            /* --- NOČNÝ REŽIM (LANDSCAPE) --- */
+            body.full-night-mode .placeholder-view {
                 display: flex !important;
                 flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                padding: 2vh 2vw !important;
+                transform: none !important;
+                width: 100vw !important;
+                height: 100vh !important;
+            }
+
+            /* Obrovské hodiny v noci, ohraničené výškou */
+            body.full-night-mode .big-clock-time {
+                font-size: clamp(6rem, 42vh, 22vw) !important;
+                line-height: 0.9 !important;
+                margin: 0 !important;
+                transform: none !important;
+            }
+
+            /* Prehrávač v noci - zrušené absolútne pozicionovanie */
+            body.full-night-mode .night-player-container {
+                position: relative !important;
+                bottom: auto !important;
+                margin-top: 2vh !important;
+                display: flex !important;
+                flex-direction: row !important;
                 align-items: center !important;
                 justify-content: center !important;
-                width: 100% !important;
-                gap: 0 !important;
-            }
-            .main-weather-icon-img {
-                width: 8vw !important;
-                height: center !important;
-                margin-bottom: 1vh !important;
-            }
-        
-            .main-temp {
-                font-size: 8vw !important;
-                text-align: auto !important;
-                line-height: 1 !important;
-            }
-        
-            .main-mini-strip {
-                flex-direction: column !important;
-                width: 100% !important;
-                gap: 6px !important;
-                margin-top: 5vh !important;
-            }
-        
-            .mini-day-box {
-                width: 100% !important;
-            }
-        
-            body.full-night-mode .placeholder-view {
-                transform: translateY(0) !important;
-            }
-            body.full-night-mode .big-clock-time {
-                transform: scaleY(1.30) translateY(0) !important;
-                margin-top: 0 !important;
-            }
-            body.full-night-mode .night-player-container {
-                flex-direction: row !important;
-                gap: 4vw !important;
-                position: absolute !important;
-                bottom: 18vh;
+                gap: 3vw !important;
                 width: auto !important;
             }
-            body.full-night-mode #player-now-playing {
-                color: var(--night-color) !important;
-            }
-            body.full-night-mode .night-player-station {
-                font-size: 3.5vw !important;
-                margin-bottom: 0 !important;
-                border-right: 1px solid rgba(255,255,255,0.15);
-                padding-right: 4vw;
-            }
-            body.full-night-mode .night-player-station img { height: 4vw !important; }
-            body.full-night-mode .night-player-controls { gap: 5vw !important; }
-            body.full-night-mode .night-btn { font-size: 4.5vw !important; padding: 5px; }
-            body.full-night-mode .night-btn.btn-playpause { font-size: 5.5vw !important; }
+
+            /* Spodný info riadok v noci */
             body.full-night-mode #nightBottomInfo {
-                font-size: 3.2vw !important;
+                position: relative !important;
+                bottom: auto !important;
+                margin-top: 2vh !important;
+                font-size: clamp(1.2rem, 4vh, 2.5rem) !important;
+                font-weight: 600 !important;
+                text-align: center !important;
+                width: 100% !important;
             }
+
             .settings-grid-view {
                 left: 280px !important;
                 width: calc(100vw - 280px) !important;
@@ -862,31 +686,8 @@
                 padding: 65px 70px 20px 20px !important; 
             }
         }
-            
-        @media (orientation: portrait) {
-            body.full-night-mode .big-clock-time {
-                transform: scaleY(1.90) translateY(-8vh) !important;
-            }
-            body.full-night-mode .night-player-container {
-                position: absolute !important;
-                bottom: 18vh !important;
-                width: 100% !important;
-            }
-            .settings-grid-view {
-                left: 0 !important;
-                width: 100vw !important;
-                padding-top: 290px !important;
-                padding-right: 20px !important;
-            }
-        }
-            
-        @media (max-width: 480px), (orientation: portrait) {
-            .weather-wrapper-block {
-                flex-direction: column;
-            }
-        }
 
-        /* --- CELOOBRAZOVKOVÉ DETAILNÉ ZOBRAZENIE GRAFU --- */
+        /* CELOOBRAZOVKOVÉ DETAILNÉ ZOBRAZENIE GRAFU POČASIA */
         .weather-detail-view {
             display: none; 
             position: absolute;
@@ -957,48 +758,28 @@
             gap: 8px; 
         }
 
-        .sun-box i, 
-        .sun-box svg {
-            width: 2.4vmin;
-            height: 2.4vmin;
-            min-width: 18px;
-            min-height: 18px;
+        .sun-box i, .sun-box svg {
+            width: 2.4vmin; height: 2.4vmin;
+            min-width: 18px; min-height: 18px;
             font-size: 2.4vmin !important;
             display: inline-block;
         }
 
         .sun-box-rise { color: #ff9f0a; }
-        .sun-box-rise i, .sun-box-rise svg { 
-            color: #ff9f0a;
-            stroke: #ff9f0a;
-            animation: sunriseAnim 3.5s infinite ease-in-out;
-        }
-
+        .sun-box-rise i, .sun-box-rise svg { color: #ff9f0a; stroke: #ff9f0a; animation: sunriseAnim 3.5s infinite ease-in-out; }
         .sun-box-set { color: #ff4500; }
-        .sun-box-set i, .sun-box-set svg { 
-            color: #ff4500;
-            stroke: #ff4500;
-            animation: sunsetAnim 3.5s infinite ease-in-out;
-        }
+        .sun-box-set i, .sun-box-set svg { color: #ff4500; stroke: #ff4500; animation: sunsetAnim 3.5s infinite ease-in-out; }
 
         @keyframes sunriseAnim {
-            0%, 100% { transform: translateY(2px) scale(0.95); opacity: 0.7; filter: drop-shadow(0 0 0px transparent); }
+            0%, 100% { transform: translateY(2px) scale(0.95); opacity: 0.7; }
             50% { transform: translateY(-2px) scale(1.1); opacity: 1; filter: drop-shadow(0 0 8px rgba(255, 159, 10, 0.8)); }
         }
 
         @keyframes sunsetAnim {
-            0%, 100% { transform: translateY(-2px) scale(1.1); opacity: 1; filter: drop-shadow(0 0 8px rgba(255, 69, 0, 0.8)); }
+            0%, 100% { transform: translateY(-2px) scale(1.1); opacity: 1; }
             50% { transform: translateY(2px) scale(0.9); opacity: 0.6; filter: drop-shadow(0 0 0px transparent); }
         }
 
-        .sun-icon {
-            width: 2.4vmin;
-            height: 2.4vmin;
-            min-width: 18px;
-            min-height: 18px;
-            display: inline-block;
-            vertical-align: middle;
-        }
         #hourly-chart-container { 
             display: flex; 
             justify-content: flex-start;
@@ -1038,80 +819,6 @@
         .forecast-day-icon { font-size: 6vmin !important; margin: 6px 0 !important; }
         .forecast-day-temp { font-size: 2.6vmin !important; font-weight: 600 !important; white-space: nowrap !important; line-height: 1.1 !important; }
 
-        /* PORTRAIT RESPONSIVITA */
-        @media (orientation: portrait) {
-            .workspace-container { flex-direction: column; }
-            .main-content-area { width: 100vw; flex: 1; order: 1; }
-            /* --- ZÁKLADNÝ STREDNÝ STĹPEC (PORTRAIT / DEFAULT) --- */
-        .clock-middle-container {
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important; /* Hodiny hore, dátum dole */
-            align-items: center !important;
-            width: 100%;
-            height: 100% !important;
-            margin: 0 !important;
-            padding: 10px 0 !important;
-            box-sizing: border-box !important;
-        }
-        
-        /* Obal hodín - zaberie voľný priestor a nepustí čísla cez hranicu */
-        .clock-row-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            flex: 1 1 auto !important;
-            overflow: hidden;
-        }
-        
-        /* Obal dátumu - upevnený pevne na spodku */
-        .date-row-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            flex: 0 0 auto !important;
-            margin-top: auto !important;
-        }
-            .placeholder-view { 
-                padding: 2vh 3vw; 
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                height: 100%;
-                box-sizing: border-box;
-                gap: 0; 
-            }
-            .big-clock-time {
-                font-size: 24vmin !important;
-                line-height: 0.9 !important;
-                /* transform: scale(1) !important; /* Pôvodne tu bolo scaleY(1.60) */
-                margin-top: 2vh !important;
-            }
-            .big-clock-date-wrapper { 
-                margin-top: 5vh !important; 
-                padding-bottom: 1vh;
-                width: 100%; 
-                font-size: 3.8vmin; 
-                display: flex;          
-                flex-wrap: wrap; 
-                justify-content: center; 
-                text-align: center;     
-                font-weight: 600;
-            }
-            .big-clock-date { color: #fff; }
-            .big-clock-nameday { margin-top: 0; }
-        
-            .main-weather-container { 
-                margin-top: auto !important; 
-                margin-bottom: 2vh !important; 
-                flex: 0 0 auto !important;
-            }
-        }
-
         @keyframes antiBurnIn {
             0%   { transform: translate(0, 0); }
             20%  { transform: translate(2px, -3px); }
@@ -1125,16 +832,6 @@
             background: #000 !important;
             border-color: var(--night-color) !important;
             color: var(--night-color) !important;
-        }
-        #player-now-playing {
-            font-size: clamp(12px, 2.2vh, 18px) !important;
-            margin-top: 0.5vh !important; 
-            margin-bottom: 0 !important;
-            display: block !important; 
-            min-height: 1.2em !important; 
-            line-height: 1.2 !important; 
-            transform: scaleY(1.20) !important;
-            transform-origin: top left !important;
         }
 
         .weather-left-side:active {
@@ -1160,13 +857,8 @@
             transition: all 0.3s ease !important;
         }
 
-        .btn-settings i.fa-gear {
-            transition: transform 0.5s ease-in-out;
-        }
-        .btn-settings:hover i.fa-gear,
-        .btn-settings.active i.fa-gear {
-            transform: rotate(180deg);
-        }
+        .btn-settings i.fa-gear { transition: transform 0.5s ease-in-out; }
+        .btn-settings:hover i.fa-gear, .btn-settings.active i.fa-gear { transform: rotate(180deg); }
             
         @keyframes radioGlow {
             0% { box-shadow: 0 0 5px rgba(255, 159, 10, 0.4); }
@@ -1190,9 +882,7 @@
             75%  { transform: translate(-1px, -1px); }
             100% { transform: translate(0, 0); }
         }
-        .placeholder-view {
-            animation: daytimeAntiBurnIn 120s infinite ease-in-out;
-        }
+        .placeholder-view { animation: daytimeAntiBurnIn 120s infinite ease-in-out; }
 
         /* --- ANIMÁCIE PRE IKONY POČASIA --- */
         @keyframes sunRotatePulse {
@@ -1221,87 +911,12 @@
             98% { opacity: 1; filter: drop-shadow(0 0 25px #ffeb3b); }
         }
         
-        #mainBigIcon {
-            display: inline-block !important;
-            transition: transform 0.5s ease;
-        }
-        
-        .weather-core-row #mainBigIcon {
-            animation: sunRotatePulse 25s infinite linear;
-        }
+        #mainBigIcon { display: inline-block !important; transition: transform 0.5s ease; }
+        .weather-core-row #mainBigIcon { animation: sunRotatePulse 25s infinite linear; }
 
         #mainBigIcon, #mainFc0Icon, #mainFc1Icon, .chart-icon-info, .forecast-day-icon {
             display: inline-block !important;
             transform-origin: center center;
-        }
-        
-        .sub-row-item-temp, .sub-row-item-hum {
-            position: relative;
-            cursor: pointer !important;
-        }
-
-        .sub-row-item-temp::after {
-            content: "Pocitová teplota";
-            position: absolute;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%) scale(0.8);
-            background: #111;
-            color: #ff9f0a;
-            border: 1px solid #ff9f0a;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.8);
-            z-index: 1000;
-        }
-
-        .sub-row-item-hum::after {
-            content: "Vlhkosť vzduchu";
-            position: absolute;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%) scale(0.8);
-            background: #111;
-            color: #4dabff;
-            border: 1px solid #4dabff;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.8);
-            z-index: 1000;
-        }
-
-        .sub-row-item-temp:hover::after,
-        .sub-row-item-hum:hover::after {
-            opacity: 1;
-            transform: translateX(-50%) scale(1);
-        }
-
-        body, 
-        .workspace-container, 
-        .favorites-sidebar, 
-        .main-content-area, 
-        .placeholder-view, 
-        .big-clock-time,
-        .big-clock-hours,
-        .big-clock-minutes,
-        .big-clock-date-wrapper, 
-        .main-weather-container, 
-        #nightBottomInfo, 
-        #player-now-playing,
-        #settingsToggleBtn {
-            transition: opacity 1.5s ease-in-out, background-color 1.5s ease-in-out, color 1.5s ease-in-out, transform 1.5s ease-in-out !important;
         }
 
         .chart-bar-fill {
@@ -1313,148 +928,6 @@
             box-sizing: border-box;
             transition: height 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
-
-        /* --- DELIACI PÁSIK MEDZI HODINAMI A POČASÍM --- */
-        #mainWorkspaceResizer {
-            display: none !important;
-            pointer-events: none !important;
-        }
-
-        /* --- DELIACI PÁSIK MEDZI HODINAMI A DÁTUMOM --- */
-        #clockDateResizer {
-            display: none !important;
-            pointer-events: none !important;
-        }
-        
-        body.edit-mode #clockDateResizer {
-            display: block !important;
-            pointer-events: auto !important;
-            width: 100%;
-            height: 14px;
-            cursor: row-resize !important;
-            position: relative;
-            z-index: 999 !important;
-            margin: 6px 0 !important;
-            background: transparent;
-        }
-        
-        body.edit-mode #clockDateResizer:hover,
-        body.edit-mode #clockDateResizer.is-dragging {
-            background: rgba(255, 159, 10, 0.4);
-            border-radius: 6px;
-        }
-        
-        body.edit-mode #clockDateResizer::after {
-            content: "";
-            position: absolute;
-            top: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
-        }
-        
-        @media (orientation: landscape) {
-            body.edit-mode #mainWorkspaceResizer {
-                display: block !important;
-                pointer-events: auto !important;
-                width: 12px;
-                height: 100%;
-                cursor: col-resize !important;
-                position: relative;
-                z-index: 999;
-                margin: 0 4px;
-                background: transparent;
-                transition: background 0.2s;
-            }
-            
-            body.edit-mode #mainWorkspaceResizer:hover,
-            body.edit-mode #mainWorkspaceResizer.is-dragging {
-                background: rgba(255, 159, 10, 0.4);
-                border-radius: 6px;
-            }
-
-            body.edit-mode #mainWorkspaceResizer::after {
-                content: "";
-                position: absolute;
-                top: 50%;
-                left: 5px;
-                transform: translateY(-50%);
-                width: 2px;
-                height: 40px;
-                background: rgba(255, 255, 255, 0.3);
-                border-radius: 2px;
-            }
-
-            body.edit-mode .clock-middle-container,
-            body.edit-mode .main-weather-container,
-            body.edit-mode .big-clock-date-wrapper {
-                outline: 1px dashed #ff9f0a;
-                outline-offset: -2px;
-            }
-
-            .big-clock-time,
-            .big-clock-date-wrapper,
-            .main-weather-container {
-                transform-origin: center center !important;
-                transition: transform 0.05s ease-out;
-                touch-action: none; /* Zaujmeme kontrolu nad dotykovými gestami v režime úprav */
-            }
-            
-            /* Zvýraznenie blokov v Režime Úprav */
-            body.edit-mode .big-clock-time,
-            body.edit-mode .big-clock-date-wrapper,
-            body.edit-mode .main-weather-container {
-                outline: 2px dashed #ff9f0a !important;
-                outline-offset: 4px;
-                cursor: ns-resize !important;
-            }
-            /* Kontajnery pre relatívne polohovanie tlačidiel */
-            .clock-row-container, 
-            .date-row-container {
-              position: relative;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              width: 100%;
-            }
-            
-            /* Ovládacie tlačidlá sú predvolene skryté */
-            .edit-controls {
-              display: none;
-              position: absolute;
-              right: 10px;
-              gap: 6px;
-              z-index: 10;
-            }
-            
-            /* Zobrazenie tlačidiel LEN pri zapnutom Režime úprav */
-            body.edit-mode .edit-controls {
-              display: flex;
-            }
-            
-            /* Vzhľad tlačidiel */
-            .edit-controls button {
-              background: rgba(51, 65, 85, 0.8);
-              color: #fff;
-              border: 1px solid rgba(255, 255, 255, 0.3);
-              border-radius: 6px;
-              width: 32px;
-              height: 32px;
-              font-size: 18px;
-              font-weight: bold;
-              cursor: pointer;
-              backdrop-filter: blur(4px);
-            }
-            
-            .edit-controls button:active {
-              background: #0284c7;
-            }
-            
-        }
-        
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
