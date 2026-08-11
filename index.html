@@ -1940,11 +1940,32 @@
             const existingIndex = slotFavorites.indexOf(id);
             
             if (existingIndex !== -1) {
-                // Ak už v zozname je, kliknutím ho odstránime
-                slotFavorites.splice(existingIndex, 1);
+                // Ak je stanica zrušená:
+                if (existingIndex < 6) {
+                    // Ak je v prvej šestke, nahradíme ju voľným slotom (null), aby držala pozíciu pre novú stanicu
+                    slotFavorites[existingIndex] = null;
+                } else {
+                    // Ak je od 7. pozície nižšie, normálne ju odstránime
+                    slotFavorites.splice(existingIndex, 1);
+                }
             } else {
-                // Pridáme nové rádio na koniec zoznamu (bez obmedzenia počtu)
-                slotFavorites.push(id);
+                // Ak pridávame novú stanicu:
+                // Najprv skontrolujeme, či je voľné miesto (null) v prvej šestke (1 - 6)
+                let freeSlotIndex = -1;
+                for (let i = 0; i < 6; i++) {
+                    if (slotFavorites[i] === null || slotFavorites[i] === undefined) {
+                        freeSlotIndex = i;
+                        break;
+                    }
+                }
+        
+                if (freeSlotIndex !== -1) {
+                    // Vložíme ju na prvé voľné číslo (napr. na uvoľnenú pozíciu 2)
+                    slotFavorites[freeSlotIndex] = id;
+                } else {
+                    // Ak sú pozície 1 - 6 plné, pridáme ju na koniec zoznamu
+                    slotFavorites.push(id);
+                }
             }
             
             localStorage.setItem('kiosk_slots_v2', JSON.stringify(slotFavorites));
@@ -2011,15 +2032,16 @@
                     audio.pause(); 
                     document.getElementById("player-now-playing").innerText = "";
                 } else {
-                    // --- BOD 6: AUTOMATICKÝ POSUN NA 3. POZÍCIU (INDEX 2) ---
+                    // --- DYNAMICKÝ POSUN LEN PRE 3. POZÍCIU A NIŽŠIE ---
                     const isPortrait = window.matchMedia("(orientation: portrait)").matches;
                     if (isPortrait) {
                         let currentIndex = slotFavorites.indexOf(item.id);
                         
-                        // Ak stanica nie je v prvej trojke, presunieme ju na 3. miesto (index 2)
+                        // Stanice na pozícii 1 a 2 (index 0 a 1) sú NEDOTKNUTEĽNÉ.
+                        // Ak si klikol na stanicu z pozície 4 alebo nižšie (index > 2), posunie sa na 3. miesto (index 2).
                         if (currentIndex > 2) {
                             slotFavorites.splice(currentIndex, 1);
-                            slotFavorites.splice(2, 0, item.id);
+                            slotFavorites.splice(2, 0, item.id); // Vložíme presne na pozíciu 3 (index 2)
                             localStorage.setItem('kiosk_slots_v2', JSON.stringify(slotFavorites));
                         }
                     }
@@ -2032,7 +2054,6 @@
                 }
             }
         
-            // Pri kliknutí na rádio panel automaticky zbalíme na 2x3 a vyresetujeme scroll
             const sidebar = document.getElementById('favSidebarContainer');
             if (sidebar) {
                 sidebar.classList.remove('open');
