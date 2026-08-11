@@ -583,15 +583,14 @@
            ========================================================= */
         @media (orientation: portrait) {
         
-            /* Usporiadanie blokov pod seba */
+            /* Usporiadanie hlavného obsahu nad spodným panelom */
             .placeholder-view {
                 flex-direction: column !important;
-                justify-content: space-evenly !important;
+                justify-content: flex-start !important;
                 align-items: center !important;
-                padding: 5vh 4vw 3vh 4vw !important;
+                padding: 5vh 4vw 220px 4vw !important; /* Spodný pad zachováva miesto pre trvalo viditeľné rádiá */
             }
         
-            /* Stredný blok s hodinami vyplní hornú polovicu */
             .clock-middle-container {
                 height: auto !important;
                 width: 100% !important;
@@ -599,19 +598,16 @@
                 justify-content: center !important;
             }
         
-            /* Obrovské dynamické hodiny pre režim na výšku */
             body:not(.full-night-mode) .big-clock-time {
-                font-size: clamp(6rem, 22vw, 15rem) !important;
+                font-size: clamp(5rem, 18vw, 12rem) !important;
                 line-height: 0.85 !important;
             }
         
-            /* Dátum a meniny pod hodinami */
             .big-clock-date-wrapper {
-                font-size: clamp(1.1rem, 4vw, 2.2rem) !important;
-                margin-top: 1.5vh !important;
+                font-size: clamp(1.1rem, 3.8vw, 2rem) !important;
+                margin-top: 1.2vh !important;
             }
         
-            /* Počasie v spodnej polovici */
             .main-weather-container {
                 width: 100% !important;
                 max-width: 100% !important;
@@ -620,29 +616,47 @@
                 justify-content: center !important;
             }
         
-            /* --- VYSÚVANIE RÁDIÍ ZDOLA NA VÝŠKU --- */
+            /* --- SPODNÝ ROLOVACÍ PANEL RÁDIÍ (PORTRAIT) --- */
             .favorites-sidebar {
                 top: auto !important;
                 bottom: 0 !important;
                 left: 0 !important;
                 width: 100vw !important;
-                height: 45vh !important; /* Výška vysunutého panelu */
+                height: 190px !important; /* Výška pre mriežku 3x2 pri zbalenom stave */
+                max-height: 85vh !important; /* Maximálna výška pri plnom vytiahnutí */
                 border-right: none !important;
                 border-top: 2px solid #222 !important;
                 box-shadow: 0 -10px 25px rgba(0,0,0,0.9) !important;
                 
-                /* Mriežka 3 stĺpce x 2 riadky */
+                /* Mriežka: 3 stĺpce, riadky sa prispôsobujú obsahu */
                 grid-template-columns: repeat(3, 1fr) !important;
-                grid-template-rows: repeat(2, 1fr) !important;
-                padding: 20px 15px 20px 15px !important;
+                grid-template-rows: auto !important;
+                padding: 24px 12px 20px 12px !important;
+                gap: 8px !important;
         
-                /* Animácia zdola nahor */
-                transform: translateY(100%) !important;
-                transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
+                /* Trvalo viditeľný na spodku (neposúvame ho mimo obrazovku) */
+                transform: translateY(0) !important;
+                transition: height 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
+                overflow-y: hidden !important; /* V zbalenom stave nescrolluje */
             }
         
+            /* Vytiahnutý / Otvorený stav */
             .favorites-sidebar.open {
-                transform: translateY(0) !important;
+                height: 80vh !important;
+                overflow-y: auto !important; /* Pri vytiahnutí sa dá scrollovať */
+            }
+        
+            /* Vizuálna rukoväť pre vytiahnutie panelu */
+            .favorites-sidebar::before {
+                content: '';
+                position: absolute;
+                top: 8px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 40px;
+                height: 4px;
+                background: #444;
+                border-radius: 2px;
             }
         }
         /* =========================================================
@@ -1790,23 +1804,31 @@
 
         function renderSidebarFavorites() {
             const container = document.getElementById('favSidebarContainer');
-            if(!container) return;
+            if (!container) return;
             container.innerHTML = "";
-
-            for (let i = 0; i < 6; i++) {
-                const id = slotFavorites[i];
+        
+            const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+            
+            // Zistíme si zoznam platných ID z nastavení (odstránime null)
+            let activeFavorites = slotFavorites.filter(id => id !== null);
+        
+            // V režime na šírku chceme zobraziť presne 6 pozícií (vrátane prázdnych)
+            // V režime na výšku zobrazíme všetky vybrané médiá
+            const displayList = isPortrait ? activeFavorites : slotFavorites.slice(0, 6);
+        
+            displayList.forEach((id, i) => {
                 const item = DATABASE.find(d => d.id === id);
                 const card = document.createElement('div');
-                
+        
                 if (item && id !== null) {
                     card.className = "fav-card";
-                    
+        
                     if (currentPlayingType === item.id && !audio.paused) {
                         card.classList.add("playing");
                     }
-                    
+        
                     card.onclick = () => handleFavCardClick(item);
-
+        
                     if (item.img) {
                         card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
                     } else if (item.icon) {
@@ -1817,7 +1839,7 @@
                     card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
                 }
                 container.appendChild(card);
-            }
+            });
         }
 
         function renderSettingsGrid() {
@@ -1931,12 +1953,28 @@
 
         function handleFavCardClick(item) {
             if (isSettingsModeActive) return;
+        
             if (item.url) {
                 if (currentPlayingType === item.id) {
                     audio.pause(); 
                     document.getElementById("player-now-playing").innerText = "";
-                    renderSidebarFavorites(); 
                 } else {
+                    // --- DYNAMICKÝ POSUN NA 3. POZÍCIU (INDEX 2) ---
+                    const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+                    if (isPortrait) {
+                        let currentIndex = slotFavorites.indexOf(item.id);
+                        
+                        // Ak je stanica ďalej ako na prvej trojke (index 0, 1, 2)
+                        if (currentIndex > 2) {
+                            // Vyberieme ju zo súčasného miesta
+                            slotFavorites.splice(currentIndex, 1);
+                            // Vložíme ju presne na 3. miesto (index 2)
+                            slotFavorites.splice(2, 0, item.id);
+                            // Uložíme zmenu, aby ostala zachovaná
+                            localStorage.setItem('kiosk_slots_v2', JSON.stringify(slotFavorites));
+                        }
+                    }
+        
                     if (item.icon && (item.id === 'spotify' || item.id === 'applemusic' || item.id === 'youtube' || item.id === 'tidal')) {
                         triggerExternalApp(item.url, item.id);
                     } else {
@@ -1944,8 +1982,11 @@
                     }
                 }
             }
+        
             const sidebar = document.getElementById('favSidebarContainer');
             if (sidebar) sidebar.classList.remove('open');
+            
+            renderSidebarFavorites();
             aktualizujTriggerText();
         }
 
@@ -2660,6 +2701,38 @@
             skontrolujAutoStartRadiaPoReloadu();
             setInterval(skontrolujNochnuAktualizaciu, 60000);
         });
+       // --- GESTÁ DOTYKU PRE PANEL RÁDIÍ NA VÝŠKU ---
+            let touchStartY = 0;
+            let touchEndY = 0;
+            
+            const favSidebarEl = document.getElementById('favSidebarContainer');
+            
+            if (favSidebarEl) {
+                favSidebarEl.addEventListener('touchstart', (e) => {
+                    touchStartY = e.changedTouches[0].screenY;
+                }, { passive: true });
+            
+                favSidebarEl.addEventListener('touchend', (e) => {
+                    touchEndY = e.changedTouches[0].screenY;
+                    handleSwipeGesture();
+                }, { passive: true });
+            }
+            
+            function handleSwipeGesture() {
+                const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+                if (!isPortrait || !favSidebarEl) return;
+            
+                const swipeDistance = touchStartY - touchEndY;
+            
+                // Potiahnutie nahor o viac ako 40px -> Otvoriť
+                if (swipeDistance > 40 && !favSidebarEl.classList.contains('open')) {
+                    favSidebarEl.classList.add('open');
+                } 
+                // Potiahnutie nadol o viac ako 40px -> Zbaliť (len ak sme na vrchu scrollu)
+                else if (swipeDistance < -40 && favSidebarEl.classList.contains('open') && favSidebarEl.scrollTop === 0) {
+                    favSidebarEl.classList.remove('open');
+                }
+            }
     </script>
 
     <!-- Modal pre zoznam mien -->
