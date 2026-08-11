@@ -148,27 +148,28 @@
         }
 
         /* --- PANEL RÁDIÍ AKO PREKRYTIE (OVERLAY) --- */
+        /* --- PANEL RÁDIÍ (ZÁKLAD PRE LANDSCAPE - VYSÚVANIE ZĽAVA) --- */
         .favorites-sidebar {
-            position: absolute !important;
-            top: 0;
-            left: 0;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
             width: 280px !important;
             height: 100vh !important;
             z-index: 99999 !important;
-            background: rgba(5, 5, 5, 0.95) !important;
+            background: rgba(5, 5, 5, 0.98) !important;
             border-right: 1px solid #222;
             box-shadow: 10px 0 25px rgba(0,0,0,0.8);
             
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
-            grid-template-rows: repeat(3, minmax(100px, 1fr)) !important;
+            grid-template-rows: repeat(3, 1fr) !important;
             gap: 10px !important;
             padding: 60px 10px 20px 10px !important;
             box-sizing: border-box !important;
-            overflow-y: auto !important;
-
-            transform: translateX(-100%);
-            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+        
+            /* Na šírku sa schová vľavo mimo obrazovku */
+            transform: translateX(-100%) !important;
+            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
         }
         
         .favorites-sidebar.open {
@@ -619,7 +620,13 @@
         /* =========================================================
            ZOBRAZENIE NA VÝŠKU (PORTRAIT)
            ========================================================= */
-        @media (orientation: portrait) {
+        
+            @media (orientation: portrait) {
+            /* 1. Úplné skrytie panelu rádií pri otvorených nastaveniach */
+            body:has(.settings-grid-view.active) .favorites-sidebar,
+            .settings-grid-view.active ~ .favorites-sidebar {
+                display: none !important;
+            }
         
             /* Usporiadanie hlavného obsahu */
             .placeholder-view {
@@ -654,39 +661,37 @@
                 justify-content: center !important;
             }
         
-            /* --- BODOV 1, 3, 5: SPODNÝ PANEL RÁDIÍ --- */
+            /* 2. Spodný vysúvací panel rádií */
             .favorites-sidebar {
                 top: auto !important;
                 bottom: 0 !important;
                 left: 0 !important;
                 width: 100vw !important;
-                height: 205px !important; /* Mierne zväčšené, aby plne zobrazil 2 riadky (6 tlačidiel) */
+                height: 205px !important;
                 max-height: 82vh !important;
                 border-right: none !important;
                 border-top: 2px solid #222 !important;
                 box-shadow: 0 -10px 25px rgba(0,0,0,0.9) !important;
-                background: rgba(5, 5, 5, 0.98) !important;
                 
-                /* Husté usporiadanie mriežky pre všetky riadky */
                 grid-template-columns: repeat(3, 1fr) !important;
                 grid-auto-rows: 76px !important; 
                 padding: 20px 10px 15px 10px !important;
                 gap: 8px !important;
-        
-                /* Plynulé prichytávanie po riadkoch */
                 scroll-snap-type: y mandatory !important;
-        
-                transform: translateY(0) !important;
-                transition: height 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
+                
+                /* Na výšku sa schováva smerom dole (translateY) */
+                transform: translateY(100%) !important;
+                transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), height 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
                 overflow-y: hidden !important;
             }
         
+            /* Otvorený stav na výšku */
             .favorites-sidebar.open {
+                transform: translateY(0) !important;
                 height: 78vh !important;
                 overflow-y: auto !important;
             }
         
-            /* Husté tlačidlá s prichytávaním */
             .favorites-sidebar .fav-card {
                 height: 76px !important;
                 width: 100% !important;
@@ -1868,14 +1873,13 @@
         
             const isPortrait = window.matchMedia("(orientation: portrait)").matches;
             
-            // Zistíme si zoznam platných ID z nastavení (odstránime null)
+            // Zistíme si zoznam platných ID z nastavení
             let activeFavorites = slotFavorites.filter(id => id !== null);
         
-            // V režime na šírku chceme zobraziť presne 6 pozícií (vrátane prázdnych)
-            // V režime na výšku zobrazíme všetky vybrané médiá
+            // Na výšku aj na šírku vezmeme prvých 6 pozícií presne podľa poradia
             const displayList = isPortrait ? activeFavorites : slotFavorites.slice(0, 6);
         
-            displayList.forEach((id, i) => {
+            displayList.forEach((id) => {
                 const item = DATABASE.find(d => d.id === id);
                 const card = document.createElement('div');
         
@@ -2028,7 +2032,13 @@
                 if (placeholder) placeholder.style.display = 'none';
                 if (weatherView) weatherView.style.display = 'none';
                 if (gridView) gridView.classList.add('active');
-                if (favSidebar) favSidebar.classList.add('open');
+                
+                // Panel rádia sa otvorí LEN v režime na šírku (Landscape)
+                if (favSidebar && window.innerWidth > window.innerHeight) {
+                    favSidebar.classList.add('open');
+                } else if (favSidebar) {
+                    favSidebar.classList.remove('open'); // Na výšku ho pre istotu zatvoríme
+                }
                 
                 renderSettingsGrid();
                 resetSettingsTimer(); 
