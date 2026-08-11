@@ -77,6 +77,24 @@
             margin: 0 !important;
             transition: color 0.2s, background 0.2s, border-color 0.2s; 
         }
+        /* --- ODZNAK ČÍSLA POZÍCIE V NASTAVENIACH --- */
+        .cfg-slot-badge {
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            background: #ff9f0a;
+            color: #000;
+            font-size: 11px;
+            font-weight: 800;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 6px rgba(0,0,0,0.8);
+            z-index: 5;
+        }
         .btn-settings.active { color: #ff9f0a; border-color: #ff9f0a; background: #1a1a1a; }
         #fullscreenToggleBtn.active { color: #ff9f0a; border-color: #ff9f0a; background: #1a1a1a; }
         #fullscreenToggleBtn {
@@ -320,17 +338,18 @@
         #mainBigIcon { font-size: clamp(3rem, 12vh, 7rem) !important; line-height: 1; }
         #mainBigTemp { font-size: clamp(2.5rem, 10vh, 6rem) !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
 
-        .weather-sub-row { 
-            font-size: clamp(1rem, 2.5vh, 1.8rem) !important; 
-            font-weight: 600; 
+        /* --- ÚPRAVA POČASIA: VLHKOSŤ POD POCITOVOU TEPLOTOU --- */
+        .weather-sub-row {
+            font-size: clamp(0.9rem, 2vh, 1.5rem) !important;
+            font-weight: 600;
             display: flex;
-            flex-direction: row;   
-            align-items: center;
+            flex-direction: column !important; /* Dáme pod seba */
+            align-items: flex-start !important; /* Zarovnáme vedľa veľkej teploty */
             justify-content: center;
-            gap: 12px;                
-            margin-top: 1vh !important;
+            gap: 4px !important;
+            margin-top: 0 !important;
+            margin-left: 6px;
         }
-
         #mainWeatherDesc {
             font-size: clamp(0.9rem, 2.2vh, 1.5rem) !important;
             font-weight: 800;
@@ -1866,7 +1885,7 @@
 
         function renderSettingsGrid() {
             const grid = document.getElementById('settingsGridView');
-            if(!grid) return;
+            if (!grid) return;
         
             const nightPanel = grid.querySelector('.settings-night-panel');
             while (grid.lastChild && grid.lastChild !== nightPanel) {
@@ -1887,15 +1906,28 @@
                 const card = document.createElement('div');
                 card.className = "cfg-mini-card";
         
-                const isSelected = slotFavorites.includes(item.id);
-                if (isSelected) card.classList.add("selected");
+                // Zistíme pozíciu v zozname obľúbených
+                const favIndex = slotFavorites.indexOf(item.id);
+                const isSelected = favIndex !== -1;
+        
+                if (isSelected) {
+                    card.classList.add("selected");
+                    
+                    // Ak patrí medzi prvých 6, pridáme číslo 1 - 6
+                    if (favIndex < 6) {
+                        const badge = document.createElement('div');
+                        badge.className = "cfg-slot-badge";
+                        badge.textContent = favIndex + 1;
+                        card.appendChild(badge);
+                    }
+                }
         
                 card.onclick = (e) => { handleChannelSelectionToggle(item.id); e.stopPropagation(); };
         
                 if (item.img) {
-                    card.innerHTML = `<img src="${item.img}"><span>${item.name}</span>`;
+                    card.innerHTML += `<img src="${item.img}"><span>${item.name}</span>`;
                 } else if (item.icon) {
-                    card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
+                    card.innerHTML += `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
                 }
                 grid.appendChild(card);
             });
