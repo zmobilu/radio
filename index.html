@@ -622,31 +622,35 @@
                 bottom: 0 !important;
                 left: 0 !important;
                 width: 100vw !important;
-                height: 190px !important; /* Výška pre mriežku 3x2 pri zbalenom stave */
-                max-height: 85vh !important; /* Maximálna výška pri plnom vytiahnutí */
+                height: 190px !important; /* Základná výška pre 2 riadky v zbalenom stave */
+                max-height: 85vh !important;
                 border-right: none !important;
                 border-top: 2px solid #222 !important;
                 box-shadow: 0 -10px 25px rgba(0,0,0,0.9) !important;
+                background: rgba(5, 5, 5, 0.98) !important;
                 
-                /* Mriežka: 3 stĺpce, riadky sa prispôsobujú obsahu */
+                /* Mriežka: Fixed riadky pre dlaždice namiesto 1fr, aby sa nerozťahovali */
                 grid-template-columns: repeat(3, 1fr) !important;
-                grid-template-rows: auto !important;
+                grid-auto-rows: 72px !important; /* Pevná výška riadku pre zbalený aj vyrolovaný stav */
                 padding: 24px 12px 20px 12px !important;
                 gap: 8px !important;
         
-                /* Trvalo viditeľný na spodku (neposúvame ho mimo obrazovku) */
                 transform: translateY(0) !important;
                 transition: height 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
-                overflow-y: hidden !important; /* V zbalenom stave nescrolluje */
+                overflow-y: hidden !important;
             }
         
-            /* Vytiahnutý / Otvorený stav */
             .favorites-sidebar.open {
-                height: 80vh !important;
-                overflow-y: auto !important; /* Pri vytiahnutí sa dá scrollovať */
+                height: 75vh !important;
+                overflow-y: auto !important; /* Zapne scrollbar pri vytiahnutí */
             }
         
-            /* Vizuálna rukoväť pre vytiahnutie panelu */
+            /* Tvar dlaždíc v portrate */
+            .favorites-sidebar .fav-card {
+                height: 72px !important; /* Pevná výška tlačidla */
+                width: 100% !important;
+            }
+        
             .favorites-sidebar::before {
                 content: '';
                 position: absolute;
@@ -1884,17 +1888,15 @@
 
         function handleChannelSelectionToggle(id) {
             const existingIndex = slotFavorites.indexOf(id);
+            
             if (existingIndex !== -1) {
-                slotFavorites[existingIndex] = null;
+                // Ak už v zozname je, kliknutím ho odstránime
+                slotFavorites.splice(existingIndex, 1);
             } else {
-                const freeSlotIndex = slotFavorites.indexOf(null);
-                if (freeSlotIndex !== -1) {
-                    slotFavorites[freeSlotIndex] = id;
-                } else {
-                    alert("Všetkých 6 pozícií je plných. Najprv kliknutím uvoľnite niektoré miesto.");
-                    return;
-                }
+                // Pridáme nové rádio na koniec zoznamu (bez obmedzenia počtu)
+                slotFavorites.push(id);
             }
+            
             localStorage.setItem('kiosk_slots_v2', JSON.stringify(slotFavorites));
             renderSidebarFavorites();
             renderSettingsGrid();
