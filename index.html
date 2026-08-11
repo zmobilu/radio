@@ -317,38 +317,57 @@
             box-sizing: border-box;
         }
 
+        /* --- UPRATANÁ A VYBALANSOVANÁ SEKCIA POČASIA --- */
         .weather-top-row {
             display: flex;
-            flex-direction: row;
+            flex-direction: column !important; /* Ikona nad riadkom s teplotou */
             align-items: center;
             justify-content: center;
-            gap: 5px;
             width: 100%;
             padding: 0 10px;
             box-sizing: border-box;
         }
         
-        .weather-core-row {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
+        #mainBigIcon {
+            font-size: clamp(3.5rem, 11vh, 6.5rem) !important;
+            line-height: 1;
+            margin-bottom: 6px !important; /* Odstup ikony od čísiel */
         }
-        #mainBigIcon { font-size: clamp(3rem, 12vh, 7rem) !important; line-height: 1; }
-        #mainBigTemp { font-size: clamp(2.5rem, 10vh, 6rem) !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
-
-        /* --- ÚPRAVA POČASIA: VLHKOSŤ POD POCITOVOU TEPLOTOU --- */
+        
+        /* Riadok, kde je hlavná teplota vedľa dvoch menších údajov */
+        .weather-core-row {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 12px !important;
+        }
+        
+        #mainBigTemp {
+            font-size: clamp(3rem, 11vh, 6.5rem) !important;
+            font-weight: 800;
+            line-height: 1;
+            white-space: nowrap !important;
+        }
+        
+        /* Dva riadky vpravo: Pocitová teplota a vlhkosť */
         .weather-sub-row {
-            font-size: clamp(0.9rem, 2vh, 1.5rem) !important;
-            font-weight: 600;
-            display: flex;
-            flex-direction: column !important; /* Dáme pod seba */
-            align-items: flex-start !important; /* Zarovnáme vedľa veľkej teploty */
-            justify-content: center;
-            gap: 4px !important;
+            font-size: clamp(1.2rem, 2.6vh, 2.1rem) !important; /* Väčší, dobre čitateľný font */
+            font-weight: 700;
+            display: flex !important;
+            flex-direction: column !important; /* Pocitová teplota a vlhkosť pod sebou */
+            align-items: flex-start !important;
+            justify-content: center !important;
+            gap: 6px !important; /* Medzera medzi 31° a 34% */
+            line-height: 1.1 !important;
             margin-top: 0 !important;
-            margin-left: 6px;
+        }
+        
+        .sub-row-item-temp, .sub-row-item-hum {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
         }
         #mainWeatherDesc {
             font-size: clamp(0.9rem, 2.2vh, 1.5rem) !important;
@@ -1101,20 +1120,23 @@
                     <div class="weather-left-side">
                         <div class="big-clock-city" id="bigClockCity" onclick="prepniDalsieMestoZHistorie(event);" title="Kliknutím prelistujete na ďalšie uložené mesto">---</div>
                         <div class="weather-top-row">
+                            <!-- Ikona sa vznáša v strede nad hlavnými údajmi -->
+                            <span id="mainBigIcon">☀️</span>
+                        
+                            <!-- Hlavný riadok: Veľká teplota vľavo + pocitová/vlhkosť vpravo -->
                             <div class="weather-core-row">
-                                <span id="mainBigIcon">☀️</span>
                                 <span id="mainBigTemp">--°C</span>
-                            </div>
-                            
-                            <div class="weather-sub-row">
-                                <span class="sub-row-item-temp">
-                                    <i class="fa-solid fa-temperature-half"></i>
-                                    <span id="mainApparent">--°</span>
-                                </span>
-                                <span class="sub-row-item-hum">
-                                    <i class="fa-solid fa-droplet"></i>
-                                    <span id="mainHumidity">--%</span>
-                                </span>
+                                
+                                <div class="weather-sub-row">
+                                    <span class="sub-row-item-temp">
+                                        <i class="fa-solid fa-temperature-half"></i>
+                                        <span id="mainApparent">--°</span>
+                                    </span>
+                                    <span class="sub-row-item-hum">
+                                        <i class="fa-solid fa-droplet"></i>
+                                        <span id="mainHumidity">--%</span>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         
