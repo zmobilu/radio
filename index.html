@@ -574,7 +574,8 @@
         
         body.full-night-mode .favorites-sidebar,
         body.full-night-mode .big-clock-date-wrapper,
-        body.full-night-mode #settingsToggleBtn, 
+        body.full-night-mode #settingsToggleBtn,
+        body.full-night-mode .radio-trigger-bar,
         body.full-night-mode .main-weather-container { 
             display: none !important;
         }
@@ -620,9 +621,9 @@
         /* =========================================================
            ZOBRAZENIE NA VÝŠKU (PORTRAIT)
            ========================================================= */
+        @media (orientation: portrait) {
         
-            @media (orientation: portrait) {
-            /* 1. Úplné skrytie panelu rádií pri otvorených nastaveniach */
+            /* V Portrait režime pri otvorených nastaveniach panel rádií úplne skryť */
             body:has(.settings-grid-view.active) .favorites-sidebar,
             .settings-grid-view.active ~ .favorites-sidebar {
                 display: none !important;
@@ -633,7 +634,7 @@
                 flex-direction: column !important;
                 justify-content: flex-start !important;
                 align-items: center !important;
-                padding: 5vh 4vw 210px 4vw !important; /* Mierne zmenšený padding pre viac miesta */
+                padding: 5vh 4vw 210px 4vw !important; /* Miesto pre spodný panel */
             }
         
             .clock-middle-container {
@@ -661,33 +662,36 @@
                 justify-content: center !important;
             }
         
-            /* 2. Spodný vysúvací panel rádií */
+            /* --- SPODNÝ PANEL RÁDIÍ (VŽDY VIDITEĽNÝ SPODOK) --- */
             .favorites-sidebar {
+                position: fixed !important;
                 top: auto !important;
                 bottom: 0 !important;
                 left: 0 !important;
                 width: 100vw !important;
-                height: 205px !important;
+                height: 205px !important; /* Výška pre viditeľné 2 riadky (6 tlačidiel) */
                 max-height: 82vh !important;
                 border-right: none !important;
                 border-top: 2px solid #222 !important;
                 box-shadow: 0 -10px 25px rgba(0,0,0,0.9) !important;
+                background: rgba(5, 5, 5, 0.98) !important;
                 
+                display: grid !important;
                 grid-template-columns: repeat(3, 1fr) !important;
                 grid-auto-rows: 76px !important; 
                 padding: 20px 10px 15px 10px !important;
                 gap: 8px !important;
+                
                 scroll-snap-type: y mandatory !important;
                 
-                /* Na výšku sa schováva smerom dole (translateY) */
-                transform: translateY(100%) !important;
-                transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), height 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
+                /* ZRUŠENÝ posun preč - panel opäť trčí zo spodu */
+                transform: translateY(0) !important; 
+                transition: height 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
                 overflow-y: hidden !important;
             }
         
-            /* Otvorený stav na výšku */
+            /* VYTIAHNUTÝ STAV (po kliknutí na ikonu rádia / potiahnutí) */
             .favorites-sidebar.open {
-                transform: translateY(0) !important;
                 height: 78vh !important;
                 overflow-y: auto !important;
             }
@@ -710,7 +714,7 @@
                 border-radius: 2px;
             }
         
-            /* --- BOD 2: NASTAVENIA PRE PORTRAIT (PLNÁ ŠÍRKA) --- */
+            /* Nastavenia na plnú šírku */
             .settings-grid-view {
                 left: 0 !important;
                 width: 100vw !important;
@@ -2260,19 +2264,23 @@
                 
                 let meninyNocturnalText = "";
                 if (dnesneMeno) {
-                    const extraMena = (dnesneVsetkyMena.length > 1) ? ` +${dnesneVsetkyMena.length - 1}` : "";
+                    const extraMena = (dnesneVsetkyMena && dnesneVsetkyMena.length > 1) ? ` +${dnesneVsetkyMena.length - 1}` : "";
                     meninyNocturnalText = `${dnesneMeno}${extraMena}    •    `;
                 }
                 
                 if (bottomInfoEl) {
+                    // Natvrdo zapneme zobrazenie, aby ho nič nevytláčalo/neskrývalo
+                    bottomInfoEl.style.display = "block";
+            
                     const lenCisloTeploty = parseInt(aktualnaTeplotaText.replace(/[^0-9.-]/g, '')) || 0;
                     const tColorNoc = getTempColor(lenCisloTeploty);
                     const ikonkaW = aktualnaTeplotaText.split(' ')[0] || "☀️";
-
+            
                     bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}    •    ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>`;
                 }
             } else {
                 bodyEl.classList.remove('full-night-mode');
+                if (bottomInfoEl) bottomInfoEl.style.display = "none";
                 if (!jeNocnyCas) manualnaNocAktivna = false;
             }
             
