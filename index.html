@@ -816,15 +816,21 @@
                 width: auto !important;
             }
 
-            /* Spodný info riadok v noci */
+            /* Prinútenie zobrazenia spodného riadku v noci (Portrait aj Landscape) */
             body.full-night-mode #nightBottomInfo {
-                position: relative !important;
-                bottom: auto !important;
-                margin-top: 2vh !important;
-                font-size: clamp(1.2rem, 4vh, 2.5rem) !important;
+                display: block !important;
+                font-size: clamp(1.1rem, 2.8vh, 2.2rem) !important;
                 font-weight: 600 !important;
                 text-align: center !important;
                 width: 100% !important;
+                color: var(--night-color) !important;
+                margin-top: 1.5vh !important;
+                z-index: 100 !important;
+            }
+            
+            /* Ak chceš, aby bol prehrávač v noci viditeľný vždy (aj keď je offline) */
+            body.full-night-mode .night-player-container {
+                display: flex !important;
             }
 
             .settings-grid-view {
@@ -2262,7 +2268,8 @@
             const bodyEl = document.body;
             const bottomInfoEl = document.getElementById('nightBottomInfo');
 
-            if ((jeNocnyCas || manualnaNocAktivna) && terazMili > nocnyRezimSnoozeDo && !isSettingsModeActive) {
+            // Vo vnútri podmienky pre nočný režim v runClockEngine():
+            if ((jeNocnyCas || manualnaNocAktivna) && terazMili > nocnyRezilSnoozeDo && !isSettingsModeActive) {
                 bodyEl.classList.add('full-night-mode');
                 
                 let meninyNocturnalText = "";
@@ -2272,15 +2279,17 @@
                 }
                 
                 if (bottomInfoEl) {
-                    // Natvrdo zapneme zobrazenie, aby ho nič nevytláčalo/neskrývalo
                     bottomInfoEl.style.display = "block";
-            
                     const lenCisloTeploty = parseInt(aktualnaTeplotaText.replace(/[^0-9.-]/g, '')) || 0;
                     const tColorNoc = getTempColor(lenCisloTeploty);
                     const ikonkaW = aktualnaTeplotaText.split(' ')[0] || "☀️";
             
                     bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}    •    ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>`;
                 }
+            
+                // DOPLNENIE: Obnovíme vizuál prehrávača pri každom tiknutí hodín v noci
+                aktualizujNochnyPrehravacVizual();
+            
             } else {
                 bodyEl.classList.remove('full-night-mode');
                 if (bottomInfoEl) bottomInfoEl.style.display = "none";
