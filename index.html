@@ -1388,6 +1388,7 @@
             }
         }
         
+        // Úprava v listeneri pre kliknutie mimo panela:
         document.addEventListener('click', (e) => {
             const sidebar = document.getElementById('favSidebarContainer');
             const trigger = document.querySelector('.radio-trigger-bar');
@@ -1395,6 +1396,7 @@
             if (sidebar && sidebar.classList.contains('open')) {
                 if (!sidebar.contains(e.target) && !trigger.contains(e.target)) {
                     sidebar.classList.remove('open');
+                    setTimeout(() => { sidebar.scrollTop = 0; }, 300);
                 }
             }
         });
@@ -2069,11 +2071,9 @@
                     if (isPortrait) {
                         let currentIndex = slotFavorites.indexOf(item.id);
                         
-                        // Stanice na pozícii 1 a 2 (index 0 a 1) sú NEDOTKNUTEĽNÉ.
-                        // Ak si klikol na stanicu z pozície 4 alebo nižšie (index > 2), posunie sa na 3. miesto (index 2).
                         if (currentIndex > 2) {
                             slotFavorites.splice(currentIndex, 1);
-                            slotFavorites.splice(2, 0, item.id); // Vložíme presne na pozíciu 3 (index 2)
+                            slotFavorites.splice(2, 0, item.id);
                             localStorage.setItem('kiosk_slots_v2', JSON.stringify(slotFavorites));
                         }
                     }
@@ -2088,8 +2088,11 @@
         
             const sidebar = document.getElementById('favSidebarContainer');
             if (sidebar) {
+                // Zavrieme panel a resetujeme skrolovanie na samý vrch (prvé 2 riadky)
                 sidebar.classList.remove('open');
-                sidebar.scrollTop = 0;
+                setTimeout(() => {
+                    sidebar.scrollTop = 0;
+                }, 300); // Počkám na dokončenie vysúvacej animácie
             }
             
             renderSidebarFavorites();
@@ -2828,6 +2831,7 @@
                 }, { passive: true });
             }
             
+            // Úprava v gestách swipe na výšku:
             function handleSwipeGesture() {
                 const isPortrait = window.matchMedia("(orientation: portrait)").matches;
                 if (!isPortrait || !favSidebarEl) return;
@@ -2838,9 +2842,10 @@
                 if (swipeDistance > 40 && !favSidebarEl.classList.contains('open')) {
                     favSidebarEl.classList.add('open');
                 } 
-                // Potiahnutie nadol o viac ako 40px -> Zbaliť (len ak sme na vrchu scrollu)
-                else if (swipeDistance < -40 && favSidebarEl.classList.contains('open') && favSidebarEl.scrollTop === 0) {
+                // Potiahnutie nadol o viac ako 40px -> Zbaliť a vynulovať posun
+                else if (swipeDistance < -40 && favSidebarEl.classList.contains('open') && favSidebarEl.scrollTop <= 10) {
                     favSidebarEl.classList.remove('open');
+                    setTimeout(() => { favSidebarEl.scrollTop = 0; }, 300);
                 }
             }
     </script>
