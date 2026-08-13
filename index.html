@@ -604,9 +604,14 @@
             transform: scaleY(1.20) !important; 
         }
         
+        /* VŠETKY PRVKY V NOČNOM REŽIME PREBERAJÚ AKTUÁLNU NOČNÚ FARBU */
         body.full-night-mode .big-clock-hours, 
         body.full-night-mode .big-clock-minutes, 
         body.full-night-mode #nightBottomInfo, 
+        body.full-night-mode #nightBottomInfo *,
+        body.full-night-mode #bigDate,
+        body.full-night-mode #bigNameday,
+        body.full-night-mode #dateSeparator,
         body.full-night-mode #player-now-playing { 
             color: var(--night-color) !important; 
         }
@@ -657,8 +662,8 @@
         /* ŠTÝL PRE MESTO V DENNOM REŽIME */
         #bigClockCity {
             color: #ff9f0a;
-            font-weight: 800;
-            letter-spacing: 2px;
+            font-weight: 900;
+            letter-spacing: 3px;
             text-transform: uppercase;
             font-size: clamp(1rem, 2.5vh, 1.8rem);
             margin-bottom: 0.8vh;
