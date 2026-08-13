@@ -515,8 +515,8 @@
         .settings-label-separator { grid-column: 1 / -1; font-size: 16px; text-transform: uppercase; letter-spacing: 1.5px; color: #555; margin: 12px 0 2px 4px; font-weight: 700; border-bottom: 1px solid #1a1a1a; padding-bottom: 3px; }
     
         #nightBottomInfo { display: none; }
-
-        /* --- INTEGRATNÝ NOČNÝ PREHRÁVAČ --- */
+        
+        /* --- INTEGligeTNÝ NOČNÝ PREHRÁVAČ --- */
         .night-player-container {
             display: none;
             flex-direction: column;
@@ -614,7 +614,7 @@
         /* Spodný riadok (Meniny • Dátum • Počasie) */
         body.full-night-mode .big-clock-date-wrapper,
         body.full-night-mode #nightBottomInfo { 
-           display: flex !important;
+            display: flex !important;
             position: absolute !important;
             bottom: 4vh !important;
             left: 0 !important;
@@ -623,18 +623,36 @@
             align-items: center !important;
             z-index: 100 !important;
             color: var(--night-color) !important;
+            font-size: clamp(16px, 3.5vw, 28px) !important;
+            font-weight: 600 !important;
         }
         
+        /* Zobrazenie a pozícia nočného prehrávača nad spodným riadkom */
+        body.full-night-mode .night-player-container,
         body.full-night-mode .night-player-container.active-playing {
             display: flex !important;
+            position: absolute !important;
+            bottom: 12vh !important;
+            left: 0 !important;
+            width: 100% !important;
+            justify-content: center !important;
+            align-items: center !important;
+            z-index: 100 !important;
+            color: var(--night-color) !important;
         }
+
+        body.full-night-mode #player-now-playing {
+            display: block !important;
+            text-align: center;
+        }
+
         /* Landscape úpravy */
         @media (orientation: landscape) {
-            body.full-night-mode #nightBottomInfo {
+            body.full-night-mode #nightBottomInfo,
+            body.full-night-mode .big-clock-date-wrapper {
                 font-size: 3.2vw !important;
             }
         }
-
 
         /* ŠTÝL PRE MESTO V DENNOM REŽIME */
         #bigClockCity {
@@ -1124,11 +1142,7 @@
             z-index: 100 !important;
         }
         
-        /* Prehrávač v noci sa zobrazí automaticky pri hrajúcom rádiu */
-        body.full-night-mode .night-player-container.active-playing {
-            display: flex !important;
-            margin-top: 1.5vh !important;
-        }
+  
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
