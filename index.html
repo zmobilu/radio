@@ -95,6 +95,10 @@
             display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr);
             gap: 6px; padding: 6px; box-sizing: border-box;
             padding-left: calc(6px + env(safe-area-inset-left));
+					/* PRIDANÉ PRE SCROLOVANIE DOLE/HORE */
+		    overflow-y: auto; 
+		    overflow-x: hidden;
+		    -webkit-overflow-scrolling: touch; /* Hladký dojazd na iOS */
         }
         .fav-card {
             background: #111; border: 1px solid #222; border-radius: 12px;
@@ -766,6 +770,10 @@
                 padding-left: calc(8px + env(safe-area-inset-left));
                 padding-right: calc(8px + env(safe-area-inset-right));
                 margin-bottom: 0 !important;
+						/* PRIDANÉ PRE SCROLOVANIE DOPRAVA/DOĽAVA ALEBO HORE/DOLE NA VÝŠKU */
+		        overflow-y: auto;
+		        overflow-x: hidden;
+		        -webkit-overflow-scrolling: touch;
             }
             .main-content-area { width: 100vw; flex: 1; order: 1; }
             
@@ -1807,36 +1815,35 @@
         }
 
         function renderSidebarFavorites() {
-            const container = document.getElementById('favSidebarContainer');
-            if(!container) return;
-            container.innerHTML = "";
-
-            for (let i = 0; i < 6; i++) {
-                const id = slotFavorites[i];
-                const item = DATABASE.find(d => d.id === id);
-                const card = document.createElement('div');
-                
-                if (item && id !== null) {
-                card.className = "fav-card";
-                
-                if (currentPlayingType === item.id && !audio.paused) {
-                    card.classList.add("playing");
-                }
-                
-                card.onclick = () => handleFavCardClick(item);
-
-                if (item.img) {
-                    card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
-                } else if (item.icon) {
-                    card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
-                }
-            } else {
-                    card.className = "fav-card empty";
-                    card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
-                }
-                container.appendChild(card);
-            }
-        }
+		    const container = document.getElementById('favSidebarContainer');
+		    if(!container) return;
+		    container.innerHTML = "";
+		
+		    // Prejdeme celé pole slotFavorites (či už má 6, 10 alebo 20 staníc)
+		    slotFavorites.forEach((id) => {
+		        if (!id) return; // Prázdne sloty preskočíme
+		        
+		        const item = DATABASE.find(d => d.id === id);
+		        const card = document.createElement('div');
+		        
+		        if (item) {
+		            card.className = "fav-card";
+		            
+		            if (currentPlayingType === item.id && !audio.paused) {
+		                card.classList.add("playing");
+		            }
+		            
+		            card.onclick = () => handleFavCardClick(item);
+		
+		            if (item.img) {
+		                card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
+		            } else if (item.icon) {
+		                card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
+		            }
+		            container.appendChild(card);
+		        }
+		    });
+		}
 
         function renderSettingsGrid() {
             const grid = document.getElementById('settingsGridView');
