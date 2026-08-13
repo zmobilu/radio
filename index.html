@@ -1082,6 +1082,24 @@
             box-sizing: border-box;
             transition: height 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
+        /* --- GARANCIA ZOBRAZENIA V NOČNOM REŽIME --- */
+        body.full-night-mode #nightBottomInfo {
+            display: block !important;
+            position: relative !important;
+            font-size: clamp(1.1rem, 2.8vh, 2.2rem) !important;
+            font-weight: 600 !important;
+            text-align: center !important;
+            width: 100% !important;
+            color: var(--night-color) !important;
+            margin-top: 1.5vh !important;
+            z-index: 100 !important;
+        }
+        
+        /* Prehrávač v noci sa zobrazí automaticky pri hrajúcom rádiu */
+        body.full-night-mode .night-player-container.active-playing {
+            display: flex !important;
+            margin-top: 1.5vh !important;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
