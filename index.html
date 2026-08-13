@@ -1091,15 +1091,11 @@
                 <div id="player-now-playing" style="color: #fff; text-align: center;"></div>
                 
                 <div class="main-weather-container">
-                <!-- KLIK NA AKTUÁLNE POČASIE -> OTVORÍ ŽIVÝ METEORADAR WINDY -->
-					<div class="weather-left-side" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
+              		<div class="weather-left-side">
 					    <div class="weather-top-row">
-					        <div class="weather-core-row">
-					            <span id="mainBigIcon">☀️</span>
-					            <span id="mainBigTemp">--°C</span>
-					        </div>
-					        
-					        <div class="weather-sub-row">
+						    <span id="mainBigIcon">☀️</span>
+					        <span id="mainBigTemp">--°C</span>
+					       	<div class="weather-sub-row">
 					            <span class="sub-row-item-temp">
 					                <i class="fa-solid fa-temperature-half"></i>
 					                <span id="mainApparent">--°</span>
@@ -1111,7 +1107,9 @@
 					        </div>
 					    </div>
 					    
-					    <div id="mainWeatherDesc">------</div>
+					    <div id="mainWeatherDesc" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
+						    ------ <i class="fa-solid fa-satellite-dish" style="color: #ff9f0a; margin-left: 8px; font-size: 0.85em;"></i>
+						</div>
 					</div>
 					
 					<!-- KLIK NA DNES A ZAJTRA -> OTVORÍ HODINOVÝ GRAF PRE DANÝ DEŇ -->
