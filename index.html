@@ -2286,7 +2286,8 @@
             
                     bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}    •    ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>`;
                 }
-            
+                // Bezpečné zavolanie aktualizácie nočného prehrávača
+                if (typeof aktualizujNochnyPrehravacVizual === 'function') {
                 // DOPLNENIE: Obnovíme vizuál prehrávača pri každom tiknutí hodín v noci
                 aktualizujNochnyPrehravacVizual();
             
