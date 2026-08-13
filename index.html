@@ -366,8 +366,23 @@
         }
         .cfg-mini-card {
             background: #151515; border: 1px solid #252525; border-radius: 10px; aspect-ratio: 1 / 1; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; cursor: pointer; box-sizing: border-box; position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; cursor: pointer; box-sizing: border-box; position: relative !important;
         }
+		.cfg-slot-badge {
+		    position: absolute;
+		    top: 4px;
+		    right: 4px;
+		    background: #ff9f0a;
+		    color: #000;
+		    font-size: 10px;
+		    font-weight: 800;
+		    width: 16px;
+		    height: 16px;
+		    border-radius: 50%;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		}
         .cfg-mini-card img { width: 60%; height: 60%; object-fit: contain; }
         .cfg-mini-card i { font-size: 22px; }
         .cfg-mini-card span { font-size: 9px; text-transform: uppercase; font-weight: 600; text-align: center; color: #888; margin-top: 3px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1835,19 +1850,29 @@
                 }
 
                 const card = document.createElement('div');
-                card.className = "cfg-mini-card";
-                
-                const isSelected = slotFavorites.includes(item.id);
-                if (isSelected) card.classList.add("selected");
-
-                card.onclick = (e) => { handleChannelSelectionToggle(item.id); e.stopPropagation(); };
-
-                if (item.img) {
-                    card.innerHTML = `<img src="${item.img}"><span>${item.name}</span>`;
-                } else if (item.icon) {
-                    card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
-                }
-                grid.appendChild(card);
+				card.className = "cfg-mini-card";
+				
+				card.onclick = (e) => { handleChannelSelectionToggle(item.id); e.stopPropagation(); };
+				
+				if (item.img) {
+				    card.innerHTML = `<img src="${item.img}"><span>${item.name}</span>`;
+				} else if (item.icon) {
+				    card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
+				}
+				
+				// NAHRADA ZA DVA ŽLTÉ RIADKY:
+				const mapovanieCisel = { 1: 1, 3: 2, 5: 3, 0: 4, 2: 5, 4: 6 };
+				const slotIndex = slotFavorites.indexOf(item.id);
+				
+				if (slotIndex !== -1) {
+				    card.classList.add("selected");
+				    const badge = document.createElement('div');
+				    badge.className = "cfg-slot-badge";
+				    badge.textContent = mapovanieCisel[slotIndex];
+				    card.appendChild(badge);
+				}
+				
+				grid.appendChild(card);
             });
             
             inicializujPlochuNastaveni();
