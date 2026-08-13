@@ -1414,7 +1414,7 @@
             if (currentPlayingType && currentPlayingType !== "" && !audio.paused) {
                 const item = DATABASE.find(d => d.id === currentPlayingType);
                 const nazov = item ? item.name : currentPlayingType.toUpperCase();
-                triggerText.textContent = `hrá ${nazov}`;
+                triggerText.textContent = `${nazov}`;
             } else {
                 triggerText.textContent = "";
             }
