@@ -564,7 +564,7 @@
         .night-btn:active { transform: scale(0.9); }
         .night-btn.btn-playpause { font-size: 2.8rem; }
 
-        /* --- NOČNÝ REŽIM (S PLYNULÝM STMIEVANÍM) --- */
+        /* --- OPRAVENÝ NOČNÝ REŽIM (S PLYNULÝM STMIEVANÍM A LAYOUTOM) --- */
         body .placeholder-view,
         body #player-now-playing,
         body #nightBottomInfo,
@@ -572,15 +572,44 @@
             transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out !important;
         }
         
-        /* Skrytie prvkov, ktoré v noci nemajú zavadzať */
+        /* 1. Skrytie denných prvkov */
         body.full-night-mode .favorites-sidebar,
         body.full-night-mode .big-clock-date-wrapper,
         body.full-night-mode #settingsToggleBtn, 
-        body.full-night-mode .main-weather-container { 
+        body.full-night-mode .main-weather-container,
+        body.full-night-mode #bigClockCity { 
             display: none !important;
         }
         
-        /* Nastavenie centrálnej farby z nastavení pre všetky nočné prvky */
+        body.full-night-mode .workspace-container, 
+        body.full-night-mode .main-content-area { 
+            width: 100vw !important; 
+            height: 100vh !important; 
+        }
+        
+        /* 2. Hlavná plocha v noci: Prvky sa ukladajú pekne pod seba */
+        body.full-night-mode .placeholder-view { 
+            width: 100vw !important; 
+            height: 100vh !important; 
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-evenly !important; 
+            align-items: center !important; 
+            padding: 3vh 0 !important; 
+            box-sizing: border-box !important;
+            transform: none !important;
+        }
+        
+        /* 3. Hodiny v noci */
+        body.full-night-mode .big-clock-time { 
+            font-size: clamp(80px, 22vw, 320px) !important; 
+            letter-spacing: 0px !important; 
+            margin: 0 !important; 
+            transform: scaleY(1.2) !important; 
+            line-height: 1 !important;
+        }
+        
+        /* 4. Nastavenie farby nočného režimu */
         body.full-night-mode .big-clock-hours, 
         body.full-night-mode .big-clock-minutes, 
         body.full-night-mode #nightBottomInfo,
@@ -589,33 +618,39 @@
             color: var(--night-color) !important; 
         }
         
-        /* Spodný riadok (Meniny • Dátum • Počasie) */
-        body.full-night-mode #nightBottomInfo { 
-            display: block !important; 
-            position: absolute !important; 
-            bottom: 5vh !important; 
-            padding-bottom: env(safe-area-inset-bottom) !important; 
-            font-size: clamp(16px, 3.5vw, 28px) !important; 
-            font-weight: 600 !important; 
-            letter-spacing: 1px !important; 
-            opacity: 1 !important; 
-            text-align: center !important; 
-            width: 100% !important; 
-            left: 0 !important; 
-            z-index: 10 !important;
+        /* 5. Prehrávač rádio v noci (priamo pod hodinami) */
+        body.full-night-mode .night-player-container {
+            position: relative !important;
+            bottom: auto !important;
+            margin: 1vh 0 !important;
         }
         
-        /* Integrovaný nočný prehrávač pod hodinami */
         body.full-night-mode .night-player-container.active-playing {
             display: flex !important;
-            position: absolute !important;
-            bottom: 15vh !important;
-            width: 100% !important;
-            justify-content: center !important;
-            align-items: center !important;
-            z-index: 10 !important;
         }
-
+        
+        /* 6. Práve hrá (Skladba) */
+        body.full-night-mode #player-now-playing {
+            position: relative !important;
+            bottom: auto !important;
+            font-size: clamp(14px, 2.5vw, 22px) !important;
+            margin: 0.5vh 0 !important;
+        }
+        
+        /* 7. Spodný riadok (Meniny • Dátum • Počasie) */
+        body.full-night-mode #nightBottomInfo { 
+            display: block !important; 
+            position: relative !important; 
+            bottom: auto !important; 
+            font-size: clamp(16px, 3vw, 26px) !important; 
+            font-weight: 600 !important; 
+            text-align: center !important; 
+            width: 100% !important; 
+            margin-top: auto !important; /* Odtlačí ho prirodzene na spodok */
+            padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
+        }
+        
+        /* ŠTÝL PRE MESTO V DENNOM REŽIME */
         #bigClockCity {
             color: #ff9f0a;
             font-weight: 800;
