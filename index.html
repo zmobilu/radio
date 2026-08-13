@@ -200,7 +200,7 @@
         /* 3. Spoločný riadok pre ikonu, teplotu a pocitový stĺpec */
         .weather-top-row {
             display: flex;
-            flex-direction: row;
+            flex-direction: column /*row;*/
             flex-wrap: nowrap;
             align-items: center;
             justify-content: center;     /* Dokonalé centrovanie jadra počasia */
@@ -210,14 +210,6 @@
             box-sizing: border-box;
         }
         
-        /* Jadro s ikonou a hlavnou teplotou */
-        .weather-core-row {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
         #mainBigIcon { font-size: 14vmin !important; line-height: 1; }
         #mainBigTemp { font-size: 13vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
 
