@@ -733,6 +733,14 @@
 
         /* PORTRAIT RESPONSIVITA (MOBIL NA VÝŠKU) FOR MAIN DASHBOARD */
         @media (orientation: portrait) {
+			/* Preusporiadanie pozícií pri zobrazení na výšku */
+			    .favorites-sidebar .fav-card:nth-child(1) { order: 4; } /* SRO (pôvodne 1.) -> ide na pozíciu 4 */
+			    .favorites-sidebar .fav-card:nth-child(2) { order: 1; } /* CHILL (pôvodne 2.) -> ide na pozíciu 1 */
+			    .favorites-sidebar .fav-card:nth-child(3) { order: 5; } /* FUN (pôvodne 3.) -> ide na pozíciu 5 */
+			    .favorites-sidebar .fav-card:nth-child(4) { order: 2; } /* EUROPA (pôvodne 4.) -> ide na pozíciu 2 */
+			    .favorites-sidebar .fav-card:nth-child(5) { order: 6; } /* ROCK (pôvodne 5.) -> ide na pozíciu 6 */
+			    .favorites-sidebar .fav-card:nth-child(6) { order: 3; } /* TECHNO (pôvodne 6.) -> ide na pozíciu 3 */
+			}
             .workspace-container { flex-direction: column; }
             .favorites-sidebar {
                 width: 100vw; height: auto; flex-shrink: 0; order: 2;
