@@ -2269,6 +2269,7 @@
             const bottomInfoEl = document.getElementById('nightBottomInfo');
 
             // Vo vnútri podmienky pre nočný režim v runClockEngine():
+            // Správny názov premennej nocnyRezimSnoozeDo
             if ((jeNocnyCas || manualnaNocAktivna) && terazMili > nocnyRezimSnoozeDo && !isSettingsModeActive) {
                 bodyEl.classList.add('full-night-mode');
                 
@@ -2286,10 +2287,11 @@
             
                     bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}    •    ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>`;
                 }
+            
                 // Bezpečné zavolanie aktualizácie nočného prehrávača
                 if (typeof aktualizujNochnyPrehravacVizual === 'function') {
-                // DOPLNENIE: Obnovíme vizuál prehrávača pri každom tiknutí hodín v noci
-                aktualizujNochnyPrehravacVizual();
+                    aktualizujNochnyPrehravacVizual();
+                }
             
             } else {
                 bodyEl.classList.remove('full-night-mode');
