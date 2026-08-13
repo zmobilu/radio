@@ -575,7 +575,8 @@
         /* Skrytie denných prvkov */
         body.full-night-mode .favorites-sidebar,
         body.full-night-mode #settingsToggleBtn, 
-        body.full-night-mode .main-weather-container { 
+        body.full-night-mode .main-weather-container,
+        body.full-night-mode .big-clock-date-wrapper { 
             display: none !important;
         }
         
@@ -596,7 +597,7 @@
             opacity: 1 !important;
         }
         
-        /* Hodiny */
+        /* Hodiny v noci */
         body.full-night-mode .big-clock-time { 
             font-size: 30vw !important; 
             letter-spacing: 0px !important; 
@@ -604,20 +605,15 @@
             transform: scaleY(1.20) !important; 
         }
         
-        /* VŠETKY PRVKY V NOČNOM REŽIME PREBERAJÚ AKTUÁLNU NOČNÚ FARBU */
         body.full-night-mode .big-clock-hours, 
         body.full-night-mode .big-clock-minutes, 
         body.full-night-mode #nightBottomInfo, 
-        body.full-night-mode #nightBottomInfo *,
-        body.full-night-mode #bigDate,
-        body.full-night-mode #bigNameday,
-        body.full-night-mode #dateSeparator,
-        body.full-night-mode #player-now-playing { 
+        body.full-night-mode .night-player-station,
+        body.full-night-mode .night-btn { 
             color: var(--night-color) !important; 
         }
         
-        /* Spodný riadok (Meniny • Dátum • Počasie) */
-        body.full-night-mode .big-clock-date-wrapper,
+        /* SPODNÝ RIADOK (Meniny • Dátum • Počasie s dynamickou teplotou) */
         body.full-night-mode #nightBottomInfo { 
             display: flex !important;
             position: absolute !important;
@@ -630,18 +626,20 @@
             color: var(--night-color) !important;
             font-size: clamp(16px, 3.5vw, 28px) !important;
             font-weight: 600 !important;
+            text-align: center !important;
         }
         
-        /* Zobrazenie a pozícia nočného prehrávača nad spodným riadkom */
+        /* NOČNÝ PREHRÁVAČ (VŽDY VIDITEĽNÝ NAD SPODNÝM RIADKOM NA VÝŠKU AJ ŠÍRKU) */
         body.full-night-mode .night-player-container,
         body.full-night-mode .night-player-container.active-playing {
             display: flex !important;
             position: absolute !important;
-            bottom: 12vh !important;
+            bottom: 11vh !important;
             left: 0 !important;
             width: 100% !important;
-            justify-content: center !important;
+            flex-direction: column !important;
             align-items: center !important;
+            justify-content: center !important;
             z-index: 100 !important;
             color: var(--night-color) !important;
         }
@@ -653,8 +651,7 @@
 
         /* Landscape úpravy */
         @media (orientation: landscape) {
-            body.full-night-mode #nightBottomInfo,
-            body.full-night-mode .big-clock-date-wrapper {
+            body.full-night-mode #nightBottomInfo {
                 font-size: 3.2vw !important;
             }
         }
@@ -854,20 +851,7 @@
                 margin: 0 !important;
                 transform: none !important;
             }
-
-            /* Prehrávač v noci - zrušené absolútne pozicionovanie */
-            body.full-night-mode .night-player-container {
-                position: relative !important;
-                bottom: auto !important;
-                margin-top: 2vh !important;
-                display: flex !important;
-                flex-direction: row !important;
-                align-items: center !important;
-                justify-content: center !important;
-                gap: 3vw !important;
-                width: auto !important;
-            }
-
+            
             /* Prinútenie zobrazenia spodného riadku v noci (Portrait aj Landscape) */
             body.full-night-mode #nightBottomInfo {
                 display: block !important;
@@ -2348,7 +2332,7 @@
                     const tColorNoc = getTempColor(lenCisloTeploty);
                     const ikonkaW = aktualnaTeplotaText.split(' ')[0] || "☀️";
             
-                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}    •    ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>`;
+                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}    •    ${ikonkaW} <span style="color: ${tColorNoc} !important; font-weight: 700;">${lenCisloTeploty}°C</span>`;
                 }
             } else {
                 bodyEl.classList.remove('full-night-mode');
