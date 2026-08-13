@@ -2269,7 +2269,7 @@
             const bottomInfoEl = document.getElementById('nightBottomInfo');
 
             // Vo vnútri podmienky pre nočný režim v runClockEngine():
-            if ((jeNocnyCas || manualnaNocAktivna) && terazMili > nocnyRezilSnoozeDo && !isSettingsModeActive) {
+            if ((jeNocnyCas || manualnaNocAktivna) && terazMili > nocnyRezimSnoozeDo && !isSettingsModeActive) {
                 bodyEl.classList.add('full-night-mode');
                 
                 let meninyNocturnalText = "";
