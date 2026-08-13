@@ -572,40 +572,48 @@
             transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out !important;
         }
         
+        /* Skrytie prvkov, ktoré v noci nemajú zavadzať */
         body.full-night-mode .favorites-sidebar,
         body.full-night-mode .big-clock-date-wrapper,
-        body.full-night-mode #settingsToggleBtn,
-        body.full-night-mode .radio-trigger-bar,
+        body.full-night-mode #settingsToggleBtn, 
         body.full-night-mode .main-weather-container { 
             display: none !important;
         }
-
+        
+        /* Nastavenie centrálnej farby z nastavení pre všetky nočné prvky */
         body.full-night-mode .big-clock-hours, 
         body.full-night-mode .big-clock-minutes, 
-        body.full-night-mode #nightBottomInfo, 
+        body.full-night-mode #nightBottomInfo,
+        body.full-night-mode .night-player-container,
         body.full-night-mode #player-now-playing { 
             color: var(--night-color) !important; 
         }
         
-        body.full-night-mode #player-now-playing {
-            display: block !important;
-            position: relative !important;
-            width: 100% !important;
-            text-align: center !important;
-            font-size: 1.4rem !important;
-            font-weight: 500 !important;
-            color: var(--night-color) !important;
+        /* Spodný riadok (Meniny • Dátum • Počasie) */
+        body.full-night-mode #nightBottomInfo { 
+            display: block !important; 
+            position: absolute !important; 
+            bottom: 5vh !important; 
+            padding-bottom: env(safe-area-inset-bottom) !important; 
+            font-size: clamp(16px, 3.5vw, 28px) !important; 
+            font-weight: 600 !important; 
+            letter-spacing: 1px !important; 
+            opacity: 1 !important; 
+            text-align: center !important; 
+            width: 100% !important; 
+            left: 0 !important; 
             z-index: 10 !important;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding: 0 20px;
-            box-sizing: border-box;
-            margin-top: 1vh !important;
         }
-
+        
+        /* Integrovaný nočný prehrávač pod hodinami */
         body.full-night-mode .night-player-container.active-playing {
             display: flex !important;
+            position: absolute !important;
+            bottom: 15vh !important;
+            width: 100% !important;
+            justify-content: center !important;
+            align-items: center !important;
+            z-index: 10 !important;
         }
 
         #bigClockCity {
@@ -2288,32 +2296,27 @@
 
             // Vo vnútri podmienky pre nočný režim v runClockEngine():
             // Správny názov premennej nocnyRezimSnoozeDo
+            // --- ÚPRAVA VO FUNKCII runClockEngine() ---
             if ((jeNocnyCas || manualnaNocAktivna) && terazMili > nocnyRezimSnoozeDo && !isSettingsModeActive) {
                 bodyEl.classList.add('full-night-mode');
                 
                 let meninyNocturnalText = "";
                 if (dnesneMeno) {
-                    const extraMena = (dnesneVsetkyMena && dnesneVsetkyMena.length > 1) ? ` +${dnesneVsetkyMena.length - 1}` : "";
-                    meninyNocturnalText = `${dnesneMeno}${extraMena}    •    `;
+                    const extraMena = (dnesneVsetkyMena.length > 1) ? ` +${dnesneVsetkyMena.length - 1}` : "";
+                    meninyNocturnalText = `${dnesneMeno}${extraMena} • `;
                 }
-                
+                    
                 if (bottomInfoEl) {
-                    bottomInfoEl.style.display = "block";
+                    // Vytiahnutie čistej teploty bez textu pre výpočet farby
                     const lenCisloTeploty = parseInt(aktualnaTeplotaText.replace(/[^0-9.-]/g, '')) || 0;
                     const tColorNoc = getTempColor(lenCisloTeploty);
                     const ikonkaW = aktualnaTeplotaText.split(' ')[0] || "☀️";
             
-                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1.}    •    ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>`;
+                    // Skladanie riadku: Ľubomír • Štvrtok 13.8. • ☀️ 27°C
+                    bottomInfoEl.innerHTML = `${meninyNocturnalText}${dniDlhe[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}. • ${ikonkaW} <span style="color: ${tColorNoc}; font-weight: 700;">${lenCisloTeploty}°C</span>`;
                 }
-            
-                // Bezpečné zavolanie aktualizácie nočného prehrávača
-                if (typeof aktualizujNochnyPrehravacVizual === 'function') {
-                    aktualizujNochnyPrehravacVizual();
-                }
-            
             } else {
                 bodyEl.classList.remove('full-night-mode');
-                if (bottomInfoEl) bottomInfoEl.style.display = "none";
                 if (!jeNocnyCas) manualnaNocAktivna = false;
             }
             
