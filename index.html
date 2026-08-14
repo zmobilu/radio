@@ -758,7 +758,65 @@
         .forecast-day-label { font-size: 2.2vmin; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
         .forecast-day-icon { font-size: 6vmin !important; margin: 6px 0 !important; }
         .forecast-day-temp { font-size: 2.6vmin !important; font-weight: 600 !important; white-space: nowrap !important; line-height: 1.1 !important; }
-
+		
+		/* --- ZÁKLADNÉ CSS PRE REŽIM NA ŠÍRKU (LANDSCAPE) --- */
+		 @media (orientation: landscape)
+		.favorites-sidebar {
+		    width: 30vw; /* Základná šírka pre 2 stĺpce */
+		    height: 100vh;
+		    background: #050505; 
+		    border-right: 1px solid #222;
+		    display: grid; 
+		    grid-template-columns: repeat(2, 1fr); /* Pevne 2 stĺpce */
+		    grid-template-rows: repeat(3, 1fr);    /* Pevne 3 riadky = 6 tlačidiel */
+		    gap: 6px; 
+		    padding: 6px 22px 6px 6px; /* Right padding vytvorí miesto pre zvislý pásik */
+		    box-sizing: border-box;
+		    padding-left: calc(6px + env(safe-area-inset-left));
+		    
+		    /* Pevne schováme všetko navyše (7+) */
+		    overflow: hidden !important;
+		    position: relative;
+		    transition: width 0.35s ease-in-out;
+		    z-index: 10;
+		}
+		
+		/* ROZBALENÝ STAV NA ŠÍRKU: Roztiahnutie doprava */
+		.favorites-sidebar.expanded {
+		    width: 60vw !important; /* Rozšíri sa do šírky pre ďalšie stĺpce */
+		    grid-template-columns: repeat(4, 1fr); /* Rozšíri mriežku na 4 stĺpce */
+		    grid-template-rows: repeat(3, 1fr);
+		    overflow-x: auto !important; /* Zapne prípadné horizontálne scrolovanie */
+		    -webkit-overflow-scrolling: touch;
+		}
+		
+		/* ZVISLÝ PÁSIK PRE LANDSCAPE (NA PRAVOM OKRAJI) */
+		.sidebar-handle-landscape {
+		    position: absolute;
+		    top: 0;
+		    right: 0;
+		    width: 20px;
+		    height: 100%;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    cursor: pointer;
+		    z-index: 12;
+		    background: rgba(255, 255, 255, 0.03);
+		}
+		
+		.handle-bar-vertical {
+		    width: 4px;
+		    height: 42px;
+		    background: #555;
+		    border-radius: 2px;
+		    transition: background 0.2s, height 0.2s;
+		}
+		
+		.sidebar-handle-landscape:active .handle-bar-vertical {
+		    background: #ff9f0a;
+		    height: 52px;
+		}
         /* PORTRAIT RESPONSIVITA (MOBIL NA VÝŠKU) FOR MAIN DASHBOARD */
         @media (orientation: portrait) {
 			.workspace-container { flex-direction: column; }
@@ -1874,12 +1932,22 @@
 		    const container = document.getElementById('favSidebarContainer');
 		    if(!container) return;
 		
-		    // Vloženie pásika na vrch
-		    container.innerHTML = `
-		        <div class="sidebar-handle" id="sidebar-handle" onclick="document.getElementById('favSidebarContainer').classList.toggle('expanded'); event.stopPropagation();">
-		            <div class="handle-bar"></div>
-		        </div>
-		    `;
+		    const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+		
+		    // Vloženie správneho pásika podľa orientácie obrazovky
+		    if (isPortrait) {
+		        container.innerHTML = `
+		            <div class="sidebar-handle" id="sidebar-handle" onclick="document.getElementById('favSidebarContainer').classList.toggle('expanded'); event.stopPropagation();">
+		                <div class="handle-bar"></div>
+		            </div>
+		        `;
+		    } else {
+		        container.innerHTML = `
+		            <div class="sidebar-handle-landscape" id="sidebar-handle" onclick="document.getElementById('favSidebarContainer').classList.toggle('expanded'); event.stopPropagation();">
+		                <div class="handle-bar-vertical"></div>
+		            </div>
+		        `;
+		    }
 		
 		    // Poradie slotov 1 až 6 (indexy 1, 3, 5, 0, 2, 4) a následne ďalšie (7+)
 		    const zobrazenePoradie = [1, 3, 5, 0, 2, 4, 7, 9, 11, 6, 8, 10];
@@ -1908,6 +1976,11 @@
 		        }
 		    });
 		}
+		
+		// Prekreslenie pásika pri otočení zariadenia
+		window.addEventListener("orientationchange", () => {
+		    setTimeout(renderSidebarFavorites, 200);
+		});
 
         function renderSettingsGrid() {
             const grid = document.getElementById('settingsGridView');
@@ -1966,23 +2039,31 @@
 		    const existingIndex = slotFavorites.indexOf(id);
 		    
 		    if (existingIndex !== -1) {
-		        // Kliknutím na označené rádio uvoľníme jeho pozíciu
-		        slotFavorites[existingIndex] = null;
+		        // Ak odoberáme rádio z prvej šestky, necháme slot prázdny (null), aby sa nerozsypali pozície
+		        if (existingIndex < 6) {
+		            slotFavorites[existingIndex] = null;
+		        } else {
+		            // Od 7. rádia vyššie zoznam skrátime
+		            slotFavorites.splice(existingIndex, 1);
+		        }
 		    } else {
-		        // Prioritné poradie obsadzovania pre 12 slotov:
-		        // 1. stránka (1-6):  [1, 3, 5, 0, 2, 4]
-		        // 2. stránka (7-12): [7, 9, 11, 6, 8, 10]
-		        const prioritnePoradieSlotov = [1, 3, 5, 0, 2, 4, 7, 9, 11, 6, 8, 10];
+		        // Prioritné poradie pre 1. až 6. miesto (indexy v poli slotFavorites)
+		        const prioritnaSestka = [1, 3, 5, 0, 2, 4];
 		
-		        // Nájdeme prvé voľné miesto
-		        let freeSlotIndex = prioritnePoradieSlotov.find(idx => !slotFavorites[idx]);
+		        // 1. Najprv skontrolujeme, či je voľné miesto v prvej šestke
+		        let freeSlotIndex = prioritnaSestka.find(idx => slotFavorites[idx] === null || slotFavorites[idx] === undefined);
 		
 		        if (freeSlotIndex !== undefined) {
 		            slotFavorites[freeSlotIndex] = id;
 		        } else {
-		            alert("Všetkých 12 pozícií je plných. Najprv uvoľnite niektoré miesto.");
-		            return;
+		            // 2. Ak je prvá šestka plná, pridávame rádia od 7. pozície na koniec poľa
+		            slotFavorites.push(id);
 		        }
+		    }
+		
+		    // Vyčistíme prípadné prázdne konce poľa
+		    while (slotFavorites.length > 6 && slotFavorites[slotFavorites.length - 1] === null) {
+		        slotFavorites.pop();
 		    }
 		
 		    localStorage.setItem('kiosk_slots_v2', JSON.stringify(slotFavorites));
