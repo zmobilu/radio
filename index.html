@@ -95,10 +95,6 @@
             display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr);
             gap: 6px; padding: 6px; box-sizing: border-box;
             padding-left: calc(6px + env(safe-area-inset-left));
-					/* PRIDANÉ PRE SCROLOVANIE DOLE/HORE */
-		    overflow-y: auto; 
-		    overflow-x: hidden;
-		    -webkit-overflow-scrolling: touch; /* Hladký dojazd na iOS */
         }
         .fav-card {
             background: #111; border: 1px solid #222; border-radius: 12px;
@@ -172,8 +168,7 @@
         }        
         .big-clock-hours { color: #fff; }
         .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
-        /* .big-clock-city { color: #ff9f0a; font-weight: bold; letter-spacing: 2px; }*/
-		.big-clock-city {
+        .big-clock-city {
    		 	font-size: 4vmin !important;
 		    font-weight: 800;
 		    color: #ff9f0a;
@@ -379,23 +374,8 @@
         }
         .cfg-mini-card {
             background: #151515; border: 1px solid #252525; border-radius: 10px; aspect-ratio: 1 / 1; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; cursor: pointer; box-sizing: border-box; position: relative !important;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; cursor: pointer; box-sizing: border-box; position: relative;
         }
-		.cfg-slot-badge {
-		    position: absolute;
-		    top: 4px;
-		    right: 4px;
-		    background: #ff9f0a;
-		    color: #000;
-		    font-size: 10px;
-		    font-weight: 800;
-		    width: 16px;
-		    height: 16px;
-		    border-radius: 50%;
-		    display: flex;
-		    align-items: center;
-		    justify-content: center;
-		}
         .cfg-mini-card img { width: 60%; height: 60%; object-fit: contain; }
         .cfg-mini-card i { font-size: 22px; }
         .cfg-mini-card span { font-size: 9px; text-transform: uppercase; font-weight: 600; text-align: center; color: #888; margin-top: 3px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -593,7 +573,7 @@
         /* --- CELOOBRAZOVKOVÉ DETAILNÉ ZOBRAZENIE GRAFU --- */
         .weather-detail-view {
             display: none; 
-            position: fixed; /* Kľúčová zmena pre správne zobrazenie */
+            position: absolute;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             background: #000;
@@ -758,133 +738,19 @@
         .forecast-day-label { font-size: 2.2vmin; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
         .forecast-day-icon { font-size: 6vmin !important; margin: 6px 0 !important; }
         .forecast-day-temp { font-size: 2.6vmin !important; font-weight: 600 !important; white-space: nowrap !important; line-height: 1.1 !important; }
-		
-		/* --- ZÁKLADNÉ CSS PRE REŽIM NA ŠÍRKU (LANDSCAPE) --- */
-		 @media (orientation: landscape)
-		.favorites-sidebar {
-		    width: 30vw; /* Základná šírka pre 2 stĺpce */
-		    height: 100vh;
-		    background: #050505; 
-		    border-right: 1px solid #222;
-		    display: grid; 
-		    grid-template-columns: repeat(2, 1fr); /* Pevne 2 stĺpce */
-		    grid-template-rows: repeat(3, 1fr);    /* Pevne 3 riadky = 6 tlačidiel */
-		    gap: 6px; 
-		    padding: 6px 22px 6px 6px; /* Right padding vytvorí miesto pre zvislý pásik */
-		    box-sizing: border-box;
-		    padding-left: calc(6px + env(safe-area-inset-left));
-		    
-		    /* Pevne schováme všetko navyše (7+) */
-		    overflow: hidden !important;
-		    position: relative;
-		    transition: width 0.35s ease-in-out;
-		    z-index: 10;
-		}
-		
-		/* ROZBALENÝ STAV NA ŠÍRKU: Roztiahnutie doprava */
-		.favorites-sidebar.expanded {
-		    width: 60vw !important; /* Rozšíri sa do šírky pre ďalšie stĺpce */
-		    grid-template-columns: repeat(4, 1fr); /* Rozšíri mriežku na 4 stĺpce */
-		    grid-template-rows: repeat(3, 1fr);
-		    overflow-x: auto !important; /* Zapne prípadné horizontálne scrolovanie */
-		    -webkit-overflow-scrolling: touch;
-		}
-		
-		/* ZVISLÝ PÁSIK PRE LANDSCAPE (NA PRAVOM OKRAJI) */
-		.sidebar-handle-landscape {
-		    position: absolute;
-		    top: 0;
-		    right: 0;
-		    width: 20px;
-		    height: 100%;
-		    display: flex;
-		    align-items: center;
-		    justify-content: center;
-		    cursor: pointer;
-		    z-index: 12;
-		    background: rgba(255, 255, 255, 0.03);
-		}
-		
-		.handle-bar-vertical {
-		    width: 4px;
-		    height: 42px;
-		    background: #555;
-		    border-radius: 2px;
-		    transition: background 0.2s, height 0.2s;
-		}
-		
-		.sidebar-handle-landscape:active .handle-bar-vertical {
-		    background: #ff9f0a;
-		    height: 52px;
-		}
+
         /* PORTRAIT RESPONSIVITA (MOBIL NA VÝŠKU) FOR MAIN DASHBOARD */
         @media (orientation: portrait) {
-			.workspace-container { flex-direction: column; }
-	
-		    .favorites-sidebar {
-		        width: 100vw;
-		        height: auto;
-		        /* ZÁKLADNÝ STAV: natvrdo drží výšku len pre 2 riadky kartičiek + lištu */
-		        max-height: 220px; 
-		        flex-shrink: 0;
-		        order: 2;
-		        display: grid;
-		        grid-template-columns: repeat(3, 1fr);
-		        grid-template-rows: repeat(2, 90px); /* Garantované presne 2 riadky */
-		        border-top: 1px solid #222;
-		        border-right: none;
-		        gap: 6px;
-		        padding: 24px 6px 6px 6px; /* Padding hore vytvorí miesto pre lištu */
-		        padding-bottom: calc(6px + env(safe-area-inset-bottom)) !important;
-		        padding-left: calc(6px + env(safe-area-inset-left));
-		        padding-right: calc(6px + env(safe-area-inset-right));
-		        
-		        /* ZAMKNUTIE PRETEKANIA: Zvyšné stanice (7+) sú úplne schované */
-		        overflow: hidden !important; 
-		        position: relative;
-		        transition: max-height 0.35s ease-in-out;
-		        box-sizing: border-box;
-		        background: #050505;
-		    }
-		
-		    /* ROZBALENÝ STAV: po vytiahnutí/kliknutí na bar sa výška zväčší a zapne skrolovanie */
-		    .favorites-sidebar.expanded {
-		        max-height: 70vh !important;
-		        grid-template-rows: auto;
-		        grid-auto-rows: 90px;
-		        overflow-y: auto !important;
-		        -webkit-overflow-scrolling: touch;
-		    }
-		
-		    /* Pásik na vytiahnutie */
-		    .sidebar-handle {
-		        position: absolute;
-		        top: 0;
-		        left: 0;
-		        width: 100%;
-		        height: 22px;
-		        display: flex;
-		        align-items: center;
-		        justify-content: center;
-		        cursor: pointer;
-		        z-index: 10;
-		        grid-column: 1 / -1;
-		        background: rgba(255, 255, 255, 0.03);
-		    }
-		
-		    .handle-bar {
-		        width: 42px;
-		        height: 4px;
-		        background: #555;
-		        border-radius: 2px;
-		        transition: background 0.2s, width 0.2s;
-		    }
-		
-		    .sidebar-handle:active .handle-bar {
-		        background: #ff9f0a;
-		        width: 52px;
-		    }
-	
+            .workspace-container { flex-direction: column; }
+            .favorites-sidebar {
+                width: 100vw; height: auto; flex-shrink: 0; order: 2;
+                grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);
+                border-right: none; border-top: 1px solid #111; gap: 8px; padding: 8px;
+                padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+                padding-left: calc(8px + env(safe-area-inset-left));
+                padding-right: calc(8px + env(safe-area-inset-right));
+                margin-bottom: 0 !important;
+            }
             .main-content-area { width: 100vw; flex: 1; order: 1; }
             
            .placeholder-view { 
@@ -928,17 +794,10 @@
                 flex: 0 0 auto !important;
                 /* Ponechá si max-width: 480px a flex-direction: column z MAIN */
             }
-			/* Preusporiadanie pozícií pri zobrazení na výšku */
-			    .favorites-sidebar .fav-card:nth-child(1) { order: 4; } /* SRO (pôvodne 1.) -> ide na pozíciu 4 */
-			    .favorites-sidebar .fav-card:nth-child(2) { order: 1; } /* CHILL (pôvodne 2.) -> ide na pozíciu 1 */
-			    .favorites-sidebar .fav-card:nth-child(3) { order: 5; } /* FUN (pôvodne 3.) -> ide na pozíciu 5 */
-			    .favorites-sidebar .fav-card:nth-child(4) { order: 2; } /* EUROPA (pôvodne 4.) -> ide na pozíciu 2 */
-			    .favorites-sidebar .fav-card:nth-child(5) { order: 6; } /* ROCK (pôvodne 5.) -> ide na pozíciu 6 */
-			    .favorites-sidebar .fav-card:nth-child(6) { order: 3; } /* TECHNO (pôvodne 6.) -> ide na pozíciu 3 */
-			}
 
             /* Ak v budúcnosti niečo pretečie, uvidíš to tu v surovom stave z MAIN */
-       
+        }
+
         .settings-grid-view { padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important; }
 
         @keyframes antiBurnIn {
@@ -1206,11 +1065,7 @@
     <audio id="audioPlayer" preload="none" playsinline fetchpriority="high"></audio>
 
     <div class="workspace-container">
-        <aside class="favorites-sidebar" id="favSidebarContainer">
-		    <div class="sidebar-handle" id="sidebar-handle">
-		        <div class="handle-bar"></div>
-		    </div>
-		</aside>
+        <aside class="favorites-sidebar" id="favSidebarContainer"></aside>
 
         <main class="main-content-area">
                                                                     
@@ -1842,20 +1697,19 @@
         }
 		
         function prepniNaDalsieMesto(event) {
-            if (event) event.stopPropagation();
-            
-            if (cfgHistoriaMest && cfgHistoriaMest.length > 1) {
-                // Nájde index aktuálneho mesta
-                let currentIndex = cfgHistoriaMest.findIndex(m => m.toLowerCase() === cfgMestoNazov.toLowerCase());
-                if (currentIndex === -1) currentIndex = 0;
-                
-                // Posunie na ďalšie mesto v poradí (a po poslednom ide znova na 0)
-                let nextIndex = (currentIndex + 1) % cfgHistoriaMest.length;
-                let dalsieMesto = cfgHistoriaMest[nextIndex];
-                
-                vyhladajMestoPodlaTextu(dalsieMesto);
-            }
-        }
+		    if (event) event.stopPropagation();
+		    
+		    if (cfgHistoriaMest && cfgHistoriaMest.length > 1) {
+		        // Porovnávame malé písmená bez ohľadu na presnú zhodu z API
+		        let currentIndex = cfgHistoriaMest.findIndex(m => m.toLowerCase().trim() === cfgMestoNazov.toLowerCase().trim());
+		        
+		        // Ak sa mesto z nejakého dôvodu nenašlo, začneme od prvého (0), inak ideme na ďalšie
+		        let nextIndex = (currentIndex === -1) ? 1 : (currentIndex + 1) % cfgHistoriaMest.length;
+		        let dalsieMesto = cfgHistoriaMest[nextIndex];
+		        
+		        vyhladajMestoPodlaTextu(dalsieMesto);
+		    }
+		}
         function zmenNastavenieMesta() {
             let navrhMesta = prompt("Zadaj názov mesta (napr. Bratislava, Kosice, Praha):", cfgMestoNazov);
             if (navrhMesta && navrhMesta.trim() !== "") {
@@ -1878,7 +1732,6 @@
                         localStorage.setItem('cfg_weather_lon', cfgLon);
                         localStorage.setItem('cfg_weather_name', cfgMestoNazov);
                         
-                        // Pridanie do histórie (zachová až 5 posledných miest bez straty)
                         cfgHistoriaMest = cfgHistoriaMest.filter(m => m.toLowerCase() !== cfgMestoNazov.toLowerCase());
                         cfgHistoriaMest.unshift(cfgMestoNazov);
                         if (cfgHistoriaMest.length > 5) cfgHistoriaMest.pop();
@@ -1929,58 +1782,36 @@
         }
 
         function renderSidebarFavorites() {
-		    const container = document.getElementById('favSidebarContainer');
-		    if(!container) return;
-		
-		    const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-		
-		    // Vloženie správneho pásika podľa orientácie obrazovky
-		    if (isPortrait) {
-		        container.innerHTML = `
-		            <div class="sidebar-handle" id="sidebar-handle" onclick="document.getElementById('favSidebarContainer').classList.toggle('expanded'); event.stopPropagation();">
-		                <div class="handle-bar"></div>
-		            </div>
-		        `;
-		    } else {
-		        container.innerHTML = `
-		            <div class="sidebar-handle-landscape" id="sidebar-handle" onclick="document.getElementById('favSidebarContainer').classList.toggle('expanded'); event.stopPropagation();">
-		                <div class="handle-bar-vertical"></div>
-		            </div>
-		        `;
-		    }
-		
-		    // Poradie slotov 1 až 6 (indexy 1, 3, 5, 0, 2, 4) a následne ďalšie (7+)
-		    const zobrazenePoradie = [1, 3, 5, 0, 2, 4, 7, 9, 11, 6, 8, 10];
-		
-		    zobrazenePoradie.forEach(idx => {
-		        const id = slotFavorites[idx];
-		        if (!id) return;
-		
-		        const item = DATABASE.find(d => d.id === id);
-		        if (item) {
-		            const card = document.createElement('div');
-		            card.className = "fav-card";
-		            
-		            if (currentPlayingType === item.id && !audio.paused) {
-		                card.classList.add("playing");
-		            }
-		            
-		            card.onclick = () => handleFavCardClick(item);
-		
-		            if (item.img) {
-		                card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
-		            } else if (item.icon) {
-		                card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
-		            }
-		            container.appendChild(card);
-		        }
-		    });
-		}
-		
-		// Prekreslenie pásika pri otočení zariadenia
-		window.addEventListener("orientationchange", () => {
-		    setTimeout(renderSidebarFavorites, 200);
-		});
+            const container = document.getElementById('favSidebarContainer');
+            if(!container) return;
+            container.innerHTML = "";
+
+            for (let i = 0; i < 6; i++) {
+                const id = slotFavorites[i];
+                const item = DATABASE.find(d => d.id === id);
+                const card = document.createElement('div');
+                
+                if (item && id !== null) {
+                card.className = "fav-card";
+                
+                if (currentPlayingType === item.id && !audio.paused) {
+                    card.classList.add("playing");
+                }
+                
+                card.onclick = () => handleFavCardClick(item);
+
+                if (item.img) {
+                    card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
+                } else if (item.icon) {
+                    card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
+                }
+            } else {
+                    card.className = "fav-card empty";
+                    card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
+                }
+                container.appendChild(card);
+            }
+        }
 
         function renderSettingsGrid() {
             const grid = document.getElementById('settingsGridView');
@@ -2003,33 +1834,19 @@
                 }
 
                 const card = document.createElement('div');
-				card.className = "cfg-mini-card";
-				
-				card.onclick = (e) => { handleChannelSelectionToggle(item.id); e.stopPropagation(); };
-				
-				if (item.img) {
-				    card.innerHTML = `<img src="${item.img}"><span>${item.name}</span>`;
-				} else if (item.icon) {
-				    card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
-				}
-				
-				// NAHRADA ZA DVA ŽLTÉ RIADKY:
-				const mapovanieCisel = { 
-				    1: 1,  3: 2,  5: 3,  0: 4,  2: 5,  4: 6,   /* 1. stránka */
-				    7: 7,  9: 8, 11: 9,  6: 10, 8: 11, 10: 12  /* 2. stránka */
-				};
-				// Zobrazenie správneho poradového čísla na karte v nastaveniach
-                const slotIndex = slotFavorites.indexOf(item.id);
+                card.className = "cfg-mini-card";
                 
-                if (slotIndex !== -1) {
-                    card.classList.add("selected");
-                    const badge = document.createElement('div');
-                    badge.className = "cfg-slot-badge";
-                    badge.textContent = slotIndex + 1; // Pevné poradie 1, 2, 3, 4, 5, 6, 7...
-                    card.appendChild(badge);
+                const isSelected = slotFavorites.includes(item.id);
+                if (isSelected) card.classList.add("selected");
+
+                card.onclick = (e) => { handleChannelSelectionToggle(item.id); e.stopPropagation(); };
+
+                if (item.img) {
+                    card.innerHTML = `<img src="${item.img}"><span>${item.name}</span>`;
+                } else if (item.icon) {
+                    card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
                 }
-				
-				grid.appendChild(card);
+                grid.appendChild(card);
             });
             
             inicializujPlochuNastaveni();
@@ -2038,31 +1855,22 @@
 
         function handleChannelSelectionToggle(id) {
             const existingIndex = slotFavorites.indexOf(id);
-            
             if (existingIndex !== -1) {
-                // Odstránime vybrané rádio z poľa
-                slotFavorites.splice(existingIndex, 1);
+                slotFavorites[existingIndex] = null;
             } else {
-                // Pridáme nové rádio na koniec poľa (dynamické pridávanie bez obmedzenia)
-                slotFavorites.push(id);
+                const freeSlotIndex = slotFavorites.indexOf(null);
+                if (freeSlotIndex !== -1) {
+                    slotFavorites[freeSlotIndex] = id;
+                } else {
+                    alert("Všetkých 6 pozícií je plných. Najprv kliknutím uvoľnite niektoré miesto.");
+                    return;
+                }
             }
-
             localStorage.setItem('kiosk_slots_v2', JSON.stringify(slotFavorites));
             renderSidebarFavorites();
             renderSettingsGrid();
             resetSettingsTimer();
         }
-		
-		    // Vyčistíme prípadné prázdne konce poľa
-		    while (slotFavorites.length > 6 && slotFavorites[slotFavorites.length - 1] === null) {
-		        slotFavorites.pop();
-		    }
-		
-		    localStorage.setItem('kiosk_slots_v2', JSON.stringify(slotFavorites));
-		    renderSidebarFavorites();
-		    renderSettingsGrid();
-		    resetSettingsTimer();
-		}
         
         function toggleFullscreenMode() {
             const doc = window.document;
@@ -2916,27 +2724,7 @@
 			        skontrolujNochnuAktualizaciu();
 			    }
 			});
-	        document.addEventListener('touchstart', (e) => {
-			    const handle = e.target.closest('.sidebar-handle');
-			    if (!handle) return;
-			    
-			    let startY = e.touches[0].clientY;
-			    
-			    const onTouchEnd = (evt) => {
-			        let endY = evt.changedTouches[0].clientY;
-			        let diffY = startY - endY;
-			        const sidebar = document.getElementById('favSidebarContainer');
-			        
-			        if (sidebar) {
-			            if (diffY > 25) sidebar.classList.add('expanded');    /* Potiahnutie nahor */
-			            else if (diffY < -25) sidebar.classList.remove('expanded'); /* Potiahnutie nadol */
-			        }
-			        document.removeEventListener('touchend', onTouchEnd);
-			    };
-			
-			    document.addEventListener('touchend', onTouchEnd);
-			}, { passive: true });
-				
+        
     </script>
      <!-- Vyskakujúce okno pre zoznam mien -->
     <div id="namesModal" style="display: none; position: fixed; z-index: 9999999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); justify-content: center; align-items: center;" onclick="this.style.display='none'">
