@@ -1083,13 +1083,9 @@
 
                 <div id="player-now-playing" style="color: #fff; text-align: center;"></div>
                 
-				<!-- Skrytý Spotify prehrávač prispôsobený pre PWA režim -->
+				<!-- Skrytý Spotify prehrávač, ktorý pri aktivácii prekryje počasie -->
 				<div id="spotifyPlayerContainer" style="display: none; width: 100%; height: 352px; margin-top: 1vh; border-radius: 12px; overflow: hidden; position: relative; z-index: 50;">
-				    <iframe id="spotifyIframe" src="" width="100%" height="100%" frameborder="0" 
-				            allowfullscreen="" 
-				            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; storage-access; web-share" 
-				            sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation" 
-				            loading="lazy"></iframe>
+				    <iframe id="spotifyIframe" src="" width="100%" height="100%" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
 				</div>
 				
                 <div class="main-weather-container">
@@ -1813,42 +1809,36 @@
         }
 
         function renderSidebarFavorites() {
-		    const container = document.getElementById("favorites-sidebar");
-		    if (!container) return;
-		    container.innerHTML = "";
-		
-		    // Načítame zoznam ukladateľných obľúbených z LocalStorage
-		    let favIds = JSON.parse(localStorage.getItem("cfg_fav_ids")) || [];
-		
-		    for (let i = 0; i < 6; i++) {
-		        const item = DATABASE.find(d => d.id === favIds[i]);
-		
-		        if (item) {
-		            // Ak je pozícia obsadená stanicou/playlistom
-		            const card = document.createElement("div");
-		            card.className = "fav-card" + (currentPlayingType === item.id ? " active" : "");
-		            card.style.cssText = item.style || "";
-		            card.onclick = () => handleFavCardClick(item);
-		
-		            card.innerHTML = `
-		                <i class="${item.icon}" style="color:${item.color}; font-size: 1.8rem;"></i>
-		                <span style="font-size: 0.75rem; margin-top: 4px; font-weight: bold; text-transform: uppercase;">${item.name}</span>
-		            `;
-		            container.appendChild(card);
-		        } else {
-		            // Ak je pozícia PRÁZDNA -> spravíme z nej klikateľné tlačidlo!
-		            const emptyCard = document.createElement("div");
-		            emptyCard.className = "fav-card empty-slot";
-		            emptyCard.style.cssText = "background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center;";
-		            
-		            // Kliknutím otvoria priamo nastavenia staníc
-		            emptyCard.onclick = () => toggleSettingsMode();
-		
-		            emptyCard.innerHTML = `<i class="fa-solid fa-plus" style="opacity: 0.4; font-size: 1.5rem;"></i>`;
-		            container.appendChild(emptyCard);
-		        }
-		    }
-		}
+            const container = document.getElementById('favSidebarContainer');
+            if(!container) return;
+            container.innerHTML = "";
+
+            for (let i = 0; i < 6; i++) {
+                const id = slotFavorites[i];
+                const item = DATABASE.find(d => d.id === id);
+                const card = document.createElement('div');
+                
+                if (item && id !== null) {
+                card.className = "fav-card";
+                
+                if (currentPlayingType === item.id && !audio.paused) {
+                    card.classList.add("playing");
+                }
+                
+                card.onclick = () => handleFavCardClick(item);
+
+                if (item.img) {
+                    card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
+                } else if (item.icon) {
+                    card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
+                }
+            } else {
+                    card.className = "fav-card empty";
+                    card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
+                }
+                container.appendChild(card);
+            }
+        }
 
         function renderSettingsGrid() {
             const grid = document.getElementById('settingsGridView');
