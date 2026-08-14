@@ -1952,25 +1952,27 @@
 			const spotifyIframe = document.getElementById('spotifyIframe');
 			const weatherBlock = document.querySelector('.main-weather-container');
 		
-			// Ak ide o Spotify playlist
-			if (item.id === 'spotify') {
+			// Ak ide o akýkoľvek Spotify playlist (kontrola podľa embedUrl alebo id)
+			if (item.embedUrl || (item.id && item.id.startsWith('sp'))) {
 				// Vypneme rádio, ak hralo
 				audio.pause();
 				audio.src = "";
 		
-				// Ak už Spotify beží, vypneme ho a vrátime počasie (TOGGLE)
-				if (currentPlayingType === 'spotify' && spotifyContainer.style.display === 'block') {
+				// Ak už tento konkrétny Spotify playlist beží, vypneme ho a vrátime počasie (TOGGLE)
+				if (currentPlayingType === item.id && spotifyContainer && spotifyContainer.style.display === 'block') {
 					spotifyContainer.style.display = 'none';
-					spotifyIframe.src = "";
+					spotifyIframe.src = "about:blank";
 					if (weatherBlock) weatherBlock.style.display = 'flex';
 					currentPlayingType = "";
 					document.getElementById("player-now-playing").innerText = "";
 				} else {
 					// Skryjeme počasie a otvoríme Spotify prehrávač
 					if (weatherBlock) weatherBlock.style.display = 'none';
-					spotifyIframe.src = item.embedUrl;
-					spotifyContainer.style.display = 'block';
-					currentPlayingType = 'spotify';
+					if (spotifyContainer && spotifyIframe) {
+						spotifyIframe.src = item.embedUrl;
+						spotifyContainer.style.display = 'block';
+					}
+					currentPlayingType = item.id;
 					document.getElementById("player-now-playing").innerText = "Playlist: " + item.name;
 				}
 				renderSidebarFavorites();
@@ -1980,7 +1982,7 @@
 			// Ak sa klikne na akékoľvek obyčajné rádio, schováme Spotify a vrátime počasie
 			if (spotifyContainer && spotifyContainer.style.display === 'block') {
 				spotifyContainer.style.display = 'none';
-				if (spotifyIframe) spotifyIframe.src = "";
+				if (spotifyIframe) spotifyIframe.src = "about:blank";
 				if (weatherBlock) weatherBlock.style.display = 'flex';
 			}
 		
