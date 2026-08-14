@@ -1842,21 +1842,20 @@
         }
 		
         function prepniNaDalsieMesto(event) {
-		    if (event) event.stopPropagation();
-		    
-		    // Ak máme v histórii/nastaveniach viac než 1 mesto
-		    if (cfgHistoriaMest && cfgHistoriaMest.length > 1) {
-		        // Zistíme index aktuálneho mesta
-		        let currentIndex = cfgHistoriaMest.findIndex(m => m.toLowerCase() === cfgMestoNazov.toLowerCase());
-		        
-		        // Posunieme sa na ďalšie v poradí (a na konci zoznamu ideme opäť od 0)
-		        let nextIndex = (currentIndex + 1) % cfgHistoriaMest.length;
-		        let dalsieMesto = cfgHistoriaMest[nextIndex];
-		        
-		        // Vyhľadáme a načítame dáta pre nové mesto
-		        vyhladajMestoPodlaTextu(dalsieMesto);
-		    }
-		}
+            if (event) event.stopPropagation();
+            
+            if (cfgHistoriaMest && cfgHistoriaMest.length > 1) {
+                // Nájde index aktuálneho mesta
+                let currentIndex = cfgHistoriaMest.findIndex(m => m.toLowerCase() === cfgMestoNazov.toLowerCase());
+                if (currentIndex === -1) currentIndex = 0;
+                
+                // Posunie na ďalšie mesto v poradí (a po poslednom ide znova na 0)
+                let nextIndex = (currentIndex + 1) % cfgHistoriaMest.length;
+                let dalsieMesto = cfgHistoriaMest[nextIndex];
+                
+                vyhladajMestoPodlaTextu(dalsieMesto);
+            }
+        }
         function zmenNastavenieMesta() {
             let navrhMesta = prompt("Zadaj názov mesta (napr. Bratislava, Kosice, Praha):", cfgMestoNazov);
             if (navrhMesta && navrhMesta.trim() !== "") {
@@ -1879,9 +1878,10 @@
                         localStorage.setItem('cfg_weather_lon', cfgLon);
                         localStorage.setItem('cfg_weather_name', cfgMestoNazov);
                         
+                        // Pridanie do histórie (zachová až 5 posledných miest bez straty)
                         cfgHistoriaMest = cfgHistoriaMest.filter(m => m.toLowerCase() !== cfgMestoNazov.toLowerCase());
                         cfgHistoriaMest.unshift(cfgMestoNazov);
-                        if (cfgHistoriaMest.length > 3) cfgHistoriaMest.pop();
+                        if (cfgHistoriaMest.length > 5) cfgHistoriaMest.pop();
                         localStorage.setItem('cfg_weather_history', JSON.stringify(cfgHistoriaMest));
                         
                         aktualizujTlacidloMesta();
@@ -2018,15 +2018,16 @@
 				    1: 1,  3: 2,  5: 3,  0: 4,  2: 5,  4: 6,   /* 1. stránka */
 				    7: 7,  9: 8, 11: 9,  6: 10, 8: 11, 10: 12  /* 2. stránka */
 				};
-				const slotIndex = slotFavorites.indexOf(item.id);
-				
-				if (slotIndex !== -1) {
-				    card.classList.add("selected");
-				    const badge = document.createElement('div');
-				    badge.className = "cfg-slot-badge";
-				    badge.textContent = mapovanieCisel[slotIndex];
-				    card.appendChild(badge);
-				}
+				// Zobrazenie správneho poradového čísla na karte v nastaveniach
+                const slotIndex = slotFavorites.indexOf(item.id);
+                
+                if (slotIndex !== -1) {
+                    card.classList.add("selected");
+                    const badge = document.createElement('div');
+                    badge.className = "cfg-slot-badge";
+                    badge.textContent = slotIndex + 1; // Pevné poradie 1, 2, 3, 4, 5, 6, 7...
+                    card.appendChild(badge);
+                }
 				
 				grid.appendChild(card);
             });
@@ -2036,30 +2037,21 @@
         }
 
         function handleChannelSelectionToggle(id) {
-		    const existingIndex = slotFavorites.indexOf(id);
-		    
-		    if (existingIndex !== -1) {
-		        // Ak odoberáme rádio z prvej šestky, necháme slot prázdny (null), aby sa nerozsypali pozície
-		        if (existingIndex < 6) {
-		            slotFavorites[existingIndex] = null;
-		        } else {
-		            // Od 7. rádia vyššie zoznam skrátime
-		            slotFavorites.splice(existingIndex, 1);
-		        }
-		    } else {
-		        // Prioritné poradie pre 1. až 6. miesto (indexy v poli slotFavorites)
-		        const prioritnaSestka = [1, 3, 5, 0, 2, 4];
-		
-		        // 1. Najprv skontrolujeme, či je voľné miesto v prvej šestke
-		        let freeSlotIndex = prioritnaSestka.find(idx => slotFavorites[idx] === null || slotFavorites[idx] === undefined);
-		
-		        if (freeSlotIndex !== undefined) {
-		            slotFavorites[freeSlotIndex] = id;
-		        } else {
-		            // 2. Ak je prvá šestka plná, pridávame rádia od 7. pozície na koniec poľa
-		            slotFavorites.push(id);
-		        }
-		    }
+            const existingIndex = slotFavorites.indexOf(id);
+            
+            if (existingIndex !== -1) {
+                // Odstránime vybrané rádio z poľa
+                slotFavorites.splice(existingIndex, 1);
+            } else {
+                // Pridáme nové rádio na koniec poľa (dynamické pridávanie bez obmedzenia)
+                slotFavorites.push(id);
+            }
+
+            localStorage.setItem('kiosk_slots_v2', JSON.stringify(slotFavorites));
+            renderSidebarFavorites();
+            renderSettingsGrid();
+            resetSettingsTimer();
+        }
 		
 		    // Vyčistíme prípadné prázdne konce poľa
 		    while (slotFavorites.length > 6 && slotFavorites[slotFavorites.length - 1] === null) {
