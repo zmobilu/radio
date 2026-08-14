@@ -1084,7 +1084,8 @@
                 <div id="player-now-playing" style="color: #fff; text-align: center;"></div>
                 
 				<!-- Skrytý Spotify prehrávač prispôsobený pre PWA režim -->
-				<div id="spotifyPlayerContainer" style="display: none; width: 100%; height: 352px; margin-top: 1vh; border-radius: 12px; overflow: hidden; position: relative; z-index: 50;">
+				<!-- Konajner pre Spotify v PWA -->
+				<div id="spotifyPlayerContainer" style="display: none; width: 100%; height: 352px; margin-top: 1vh; border-radius: 12px; overflow: hidden; position: relative; z-index: 50;"></div>
 				    <iframe id="spotifyIframe" src="" width="100%" height="100%" frameborder="0" 
 				            allowfullscreen="" 
 				            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; storage-access; web-share" 
@@ -1950,54 +1951,63 @@
         }
 
         function handleFavCardClick(item) {
-			if (isSettingsModeActive) return;
+			if (typeof isSettingsModeActive !== 'undefined' && isSettingsModeActive) return;
 		
 			const spotifyContainer = document.getElementById('spotifyPlayerContainer');
-			const spotifyIframe = document.getElementById('spotifyIframe');
 			const weatherBlock = document.querySelector('.main-weather-container');
+			const targetItem = DATABASE.find(d => d.id === item.id) || item;
 		
-			// Ak ide o akýkoľvek Spotify playlist (kontrola podľa embedUrl alebo id)
-			if (item.embedUrl || (item.id && item.id.startsWith('sp'))) {
-				// Vypneme rádio, ak hralo
+			// Ak ide o Spotify playlist
+			if (targetItem.embedUrl || (targetItem.id && targetItem.id.startsWith('sp'))) {
 				audio.pause();
 				audio.src = "";
 		
-				// Ak už tento konkrétny Spotify playlist beží, vypneme ho a vrátime počasie (TOGGLE)
-				if (currentPlayingType === item.id && spotifyContainer && spotifyContainer.style.display === 'block') {
+				// TOGGLE: Ak už Spotify beží, zmažeme ho a vrátime počasie
+				if (currentPlayingType === targetItem.id && spotifyContainer && spotifyContainer.style.display === 'block') {
 					spotifyContainer.style.display = 'none';
-					spotifyIframe.src = "about:blank";
+					spotifyContainer.innerHTML = ""; // Úplne odstránime iframe
 					if (weatherBlock) weatherBlock.style.display = 'flex';
 					currentPlayingType = "";
 					document.getElementById("player-now-playing").innerText = "";
 				} else {
-					// Skryjeme počasie a otvoríme Spotify prehrávač
+					// Skryjeme počasie
 					if (weatherBlock) weatherBlock.style.display = 'none';
-					if (spotifyContainer && spotifyIframe) {
-						spotifyIframe.src = item.embedUrl;
+		
+					if (spotifyContainer) {
+						// Dynamicky vygenerujeme nový iframe priamo pre PWA
+						spotifyContainer.innerHTML = `
+							<iframe src="${targetItem.embedUrl}" 
+									width="100%" 
+									height="100%" 
+									frameborder="0" 
+									allowfullscreen="" 
+									allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; storage-access" 
+									loading="lazy"></iframe>
+						`;
 						spotifyContainer.style.display = 'block';
 					}
-					currentPlayingType = item.id;
-					document.getElementById("player-now-playing").innerText = "Playlist: " + item.name;
+					currentPlayingType = targetItem.id;
+					document.getElementById("player-now-playing").innerText = "Playlist: " + targetItem.name;
 				}
 				renderSidebarFavorites();
 				return;
 			}
 		
-			// Ak sa klikne na akékoľvek obyčajné rádio, schováme Spotify a vrátime počasie
+			// Ak sa klikne na rádio, schováme a zmažeme Spotify iframe
 			if (spotifyContainer && spotifyContainer.style.display === 'block') {
 				spotifyContainer.style.display = 'none';
-				if (spotifyIframe) spotifyIframe.src = "about:blank";
+				spotifyContainer.innerHTML = "";
 				if (weatherBlock) weatherBlock.style.display = 'flex';
 			}
 		
 			// Bežné zapínanie/vypínanie rádia
-			if (item.url) {
-				if (currentPlayingType === item.id) {
+			if (targetItem.url) {
+				if (currentPlayingType === targetItem.id) {
 					audio.pause(); 
 					document.getElementById("player-now-playing").innerText = "";
 					renderSidebarFavorites(); 
 				} else {
-					playRadio(item.url, item.id);
+					playRadio(targetItem.url, targetItem.id);
 				}
 			}
 		}
