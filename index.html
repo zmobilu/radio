@@ -1699,17 +1699,33 @@
         function prepniNaDalsieMesto(event) {
 		    if (event) event.stopPropagation();
 		    
-		    // Ak máme v histórii/nastaveniach viac než 1 mesto
 		    if (cfgHistoriaMest && cfgHistoriaMest.length > 1) {
-		        // Zistíme index aktuálneho mesta
-		        let currentIndex = cfgHistoriaMest.findIndex(m => m.toLowerCase() === cfgMestoNazov.toLowerCase());
+		        // Zistíme index aktuálneho mesta v histórii
+		        let currentIndex = cfgHistoriaMest.findIndex(m => m.toLowerCase().trim() === cfgMestoNazov.toLowerCase().trim());
 		        
-		        // Posunieme sa na ďalšie v poradí (a na konci zoznamu ideme opäť od 0)
-		        let nextIndex = (currentIndex + 1) % cfgHistoriaMest.length;
+		        // Ak sa nenašlo, začneme od indexu 1, inak ideme na ďalšie v poradí
+		        let nextIndex = (currentIndex === -1) ? 1 : (currentIndex + 1) % cfgHistoriaMest.length;
 		        let dalsieMesto = cfgHistoriaMest[nextIndex];
-		        
-		        // Vyhľadáme a načítame dáta pre nové mesto
-		        vyhladajMestoPodlaTextu(dalsieMesto);
+		
+		        // Priamo načítame dáta pre ďalšie mesto BEZ prehadzovania polohy v histórii
+		        fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(dalsieMesto)}&count=1&language=sk&format=json`)
+		            .then(res => res.json())
+		            .then(data => {
+		                if (data && data.results && data.results.length > 0) {
+		                    const najdene = data.results[0];
+		                    cfgLat = najdene.latitude;
+		                    cfgLon = najdene.longitude;
+		                    cfgMestoNazov = najdene.name;
+		                    
+		                    localStorage.setItem('cfg_weather_lat', cfgLat);
+		                    localStorage.setItem('cfg_weather_lon', cfgLon);
+		                    localStorage.setItem('cfg_weather_name', cfgMestoNazov);
+		                    
+		                    aktualizujTlacidloMesta();
+		                    fetchWeatherData();
+		                }
+		            })
+		            .catch(e => console.log("Chyba prepínania mesta."));
 		    }
 		}
         function zmenNastavenieMesta() {
