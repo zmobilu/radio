@@ -1084,8 +1084,7 @@
                 <div id="player-now-playing" style="color: #fff; text-align: center;"></div>
                 
 				<!-- Skrytý Spotify prehrávač prispôsobený pre PWA režim -->
-				<!-- Konajner pre Spotify v PWA -->
-				<div id="spotifyPlayerContainer" style="display: none; width: 100%; height: 352px; margin-top: 1vh; border-radius: 12px; overflow: hidden; position: relative; z-index: 50;"></div>
+				<div id="spotifyPlayerContainer" style="display: none; width: 100%; height: 352px; margin-top: 1vh; border-radius: 12px; overflow: hidden; position: relative; z-index: 50;">
 				    <iframe id="spotifyIframe" src="" width="100%" height="100%" frameborder="0" 
 				            allowfullscreen="" 
 				            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; storage-access; web-share" 
@@ -1814,36 +1813,42 @@
         }
 
         function renderSidebarFavorites() {
-            const container = document.getElementById('favSidebarContainer');
-            if(!container) return;
-            container.innerHTML = "";
-
-            for (let i = 0; i < 6; i++) {
-                const id = slotFavorites[i];
-                const item = DATABASE.find(d => d.id === id);
-                const card = document.createElement('div');
-                
-                if (item && id !== null) {
-                card.className = "fav-card";
-                
-                if (currentPlayingType === item.id && !audio.paused) {
-                    card.classList.add("playing");
-                }
-                
-                card.onclick = () => handleFavCardClick(item);
-
-                if (item.img) {
-                    card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
-                } else if (item.icon) {
-                    card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
-                }
-            } else {
-                    card.className = "fav-card empty";
-                    card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
-                }
-                container.appendChild(card);
-            }
-        }
+		    const container = document.getElementById("favorites-sidebar");
+		    if (!container) return;
+		    container.innerHTML = "";
+		
+		    // Načítame zoznam ukladateľných obľúbených z LocalStorage
+		    let favIds = JSON.parse(localStorage.getItem("cfg_fav_ids")) || [];
+		
+		    for (let i = 0; i < 6; i++) {
+		        const item = DATABASE.find(d => d.id === favIds[i]);
+		
+		        if (item) {
+		            // Ak je pozícia obsadená stanicou/playlistom
+		            const card = document.createElement("div");
+		            card.className = "fav-card" + (currentPlayingType === item.id ? " active" : "");
+		            card.style.cssText = item.style || "";
+		            card.onclick = () => handleFavCardClick(item);
+		
+		            card.innerHTML = `
+		                <i class="${item.icon}" style="color:${item.color}; font-size: 1.8rem;"></i>
+		                <span style="font-size: 0.75rem; margin-top: 4px; font-weight: bold; text-transform: uppercase;">${item.name}</span>
+		            `;
+		            container.appendChild(card);
+		        } else {
+		            // Ak je pozícia PRÁZDNA -> spravíme z nej klikateľné tlačidlo!
+		            const emptyCard = document.createElement("div");
+		            emptyCard.className = "fav-card empty-slot";
+		            emptyCard.style.cssText = "background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center;";
+		            
+		            // Kliknutím otvoria priamo nastavenia staníc
+		            emptyCard.onclick = () => toggleSettingsMode();
+		
+		            emptyCard.innerHTML = `<i class="fa-solid fa-plus" style="opacity: 0.4; font-size: 1.5rem;"></i>`;
+		            container.appendChild(emptyCard);
+		        }
+		    }
+		}
 
         function renderSettingsGrid() {
             const grid = document.getElementById('settingsGridView');
@@ -1951,63 +1956,54 @@
         }
 
         function handleFavCardClick(item) {
-			if (typeof isSettingsModeActive !== 'undefined' && isSettingsModeActive) return;
+			if (isSettingsModeActive) return;
 		
 			const spotifyContainer = document.getElementById('spotifyPlayerContainer');
+			const spotifyIframe = document.getElementById('spotifyIframe');
 			const weatherBlock = document.querySelector('.main-weather-container');
-			const targetItem = DATABASE.find(d => d.id === item.id) || item;
 		
-			// Ak ide o Spotify playlist
-			if (targetItem.embedUrl || (targetItem.id && targetItem.id.startsWith('sp'))) {
+			// Ak ide o akýkoľvek Spotify playlist (kontrola podľa embedUrl alebo id)
+			if (item.embedUrl || (item.id && item.id.startsWith('sp'))) {
+				// Vypneme rádio, ak hralo
 				audio.pause();
 				audio.src = "";
 		
-				// TOGGLE: Ak už Spotify beží, zmažeme ho a vrátime počasie
-				if (currentPlayingType === targetItem.id && spotifyContainer && spotifyContainer.style.display === 'block') {
+				// Ak už tento konkrétny Spotify playlist beží, vypneme ho a vrátime počasie (TOGGLE)
+				if (currentPlayingType === item.id && spotifyContainer && spotifyContainer.style.display === 'block') {
 					spotifyContainer.style.display = 'none';
-					spotifyContainer.innerHTML = ""; // Úplne odstránime iframe
+					spotifyIframe.src = "about:blank";
 					if (weatherBlock) weatherBlock.style.display = 'flex';
 					currentPlayingType = "";
 					document.getElementById("player-now-playing").innerText = "";
 				} else {
-					// Skryjeme počasie
+					// Skryjeme počasie a otvoríme Spotify prehrávač
 					if (weatherBlock) weatherBlock.style.display = 'none';
-		
-					if (spotifyContainer) {
-						// Dynamicky vygenerujeme nový iframe priamo pre PWA
-						spotifyContainer.innerHTML = `
-							<iframe src="${targetItem.embedUrl}" 
-									width="100%" 
-									height="100%" 
-									frameborder="0" 
-									allowfullscreen="" 
-									allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; storage-access" 
-									loading="lazy"></iframe>
-						`;
+					if (spotifyContainer && spotifyIframe) {
+						spotifyIframe.src = item.embedUrl;
 						spotifyContainer.style.display = 'block';
 					}
-					currentPlayingType = targetItem.id;
-					document.getElementById("player-now-playing").innerText = "Playlist: " + targetItem.name;
+					currentPlayingType = item.id;
+					document.getElementById("player-now-playing").innerText = "Playlist: " + item.name;
 				}
 				renderSidebarFavorites();
 				return;
 			}
 		
-			// Ak sa klikne na rádio, schováme a zmažeme Spotify iframe
+			// Ak sa klikne na akékoľvek obyčajné rádio, schováme Spotify a vrátime počasie
 			if (spotifyContainer && spotifyContainer.style.display === 'block') {
 				spotifyContainer.style.display = 'none';
-				spotifyContainer.innerHTML = "";
+				if (spotifyIframe) spotifyIframe.src = "about:blank";
 				if (weatherBlock) weatherBlock.style.display = 'flex';
 			}
 		
 			// Bežné zapínanie/vypínanie rádia
-			if (targetItem.url) {
-				if (currentPlayingType === targetItem.id) {
+			if (item.url) {
+				if (currentPlayingType === item.id) {
 					audio.pause(); 
 					document.getElementById("player-now-playing").innerText = "";
 					renderSidebarFavorites(); 
 				} else {
-					playRadio(targetItem.url, targetItem.id);
+					playRadio(item.url, item.id);
 				}
 			}
 		}
