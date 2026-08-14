@@ -1699,14 +1699,16 @@
         function prepniNaDalsieMesto(event) {
 		    if (event) event.stopPropagation();
 		    
+		    // Ak máme v histórii/nastaveniach viac než 1 mesto
 		    if (cfgHistoriaMest && cfgHistoriaMest.length > 1) {
-		        // Porovnávame malé písmená bez ohľadu na presnú zhodu z API
-		        let currentIndex = cfgHistoriaMest.findIndex(m => m.toLowerCase().trim() === cfgMestoNazov.toLowerCase().trim());
+		        // Zistíme index aktuálneho mesta
+		        let currentIndex = cfgHistoriaMest.findIndex(m => m.toLowerCase() === cfgMestoNazov.toLowerCase());
 		        
-		        // Ak sa mesto z nejakého dôvodu nenašlo, začneme od prvého (0), inak ideme na ďalšie
-		        let nextIndex = (currentIndex === -1) ? 1 : (currentIndex + 1) % cfgHistoriaMest.length;
+		        // Posunieme sa na ďalšie v poradí (a na konci zoznamu ideme opäť od 0)
+		        let nextIndex = (currentIndex + 1) % cfgHistoriaMest.length;
 		        let dalsieMesto = cfgHistoriaMest[nextIndex];
 		        
+		        // Vyhľadáme a načítame dáta pre nové mesto
 		        vyhladajMestoPodlaTextu(dalsieMesto);
 		    }
 		}
