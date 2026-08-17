@@ -1,1 +1,30 @@
 
+<!-- KONTANER HODÍN -->
+<div class="clock-large-wrapper">
+    <div id="time-large">
+        <span id="h-part-large" class="hours-part">00</span><span id="m-part-large" class="minutes-part">00</span>
+    </div>
+</div>
+
+<style>
+    .clock-large-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+    #time-large {
+        font-size: 24vw;
+        line-height: 0.8;
+        letter-spacing: -4px;
+        display: flex;
+        align-items: baseline;
+        transform: scaleY(1.05);
+        cursor: pointer;
+    }
+    .hours-part { font-weight: 600; color: #ffffff; }
+    .minutes-part { font-weight: 200; color: #ffffff; margin-left: 5px; }
+    .red-digit { color: #eb0028 !important; }
+    .blue-digit { color: #307CEB !important; }
+</style>
