@@ -1,1 +1,644 @@
 
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="📻">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+
+    <title>📻 Kiosk Dashboard</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
+
+    <!-- ========================================== -->
+    <!-- 1. CSS ŠTÝLY                               -->
+    <!-- ========================================== -->
+    <style>
+        :root { --night-color: #ffa500; }
+        
+        button, a, [onclick], .fav-card, .cfg-mini-card, .forecast-day-box, .color-dot, .weather-left-side, .big-clock-time, .big-clock-nameday {
+            cursor: pointer !important;
+        }
+
+        body {
+            margin: 0; padding: 0; background-color: #000; color: #fff;
+            font-family: -apple-system-short-condensed, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; flex-direction: column; height: 100vh; width: 100vw;
+            overflow: hidden; box-sizing: border-box; -webkit-user-select: none; user-select: none;
+            position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+        }
+
+        .btn-settings { 
+            position: absolute !important; top: 10px !important; right: 15px !important; z-index: 999999 !important;
+            background: #111 !important; border: 1px solid #222 !important; color: #666; font-size: 20px; 
+            display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%;
+        }
+        .btn-settings.active { color: #ff9f0a; border-color: #ff9f0a; background: #1a1a1a; }
+        #fullscreenToggleBtn { position: absolute !important; top: 60px !important; right: 15px !important; z-index: 999999 !important; }
+
+        .workspace-container { display: flex; flex: 1; width: 100vw; overflow: hidden; position: relative; }
+
+        .favorites-sidebar {
+            width: 30%; background: #050505; border-right: 1px solid #111;
+            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr);
+            gap: 6px; padding: 6px; box-sizing: border-box;
+        }
+        .fav-card {
+            background: #111; border: 1px solid #222; border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 6px; box-sizing: border-box; position: relative; overflow: hidden;
+        }
+        .fav-card.playing { border: 2px solid #ff9f0a !important; background: #151515; }
+        .fav-card img { width: 75%; height: 75%; object-fit: contain; }
+        .fav-card i { font-size: 30px; }
+        .fav-card span { font-size: 11px; font-weight: 600; text-transform: uppercase; text-align: center; margin-top: 2px; }
+        .fav-card.empty { border: 1px dashed #222; background: transparent; }
+
+        .main-content-area { width: 70%; background: #000; position: relative; overflow: hidden; }
+
+        .placeholder-view {
+            display: flex; width: 100%; height: 100%; flex-direction: column;
+            align-items: center; justify-content: center; gap: 2vh; background: #000;
+            box-sizing: border-box; padding: 2vh 3vw 1vh 3vw; overflow: hidden;
+        }
+
+        .big-clock-time { font-size: clamp(60px, 16vw, 480px); line-height: 1.1; font-weight: 800; display: flex; letter-spacing: 30px; justify-content: center; align-items: center; width: 100%; transform: scaleY(1.8); margin-top: 3vh !important; }
+        .big-clock-date-wrapper { display: flex; justify-content: center; align-items: center; text-align: center; gap: 5px 12px; font-size: clamp(18px, 3.0vh, 32px); font-weight: 600; width: 100%; margin: 8vh 0 0vh 0 !important; }
+        .big-clock-hours { color: #fff; }
+        .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
+        .big-clock-city { font-size: 4vmin !important; font-weight: 800; color: #ff9f0a; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 1vh; text-align: center; }
+        .big-clock-nameday { color: #ff9f0a; }
+
+        .main-weather-container { display: flex; flex-direction: column; width: 100%; max-width: 680px; margin: 0 auto; align-items: center; justify-content: center; box-sizing: border-box; }
+        .weather-left-side { display: flex !important; flex-direction: column; align-items: center; justify-content: center; width: 100% !important; padding: 0 !important; }
+        .weather-top-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; width: 100%; }
+        #mainBigIcon { font-size: 14vmin !important; line-height: 1; }
+        #mainBigTemp { font-size: 13vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
+        .weather-sub-row { font-size: 3.6vmin !important; font-weight: 600; display: flex; flex-direction: row; align-items: flex-start; justify-content: center; gap: 2px; transform: scaleY(1.25); }
+        #mainWeatherDesc { font-size: 3.2vmin !important; font-weight: 800; color: #aaa; text-transform: uppercase; letter-spacing: 3px; margin-top: 1.5vh !important; text-align: center; width: 100%; transform: scaleY(1.3); }
+
+        .main-mini-strip { display: flex !important; flex-direction: row !important; justify-content: space-between; width: 100% !important; margin-top: 2vh !important; gap: 12px !important; }
+        .mini-day-box { display: flex !important; flex-direction: column !important; align-items: center; justify-content: center; flex: 1; background: #080808; border: 1px solid #111; padding: 1vh 10px !important; border-radius: 10px; }
+        .mini-label { font-size: 3.2vmin !important; color: #888; font-weight: 800; letter-spacing: 1px; margin-bottom: 6px !important; transform: scaleY(1.3); }
+        .mini-data-row { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: 5px !important; width: 100% !important; }
+        #mainFc0Icon, #mainFc1Icon { font-size: 5vmin !important; line-height: 1; }
+        #mainFc0Temp, #mainFc1Temp { font-size: 3.6vmin !important; font-weight: 800; white-space: nowrap !important; transform: scaleY(1.25); }
+
+        .settings-grid-view { display: none; width: 100%; height: 100%; overflow-y: auto; padding: 10px; box-sizing: border-box; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 8px; align-content: start; background: #090909; }
+        .settings-night-panel { background: #0d0d0d; padding: 8px; border-bottom: 2px solid #1a1a1a; display: flex; flex-wrap: wrap; flex-direction: row; gap: 8px; justify-content: space-between; grid-column: 1 / -1; }
+        .settings-night-row { display: flex; align-items: center; background: #151515; padding: 4px 8px; border-radius: 8px; border: 1px solid #222; gap: 6px; flex: 1; min-width: calc(50% - 8px); height: 42px; justify-content: center; box-sizing: border-box; }
+        .settings-night-row button { background: #222; color: #fff; border: 1px solid #444; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+        .color-picker-group { display: flex; gap: 5px; align-items: center; }
+        .color-dot { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); }
+        .color-dot.active-color { border: 2px solid #ffffff !important; transform: scale(1.25); }
+        .cfg-mini-card { background: #151515; border: 1px solid #252525; border-radius: 10px; aspect-ratio: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; box-sizing: border-box; }
+        .cfg-mini-card img { width: 60%; height: 60%; object-fit: contain; }
+        .cfg-mini-card i { font-size: 22px; }
+        .cfg-mini-card span { font-size: 9px; text-transform: uppercase; font-weight: 600; color: #888; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; }
+        .cfg-mini-card.selected { border: 3px solid #ff9f0a !important; background: #1a1a1a; }
+        .cfg-mini-card.selected span { color: #ff9f0a; }
+        .settings-label-separator { grid-column: 1 / -1; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #555; margin: 12px 0 2px 4px; font-weight: 700; border-bottom: 1px solid #1a1a1a; padding-bottom: 3px; }
+
+        .night-player-container { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; color: var(--night-color); margin-top: 1.5vh; }
+        .night-player-station { font-size: 5.5vw; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1vh; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .night-player-station img { height: 6vw; width: auto; object-fit: contain; filter: grayscale(1) brightness(1.5); }
+        .night-player-controls { display: flex; align-items: center; justify-content: center; gap: 8vw; }
+        .night-btn { background: transparent; border: none; color: var(--night-color); font-size: 7vw; padding: 10px; display: flex; align-items: center; justify-content: center; }
+        .night-btn.btn-playpause { font-size: 9vw; }
+
+        body.full-night-mode .favorites-sidebar,
+        body.full-night-mode .big-clock-date-wrapper,
+        body.full-night-mode #settingsToggleBtn, 
+        body.full-night-mode .main-weather-container { display: none !important; }
+        body.full-night-mode .workspace-container, body.full-night-mode .main-content-area { width: 100vw; height: 100vh; }
+        body.full-night-mode .placeholder-view { width: 100vw !important; height: 100vh !important; transform: translateY(-4dvh) !important; justify-content: center !important; align-items: center !important; padding: 0 !important; position: relative !important; }
+        body.full-night-mode .big-clock-time { font-size: 30vw !important; letter-spacing: 0px !important; margin: 0 !important; transform: scaleY(1.20) !important; }
+        body.full-night-mode .big-clock-hours, body.full-night-mode .big-clock-minutes, body.full-night-mode #nightBottomInfo, body.full-night-mode #player-now-playing { color: var(--night-color) !important; }
+        body.full-night-mode #player-now-playing { display: block !important; position: absolute !important; bottom: 13vh !important; left: 0; width: 100% !important; text-align: center !important; font-size: 3.5vw !important; font-weight: 500 !important; color: var(--night-color) !important; z-index: 10 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 20px; box-sizing: border-box; }
+        body.full-night-mode #nightBottomInfo { display: block !important; position: absolute !important; bottom: 5vh !important; font-size: 5.5vw !important; font-weight: 500; letter-spacing: 1px; text-align: center; width: 100%; left: 0; z-index: 10; }
+        body.full-night-mode .night-player-container.active-playing { display: flex !important; }
+
+        @media (orientation: landscape) {
+            body.full-night-mode .placeholder-view { transform: translateY(0) !important; }
+            body.full-night-mode .big-clock-time { transform: scaleY(1.30) translateY(-10vh) !important; }
+            body.full-night-mode .night-player-container { flex-direction: row !important; gap: 4vw !important; position: absolute !important; bottom: 18vh; width: auto !important; }
+            body.full-night-mode #player-now-playing { bottom: 11vh !important; font-size: 2.2vw !important; }
+            body.full-night-mode .night-player-station { font-size: 3.5vw !important; margin-bottom: 0 !important; border-right: 1px solid rgba(255,255,255,0.15); padding-right: 4vw; }
+            body.full-night-mode .night-player-station img { height: 4vw !important; }
+            body.full-night-mode .night-player-controls { gap: 5vw !important; }
+            body.full-night-mode .night-btn { font-size: 4.5vw !important; padding: 5px; }
+            body.full-night-mode .night-btn.btn-playpause { font-size: 5.5vw !important; }
+            body.full-night-mode #nightBottomInfo { font-size: 3.2vw !important; }
+        }
+
+        @media (orientation: portrait) {
+            .workspace-container { flex-direction: column; }
+            .favorites-sidebar { width: 100vw; height: auto; flex-shrink: 0; order: 2; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); border-right: none; border-top: 1px solid #111; gap: 8px; padding: 8px; }
+            .main-content-area { width: 100vw; flex: 1; order: 1; }
+            .placeholder-view { padding: 2vh 3vw; display: flex; flex-direction: column; justify-content: flex-start; height: 100%; box-sizing: border-box; gap: 0; }
+            .big-clock-time { font-size: 22vmin; line-height: 0.8; transform: scaleY(1.05) !important; margin-top: 8vh !important; width: 100%; display: flex; justify-content: center; }
+            .big-clock-date-wrapper { margin-top: 5vh !important; padding-bottom: 1vh; width: 100%; font-size: 3.8vmin; display: flex; flex-wrap: wrap; justify-content: center; text-align: center; font-weight: 600; }
+            .main-weather-container { margin-top: auto !important; margin-bottom: 2vh !important; flex: 0 0 auto !important; }
+            body.full-night-mode .big-clock-time { transform: scaleY(1.90) translateY(-8vh) !important; }
+            body.full-night-mode .night-player-container { position: absolute !important; bottom: 18vh !important; width: 100% !important; }
+        }
+
+        .weather-detail-view { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 99999 !important; box-sizing: border-box; padding: 3vh 3vw; cursor: pointer; overflow: hidden; flex-direction: column; justify-content: space-between; }
+        #weather-location-container-top { width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 1vh; border-bottom: 1px dashed #ff9f0a; padding-bottom: 1vh; }
+        #weather-location-date, #weather-location-time { font-size: 3vmin; font-weight: bold; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+        #weather-location-main { font-size: 3vmin; font-weight: bold; color: #ff9f0a; text-transform: uppercase; letter-spacing: 2px; }
+        #weather-details-top-inline { display: flex; flex-direction: column; width: 100%; height: 52vh; justify-content: space-between; }
+        #weather-sun-row { display: flex; justify-content: center; gap: 24px; width: 100%; margin-bottom: 1.5vh; }
+        .sun-box { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; font-size: 2.2vmin; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .sun-icon { width: 2.4vmin; height: 2.4vmin; min-width: 18px; min-height: 18px; display: inline-block; vertical-align: middle; }
+        .sun-box-rise { color: #ff9f0a; }
+        .sun-box-set { color: #ff4500; }
+        #hourly-chart-container { display: flex; justify-content: flex-start; align-items: flex-end; height: 42vh; width: 100%; gap: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
+        .hourly-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 50px; flex-shrink: 0; }
+        .hourly-time { font-size: 14px; color: #fff; margin-top: 5px; font-weight: 500; }
+        .hourly-icon { font-size: 22px !important; }
+        .hourly-temp { font-size: 15px !important; font-weight: bold; color: #ff9f0a; }
+        .hourly-pop { font-size: 12px !important; color: #4dabff; min-height: 14px; }
+    </style>
+</head>
+<body id="mainBody">
+
+    <audio id="audioPlayer" preload="none" playsinline fetchpriority="high"></audio>
+
+    <!-- ========================================== -->
+    <!-- 2. HORNÉ OVLÁDACIE TLAČIDLÁ                -->
+    <!-- ========================================== -->
+    <button class="btn-settings" id="settingsToggleBtn" onclick="toggleSettingsMode(); event.stopPropagation();" title="Správa obľúbených">
+        <i class="fa-solid fa-gear"></i>
+    </button>
+    <button class="btn-settings" id="fullscreenToggleBtn" onclick="toggleFullscreenMode(); event.stopPropagation();" title="Celá obrazovka">
+        <i class="fa-solid fa-expand" id="fullscreenIcon"></i>
+    </button>
+
+    <div class="workspace-container">
+        <!-- ========================================== -->
+        <!-- 3. BOČNÁ LIŠTA PRE 6 RÁDIÍ                -->
+        <!-- ========================================== -->
+        <aside class="favorites-sidebar" id="favSidebarContainer"></aside>
+
+        <main class="main-content-area">
+            <div class="placeholder-view" id="rightPlaceholder">
+                
+                <!-- ========================================== -->
+                <!-- 4. HODINY, DÁTUM A METADÁTA               -->
+                <!-- ========================================== -->
+                <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();">
+                    <span class="big-clock-hours" id="bigHours">00</span>
+                    <span class="big-clock-minutes" id="bigMinutes">00</span>
+                </div>
+
+                <div class="big-clock-date-wrapper">
+                    <span class="big-clock-date" id="bigDate">---</span>
+                    <span style="color: #444;" id="dateSeparator">•</span>
+                    <span class="big-clock-nameday" id="bigNameday">---</span>
+                </div>
+
+                <div id="player-now-playing" style="color: #fff; text-align: center;"></div>
+
+                <!-- SPOTIFY CONTAINER -->
+                <div id="spotifyPlayerContainer" style="display: none; width: 100%; height: 352px; margin-top: 1vh; border-radius: 12px; overflow: hidden; position: relative; z-index: 50;">
+                    <iframe id="spotifyIframe" src="" width="100%" height="100%" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- 5. HLAVNÝ BLOK POČASIA                    -->
+                <!-- ========================================== -->
+                <div class="main-weather-container">
+                    <div class="weather-left-side">
+                        <span class="big-clock-city" id="bigClockCity" onclick="prepniNaDalsieMesto(event);">Bratislava</span>
+                        <div class="weather-top-row">
+                            <span id="mainBigIcon" onclick="prepniNaDalsieMesto(event);">☀️</span>
+                            <span id="mainBigTemp" onclick="prepniNaDalsieMesto(event);">--°C</span>
+                            <div class="weather-sub-row">
+                                <span class="sub-row-item-temp"><i class="fa-solid fa-temperature-half"></i> <span id="mainApparent">--°</span></span>
+                                <span class="sub-row-item-hum"><i class="fa-solid fa-droplet"></i> <span id="mainHumidity">--%</span></span>
+                            </div>
+                        </div>
+                        <div id="mainWeatherDesc">------ <i class="fa-solid fa-satellite-dish" style="color: #ff9f0a; margin-left: 8px; font-size: 0.85em;"></i></div>
+                    </div>
+
+                    <div class="main-mini-strip">
+                        <div class="mini-day-box" onclick="otvorGrafPreDen(event, 'teraz');">
+                            <span class="mini-label">DNES</span>
+                            <div class="mini-data-row">
+                                <span id="mainFc0Icon">--</span>
+                                <span id="mainFc0Temp">-- / --</span>
+                            </div>
+                        </div>
+                        <div class="mini-day-box" onclick="otvorGrafPreDen(event, 1);">
+                            <span class="mini-label">ZAJTRA</span>
+                            <div class="mini-data-row">
+                                <span id="mainFc1Icon">--</span>
+                                <span id="mainFc1Temp">-- / --</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- 6. NOČNÝ REŽIM PRVKY                       -->
+                <!-- ========================================== -->
+                <div class="night-player-container" id="nightPlayer">
+                    <div class="night-player-station" id="nightStationInfo">
+                        <i class="fa-solid fa-radio"></i> <span id="nightStationName">OFFLINE</span>
+                    </div>
+                    <div class="night-player-controls">
+                        <button class="night-btn" onclick="spustiDalsieRadio('vzad'); event.stopPropagation();">
+                            <i class="fa-solid fa-backward-step"></i>
+                        </button>
+                        <button class="night-btn btn-playpause" onclick="toggleNightPlayPause(); event.stopPropagation();" id="nightPlayPauseBtn">
+                            <i class="fa-solid fa-circle-pause"></i>
+                        </button>
+                        <button class="night-btn" onclick="spustiDalsieRadio('vpred'); event.stopPropagation();">
+                            <i class="fa-solid fa-forward-step"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="nightBottomInfo"></div>
+
+            </div>
+
+            <!-- ========================================== -->
+            <!-- 7. PANEL NASTAVENÍ                         -->
+            <!-- ========================================== -->
+            <div class="settings-grid-view" id="settingsGridView" onclick="resetSettingsTimer()">               
+                <div class="settings-night-panel" onclick="resetSettingsTimer()">
+                    <div class="settings-night-row">
+                        <i class="fa-solid fa-clock label-icon" title="Trvanie noci"></i>
+                        <div>
+                            <button onclick="zmenNastavenieCasu('od'); event.stopPropagation();" id="set-night-from">20:00</button>
+                            <span style="color: #444; margin: 0 2px;">-</span>
+                            <button onclick="zmenNastavenieCasu('do'); event.stopPropagation();" id="set-night-to">05:20</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-night-row">
+                        <i class="fa-solid fa-bed label-icon" title="Prerušenie noci (Snooze)"></i>
+                        <button onclick="zmenDobuOdkladu(); event.stopPropagation();" id="set-snooze-time">1 min</button>
+                    </div>
+
+                    <div class="settings-night-row">
+                        <i class="fa-solid fa-palette label-icon" title="Farba nočného zobrazenia"></i>
+                        <div class="color-picker-group">
+                            <div onclick="nastavFarbuNoci('#ffff00', this); event.stopPropagation();" class="color-dot" style="background: #ffff00;"></div>
+                            <div onclick="nastavFarbuNoci('#eb0028', this); event.stopPropagation();" class="color-dot" style="background: #eb0028;"></div>
+                            <div onclick="nastavFarbuNoci('#ffa500', this); event.stopPropagation();" class="color-dot" style="background: #ffa500;"></div>
+                            <div onclick="nastavFarbuNoci('#32CD32', this); event.stopPropagation();" class="color-dot" style="background: #32CD32;"></div>
+                            <div onclick="nastavFarbuNoci('#ffffff', this); event.stopPropagation();" class="color-dot" style="background: #ffffff;"></div>
+                        </div>
+                    </div>
+
+                    <div class="settings-night-row" style="flex-direction: column; height: auto; gap: 4px; padding: 6px 8px;">
+                        <div style="display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center;">
+                            <i class="fa-solid fa-cloud-sun label-icon" title="Mesto pre počasie"></i>
+                            <button onclick="zmenNastavenieMesta(); event.stopPropagation();" id="set-weather-coords">Mesto: Bratislava</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 8. DETAILNÝ GRAF POČASIA                   -->
+    <!-- ========================================== -->
+    <div class="weather-detail-view" id="weatherDetailView" onclick="toggleWeatherView(event)">
+        <div id="weather-location-container-top">
+            <div id="weather-location-date">--.--.----</div>
+            <span style="color: #444;">•</span>
+            <div id="weather-location-main" style="cursor: pointer; background: rgba(255,159,10,0.15); border: 1px solid #ff9f0a; padding: 4px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();">
+                <i class="fa-solid fa-map-location-dot" style="font-size: 0.85em; color: #ff9f0a;"></i>
+                <span id="weather-location-text">---</span>
+            </div>
+            <span style="color: #444;">•</span>
+            <div id="weather-location-time">00:00</div>
+        </div>
+
+        <div id="weather-details-top-inline">
+            <div id="weather-sun-row">
+                <div class="sun-box sun-box-rise">☀️ <span id="sun-rise-val">--:--</span></div>
+                <div class="sun-box sun-box-set">🌙 <span id="sun-set-val">--:--</span></div>
+            </div>
+
+            <div id="hourly-chart-container"></div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 9. JAVASCRIPT LOGIKA                       -->
+    <!-- ========================================== -->
+    <script>
+        // --- 1. DATABÁZA & GLOBÁLNE PREMENNÉ ---
+        const DATABASE = [
+            { id: "slovensko", name: "Slovensko", url: "https://icecast.stv.livebox.sk/slovensko_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png", category: "Verejnoprávne" },
+            { id: "fm", name: "Rádio_FM", url: "https://icecast.stv.livebox.sk/fm_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioFM.png", category: "Verejnoprávne" },
+            { id: "fun", name: "Fun Radio", url: "https://stream.funradio.sk/fun192.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png", category: "Fun Kontajner" },
+            { id: "funchill", name: "Fun Chill", url: "https://stream.funradio.sk/chill128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunChill.png", category: "Fun Kontajner" },
+            { id: "rock", name: "Radio rock", url: "https://stream.bauermedia.sk/rock-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png", category: "Komerčné & Ostatné" },
+            { id: "blanik", name: "Blaník", url: "https://ice.abradio.cz/blanikcz128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png", category: "Komerčné & Ostatné" },
+            { id: "expres", name: "Expres", url: "https://stream.bauermedia.sk/expres-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoExpress.png", category: "Komerčné & Ostatné" },
+            { id: "europa2", name: "Europa 2", url: "https://stream.bauermedia.sk/europa2-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoEuropa2.png", category: "Komerčné & Ostatné" }
+        ];
+
+        let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v2')) || ["slovensko", "funchill", "rock", "blanik", "fun", "expres"];
+        const audio = document.getElementById('audioPlayer');
+        let currentPlayingType = "";
+
+        let cfgNightFrom = localStorage.getItem('kiosk_night_from') || "20:00";
+        let cfgNightTo = localStorage.getItem('kiosk_night_to') || "05:20";
+        let cfgNightColor = localStorage.getItem('kiosk_night_color') || "#ffa500";
+        let cfgSnoozeMin = parseInt(localStorage.getItem('kiosk_snooze_min')) || 1;
+        let isManualNightMode = false;
+        let snoozeUntilTimestamp = 0;
+
+        let cfgLat = parseFloat(localStorage.getItem('kiosk_geo_lat')) || 48.1486;
+        let cfgLon = parseFloat(localStorage.getItem('kiosk_geo_lon')) || 17.1077;
+        let cfgCityName = localStorage.getItem('kiosk_geo_name') || "Bratislava";
+        let globalWeatherData = null;
+
+        let isSettingsModeActive = false;
+        let settingsTimeout = null;
+
+        const HISTORIA_MIEST = [
+            { name: "Bratislava", lat: 48.1486, lon: 17.1077 },
+            { name: "Šamorín", lat: 48.0285, lon: 17.3097 },
+            { name: "Senecké jazerá", lat: 48.2192, lon: 17.4162 }
+        ];
+
+        // --- 2. HODINY A NOČNÝ REŽIM ---
+        function runClockEngine() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+
+            document.getElementById('bigHours').innerText = h;
+            document.getElementById('bigMinutes').innerText = m;
+
+            const dni = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
+            const dateStr = `${dni[now.getDay()]} ${now.getDate()}. ${now.getMonth() + 1}.`;
+            document.getElementById('bigDate').innerText = dateStr;
+
+            // Vyhodnotenie noci
+            const currentTimeVal = now.getHours() * 60 + now.getMinutes();
+            const [fH, fM] = cfgNightFrom.split(':').map(Number);
+            const [tH, tM] = cfgNightTo.split(':').map(Number);
+            const fromVal = fH * 60 + fM;
+            const toVal = tH * 60 + tM;
+
+            let isAutoNightWindow = (fromVal > toVal) ? (currentTimeVal >= fromVal || currentTimeVal < toVal) : (currentTimeVal >= fromVal && currentTimeVal < toVal);
+            const isSnoozed = (Date.now() < snoozeUntilTimestamp);
+            const shouldBeNight = (isAutoNightWindow || isManualNightMode) && !isSnoozed;
+
+            if (shouldBeNight) {
+                document.body.classList.add('full-night-mode');
+            } else {
+                document.body.classList.remove('full-night-mode');
+            }
+
+            const mainTemp = document.getElementById('mainBigTemp') ? document.getElementById('mainBigTemp').innerText : '--°C';
+            const mainIcon = document.getElementById('mainBigIcon') ? document.getElementById('mainBigIcon').innerText : '☀️';
+            document.getElementById('nightBottomInfo').innerHTML = `<span>${dateStr}</span> <span style="color:var(--night-color); opacity:0.3;">•</span> <span>${mainIcon} ${mainTemp}</span>`;
+        }
+
+        function handleBigClockClick() {
+            const now = new Date();
+            const currentTimeVal = now.getHours() * 60 + now.getMinutes();
+            const [fH, fM] = cfgNightFrom.split(':').map(Number);
+            const [tH, tM] = cfgNightTo.split(':').map(Number);
+            const fromVal = fH * 60 + fM;
+            const toVal = tH * 60 + tM;
+
+            let isAutoNightWindow = (fromVal > toVal) ? (currentTimeVal >= fromVal || currentTimeVal < toVal) : (currentTimeVal >= fromVal && currentTimeVal < toVal);
+
+            if (isAutoNightWindow) {
+                snoozeUntilTimestamp = Date.now() + (cfgSnoozeMin * 60 * 1000);
+            } else {
+                isManualNightMode = !isManualNightMode;
+            }
+            runClockEngine();
+        }
+
+        // --- 3. LOGIKA RÁDIÍ ---
+        function renderSidebarFavorites() {
+            const container = document.getElementById('favSidebarContainer');
+            if(!container) return;
+            container.innerHTML = "";
+
+            for (let i = 0; i < 6; i++) {
+                const id = slotFavorites[i];
+                const item = DATABASE.find(d => d.id === id);
+                const card = document.createElement('div');
+                
+                if (item && id !== null) {
+                    card.className = "fav-card";
+                    if (currentPlayingType === item.id && !audio.paused) {
+                        card.classList.add("playing");
+                    }
+                    card.onclick = () => handleFavCardClick(item);
+
+                    if (item.img) {
+                        card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
+                    } else if (item.icon) {
+                        card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
+                    }
+                } else {
+                    card.className = "fav-card empty";
+                    card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
+                }
+                container.appendChild(card);
+            }
+        }
+
+        function handleFavCardClick(item) {
+            if (isSettingsModeActive) return;
+
+            if (item.url) {
+                if (currentPlayingType === item.id) {
+                    audio.pause(); 
+                    currentPlayingType = "";
+                    document.getElementById("player-now-playing").innerText = "";
+                    renderSidebarFavorites(); 
+                } else {
+                    playRadio(item.url, item.id);
+                }
+            }
+        }
+
+        function playRadio(url, id) {
+            audio.src = url;
+            audio.load();
+            currentPlayingType = id;
+            
+            audio.play().then(() => {
+                renderSidebarFavorites();
+                runClockEngine(); 
+            }).catch((e) => console.log("Stream offline", e));
+        }
+
+        // --- 4. POČASIE ---
+        async function fetchWeatherData() {
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${cfgLat}&longitude=${cfgLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
+                const res = await fetch(url);
+                if (!res.ok) return;
+                
+                globalWeatherData = await res.json();
+                vykresliPlochuPocasia();
+            } catch (e) {
+                console.log("Chyba počasia:", e);
+            }
+        }
+
+        function decodeWmoIcon(code) {
+            if (code === 0) return '☀️';
+            if (code >= 1 && code <= 3) return '⛅';
+            if (code >= 45 && code <= 48) return '🌫️';
+            if (code >= 51 && code <= 67) return '🌧️';
+            if (code >= 71 && code <= 77) return '❄️';
+            if (code >= 80 && code <= 82) return '🌦️';
+            if (code >= 95) return '🌩️';
+            return '🌡️';
+        }
+
+        function vykresliPlochuPocasia() {
+            if (!globalWeatherData) return;
+            const curr = globalWeatherData.current;
+            const daily = globalWeatherData.daily;
+
+            document.getElementById('bigClockCity').innerText = cfgCityName;
+            document.getElementById('mainBigTemp').innerText = `${Math.round(curr.temperature_2m)}°C`;
+            document.getElementById('mainBigIcon').innerText = decodeWmoIcon(curr.weather_code);
+            document.getElementById('mainApparent').innerText = `${Math.round(curr.apparent_temperature)}°`;
+            document.getElementById('mainHumidity').innerText = `${curr.relative_humidity_2m}%`;
+
+            document.getElementById('mainFc0Icon').innerText = decodeWmoIcon(daily.weather_code[0]);
+            document.getElementById('mainFc0Temp').innerText = `${Math.round(daily.temperature_2m_max[0])}° / ${Math.round(daily.temperature_2m_min[0])}°`;
+
+            document.getElementById('mainFc1Icon').innerText = decodeWmoIcon(daily.weather_code[1]);
+            document.getElementById('mainFc1Temp').innerText = `${Math.round(daily.temperature_2m_max[1])}° / ${Math.round(daily.temperature_2m_min[1])}°`;
+        }
+
+        function prepniNaDalsieMesto(ev) {
+            if (ev) ev.stopPropagation();
+            let currentIndex = HISTORIA_MIEST.findIndex(m => m.name.toLowerCase() === cfgCityName.toLowerCase());
+            let nextIndex = (currentIndex + 1) % HISTORIA_MIEST.length;
+            const noveMesto = HISTORIA_MIEST[nextIndex];
+
+            cfgCityName = noveMesto.name;
+            cfgLat = noveMesto.lat;
+            cfgLon = noveMesto.lon;
+
+            fetchWeatherData();
+        }
+
+        function toggleWeatherView(ev) {
+            if (ev) ev.stopPropagation();
+            const detailView = document.getElementById('weatherDetailView');
+            if (detailView.style.display === 'flex') {
+                detailView.style.display = 'none';
+            } else {
+                detailView.style.display = 'flex';
+            }
+        }
+
+        function otvorGrafPreDen(ev, denIndex) {
+            if (ev) ev.stopPropagation();
+            toggleWeatherView(ev);
+        }
+
+        // --- 5. NASTAVENIA & FULLSCREEN ---
+        function toggleSettingsMode() {
+            isSettingsModeActive = !isSettingsModeActive;
+            const btn = document.getElementById('settingsToggleBtn');
+            const placeholder = document.getElementById('rightPlaceholder');
+            const gridView = document.getElementById('settingsGridView');
+
+            if (isSettingsModeActive) {
+                btn.classList.add('active');
+                placeholder.style.display = 'none';
+                gridView.style.display = 'grid';
+                renderSettingsGrid();
+            } else {
+                btn.classList.remove('active');
+                placeholder.style.display = 'flex';
+                gridView.style.display = 'none';
+            }
+        }
+
+        function renderSettingsGrid() {
+            const grid = document.getElementById('settingsGridView');
+            const nightPanel = grid.querySelector('.settings-night-panel');
+            while (grid.lastChild && grid.lastChild !== nightPanel) {
+                grid.removeChild(grid.lastChild);
+            }
+
+            DATABASE.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "cfg-mini-card";
+                if (slotFavorites.includes(item.id)) card.classList.add("selected");
+
+                card.onclick = (e) => { 
+                    handleChannelSelectionToggle(item.id); 
+                    e.stopPropagation(); 
+                };
+
+                if (item.img) card.innerHTML = `<img src="${item.img}"><span>${item.name}</span>`;
+                grid.appendChild(card);
+            });
+        }
+
+        function handleChannelSelectionToggle(id) {
+            const existingIndex = slotFavorites.indexOf(id);
+            if (existingIndex !== -1) {
+                slotFavorites[existingIndex] = null;
+            } else {
+                const freeSlotIndex = slotFavorites.indexOf(null);
+                if (freeSlotIndex !== -1) {
+                    slotFavorites[freeSlotIndex] = id;
+                } else {
+                    alert("Všetkých 6 pozícií je plných.");
+                    return;
+                }
+            }
+            localStorage.setItem('kiosk_slots_v2', JSON.stringify(slotFavorites));
+            renderSidebarFavorites();
+            renderSettingsGrid();
+        }
+
+        function toggleFullscreenMode() {
+            const doc = window.document;
+            const docEl = doc.documentElement;
+            const requestFullScreen = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
+            const cancelFullScreen = doc.exitFullscreen || doc.webkitExitFullscreen;
+
+            if (!doc.fullscreenElement && !doc.webkitFullscreenElement) {
+                if (requestFullScreen) requestFullScreen.call(docEl);
+            } else {
+                if (cancelFullScreen) cancelFullScreen.call(doc);
+            }
+        }
+
+        // --- INICIALIZÁCIA PO NAČÍTANÍ STRÁNKY ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebarFavorites();
+            runClockEngine();
+            setInterval(runClockEngine, 1000);
+            fetchWeatherData();
+            setInterval(fetchWeatherData, 15 * 60 * 1000);
+        });
+    </script>
+</body>
+</html>
