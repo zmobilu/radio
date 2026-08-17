@@ -2,25 +2,248 @@
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiosk Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- Načítanie pomocných skriptov -->
-    <script src="js/loader.js"></script>
-    <script src="js/clock.js"></script>
-</head>
-<body style="margin:0; background:#000; color:#fff;">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="📻">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
 
-    <!-- Miesto (slot) pre hodiny -->
-    <div id="slot-clock" style="width: 100vw; height: 100vh;"></div>
+    <title>📻 Kiosk</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/zmobilu/assets/main/kiosk-ikona.png?v=2">
+
+    <!-- Externé knižnice a Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
+    <script src="js/loader.js"></script>
+
+    <style>
+        :root { --night-color: #ffff00; }
+        
+        button, a, [onclick], .fav-card, .cfg-mini-card, .forecast-day-box, .color-dot, .weather-left-side, .big-clock-time, .big-clock-nameday {
+            cursor: pointer !important;
+        }
+
+        body {
+            margin: 0; padding: 0; background-color: #000; color: #fff;
+            font-family: -apple-system-short-condensed, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; flex-direction: column; height: 100vh; width: 100vw;
+            overflow: hidden; box-sizing: border-box; -webkit-user-select: none; user-select: none;
+            position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+        }
+
+        .btn-settings { 
+            position: absolute !important; top: 10px !important; right: 15px !important; z-index: 999999 !important;
+            background: #111 !important; border: 1px solid #222 !important; color: #666; font-size: 20px; 
+            display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%;
+        }
+        .btn-settings.active { color: #ff9f0a; border-color: #ff9f0a; background: #1a1a1a; }
+        #fullscreenToggleBtn { position: absolute !important; top: 60px !important; right: 15px !important; z-index: 999999 !important; }
+
+        .workspace-container { display: flex; flex: 1; width: 100vw; overflow: hidden; position: relative; }
+
+        .favorites-sidebar {
+            width: 30%; background: #050505; border-right: 1px solid #111;
+            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr);
+            gap: 6px; padding: 6px; box-sizing: border-box;
+        }
+        .fav-card {
+            background: #111; border: 1px solid #222; border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 6px; box-sizing: border-box; position: relative; overflow: hidden;
+        }
+        .fav-card.playing { border: 2px solid #ff9f0a !important; background: #151515; }
+        .fav-card img { width: 75%; height: 75%; object-fit: contain; }
+        .fav-card i { font-size: 30px; }
+        .fav-card span { font-size: 11px; font-weight: 600; text-transform: uppercase; text-align: center; margin-top: 2px; }
+        .fav-card.empty { border: 1px dashed #222; background: transparent; }
+
+        .main-content-area { width: 70%; background: #000; position: relative; overflow: hidden; }
+
+        .placeholder-view {
+            display: flex; width: 100%; height: 100%; flex-direction: column;
+            align-items: center; justify-content: center; gap: 2vh; background: #000;
+            box-sizing: border-box; padding: 2vh 3vw 1vh 3vw; overflow: hidden;
+        }
+
+        .big-clock-time { font-size: clamp(60px, 16vw, 480px); line-height: 1.1; font-weight: 800; display: flex; letter-spacing: 30px; justify-content: center; align-items: center; width: 100%; transform: scaleY(1.8); margin-top: 3vh !important; }
+        .big-clock-date-wrapper { display: flex; justify-content: center; align-items: center; text-align: center; gap: 5px 12px; font-size: clamp(18px, 3.0vh, 32px); font-weight: 600; width: 100%; margin: 8vh 0 0vh 0 !important; }
+        .big-clock-hours { color: #fff; }
+        .big-clock-minutes { color: #fff; font-weight: 200; margin-left: 10px; }
+        .big-clock-city { font-size: 4vmin !important; font-weight: 800; color: #ff9f0a; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 1vh; text-align: center; }
+        .big-clock-nameday { color: #ff9f0a; }
+
+        .main-weather-container { display: flex; flex-direction: column; width: 100%; max-width: 680px; margin: 0 auto; align-items: center; justify-content: center; box-sizing: border-box; }
+        .weather-left-side { display: flex !important; flex-direction: column; align-items: center; justify-content: center; width: 100% !important; padding: 0 !important; }
+        .weather-top-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; width: 100%; }
+        #mainBigIcon { font-size: 14vmin !important; line-height: 1; }
+        #mainBigTemp { font-size: 13vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
+        .weather-sub-row { font-size: 3.6vmin !important; font-weight: 600; display: flex; flex-direction: row; align-items: flex-start; justify-content: center; gap: 2px; transform: scaleY(1.25); }
+        #mainWeatherDesc { font-size: 3.2vmin !important; font-weight: 800; color: #aaa; text-transform: uppercase; letter-spacing: 3px; margin-top: 1.5vh !important; text-align: center; width: 100%; transform: scaleY(1.3); }
+
+        .main-mini-strip { display: flex !important; flex-direction: row !important; justify-content: space-between; width: 100% !important; margin-top: 2vh !important; gap: 12px !important; }
+        .mini-day-box { display: flex !important; flex-direction: column !important; align-items: center; justify-content: center; flex: 1; background: #080808; border: 1px solid #111; padding: 1vh 10px !important; border-radius: 10px; }
+        .mini-label { font-size: 3.2vmin !important; color: #888; font-weight: 800; letter-spacing: 1px; margin-bottom: 6px !important; transform: scaleY(1.3); }
+        .mini-data-row { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: 5px !important; width: 100% !important; }
+        #mainFc0Icon, #mainFc1Icon { font-size: 5vmin !important; line-height: 1; }
+        #mainFc0Temp, #mainFc1Temp { font-size: 3.6vmin !important; font-weight: 800; white-space: nowrap !important; transform: scaleY(1.25); }
+
+        .settings-grid-view { display: none; width: 100%; height: 100%; overflow-y: auto; padding: 10px; box-sizing: border-box; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 8px; align-content: start; background: #090909; }
+        .settings-night-panel { background: #0d0d0d; padding: 8px; border-bottom: 2px solid #1a1a1a; display: flex; flex-wrap: wrap; flex-direction: row; gap: 8px; justify-content: space-between; }
+        .settings-night-row { display: flex; align-items: center; background: #151515; padding: 4px 8px; border-radius: 8px; border: 1px solid #222; gap: 6px; flex: 1; min-width: calc(50% - 8px); height: 42px; justify-content: center; box-sizing: border-box; }
+        .settings-night-row button { background: #222; color: #fff; border: 1px solid #444; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+        .color-picker-group { display: flex; gap: 5px; align-items: center; }
+        .color-dot { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); }
+        .color-dot.active-color { border: 2px solid #ffffff !important; transform: scale(1.25); }
+        .cfg-mini-card { background: #151515; border: 1px solid #252525; border-radius: 10px; aspect-ratio: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; box-sizing: border-box; }
+        .cfg-mini-card img { width: 60%; height: 60%; object-fit: contain; }
+        .cfg-mini-card i { font-size: 22px; }
+        .cfg-mini-card span { font-size: 9px; text-transform: uppercase; font-weight: 600; color: #888; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; }
+        .cfg-mini-card.selected { border: 3px solid #ff9f0a !important; background: #1a1a1a; }
+        .cfg-mini-card.selected span { color: #ff9f0a; }
+        .settings-label-separator { grid-column: 1 / -1; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #555; margin: 12px 0 2px 4px; font-weight: 700; border-bottom: 1px solid #1a1a1a; padding-bottom: 3px; }
+
+        .night-player-container { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; color: var(--night-color); margin-top: 1.5vh; }
+        .night-player-station { font-size: 5.5vw; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1vh; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .night-player-station img { height: 6vw; width: auto; object-fit: contain; filter: grayscale(1) brightness(1.5); }
+        .night-player-controls { display: flex; align-items: center; justify-content: center; gap: 8vw; }
+        .night-btn { background: transparent; border: none; color: var(--night-color); font-size: 7vw; padding: 10px; display: flex; align-items: center; justify-content: center; }
+        .night-btn.btn-playpause { font-size: 9vw; }
+
+        body.full-night-mode .favorites-sidebar,
+        body.full-night-mode .big-clock-date-wrapper,
+        body.full-night-mode #settingsToggleBtn, 
+        body.full-night-mode .main-weather-container { display: none !important; }
+        body.full-night-mode .workspace-container, body.full-night-mode .main-content-area { width: 100vw; height: 100vh; }
+        body.full-night-mode .placeholder-view { width: 100vw !important; height: 100vh !important; transform: translateY(-4dvh) !important; justify-content: center !important; align-items: center !important; padding: 0 !important; position: relative !important; }
+        body.full-night-mode .big-clock-time { font-size: 30vw !important; letter-spacing: 0px !important; margin: 0 !important; transform: scaleY(1.20) !important; }
+        body.full-night-mode .big-clock-hours, body.full-night-mode .big-clock-minutes, body.full-night-mode #nightBottomInfo, body.full-night-mode #player-now-playing { color: var(--night-color) !important; }
+        body.full-night-mode #player-now-playing { display: block !important; position: absolute !important; bottom: 13vh !important; left: 0; width: 100% !important; text-align: center !important; font-size: 3.5vw !important; font-weight: 500 !important; color: var(--night-color) !important; z-index: 10 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 20px; box-sizing: border-box; }
+        body.full-night-mode #nightBottomInfo { display: block !important; position: absolute !important; bottom: 5vh !important; font-size: 5.5vw !important; font-weight: 500; letter-spacing: 1px; text-align: center; width: 100%; left: 0; z-index: 10; }
+        body.full-night-mode .night-player-container.active-playing { display: flex !important; }
+
+        @media (orientation: landscape) {
+            body.full-night-mode .placeholder-view { transform: translateY(0) !important; }
+            body.full-night-mode .big-clock-time { transform: scaleY(1.30) translateY(-10vh) !important; }
+            body.full-night-mode .night-player-container { flex-direction: row !important; gap: 4vw !important; position: absolute !important; bottom: 18vh; width: auto !important; }
+            body.full-night-mode #player-now-playing { bottom: 11vh !important; font-size: 2.2vw !important; }
+            body.full-night-mode .night-player-station { font-size: 3.5vw !important; margin-bottom: 0 !important; border-right: 1px solid rgba(255,255,255,0.15); padding-right: 4vw; }
+            body.full-night-mode .night-player-station img { height: 4vw !important; }
+            body.full-night-mode .night-player-controls { gap: 5vw !important; }
+            body.full-night-mode .night-btn { font-size: 4.5vw !important; padding: 5px; }
+            body.full-night-mode .night-btn.btn-playpause { font-size: 5.5vw !important; }
+            body.full-night-mode #nightBottomInfo { font-size: 3.2vw !important; }
+        }
+
+        @media (orientation: portrait) {
+            .workspace-container { flex-direction: column; }
+            .favorites-sidebar { width: 100vw; height: auto; flex-shrink: 0; order: 2; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); border-right: none; border-top: 1px solid #111; gap: 8px; padding: 8px; }
+            .main-content-area { width: 100vw; flex: 1; order: 1; }
+            .placeholder-view { padding: 2vh 3vw; display: flex; flex-direction: column; justify-content: flex-start; height: 100%; box-sizing: border-box; gap: 0; }
+            .big-clock-time { font-size: 22vmin; line-height: 0.8; transform: scaleY(1.05) !important; margin-top: 8vh !important; width: 100%; display: flex; justify-content: center; }
+            .big-clock-date-wrapper { margin-top: 5vh !important; padding-bottom: 1vh; width: 100%; font-size: 3.8vmin; display: flex; flex-wrap: wrap; justify-content: center; text-align: center; font-weight: 600; }
+            .main-weather-container { margin-top: auto !important; margin-bottom: 2vh !important; flex: 0 0 auto !important; }
+            body.full-night-mode .big-clock-time { transform: scaleY(1.90) translateY(-8vh) !important; }
+            body.full-night-mode .night-player-container { position: absolute !important; bottom: 18vh !important; width: 100% !important; }
+        }
+
+        .weather-detail-view { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 99999 !important; box-sizing: border-box; padding: 3vh 3vw; cursor: pointer; overflow: hidden; flex-direction: column; justify-content: space-between; }
+        #weather-location-container-top { width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 1vh; border-bottom: 1px dashed #ff9f0a; padding-bottom: 1vh; }
+        #weather-location-date, #weather-location-time { font-size: 3vmin; font-weight: bold; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+        #weather-location-main { font-size: 3vmin; font-weight: bold; color: #ff9f0a; text-transform: uppercase; letter-spacing: 2px; }
+        #weather-details-top-inline { display: flex; flex-direction: column; width: 100%; height: 52vh; justify-content: space-between; }
+        #weather-sun-row { display: flex; justify-content: center; gap: 24px; width: 100%; margin-bottom: 1.5vh; }
+        .sun-box { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; font-size: 2.2vmin; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .sun-icon { width: 2.4vmin; height: 2.4vmin; min-width: 18px; min-height: 18px; display: inline-block; vertical-align: middle; }
+        .sun-box-rise { color: #ff9f0a; }
+        .sun-box-set { color: #ff4500; }
+        #hourly-chart-container { display: flex; justify-content: flex-start; align-items: flex-end; height: 42vh; width: 100%; gap: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
+        .hourly-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 50px; flex-shrink: 0; }
+        .hourly-time { font-size: 14px; color: #fff; margin-top: 5px; font-weight: 500; }
+        .hourly-icon { font-size: 22px !important; }
+        .hourly-temp { font-size: 15px !important; font-weight: bold; color: #ff9f0a; }
+        .hourly-pop { font-size: 12px !important; color: #4dabff; min-height: 14px; }
+        #extended-forecast-container { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; width: 100%; height: 24vh; margin-top: auto; }
+        .forecast-day-box { background: #060606; border: 1px solid #151515; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; }
+        .forecast-day-label { font-size: 2.2vmin; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        .forecast-day-icon { font-size: 6vmin !important; margin: 6px 0 !important; }
+        .forecast-day-temp { font-size: 2.6vmin !important; font-weight: 600 !important; line-height: 1.1 !important; }
+
+        @keyframes antiBurnIn {
+            0%   { transform: translate(0, 0); }
+            20%  { transform: translate(2px, -3px); }
+            40%  { transform: translate(-3px, 2px); }
+            60%  { transform: translate(3px, 3px); }
+            80%  { transform: translate(-2px, -2px); }
+            100% { transform: translate(0, 0); }
+        }
+        body.full-night-mode .placeholder-view { animation: antiBurnIn 300s infinite linear; }
+    </style>
+</head>
+<body id="mainBody">
+
+    <audio id="audioPlayer" preload="none" playsinline fetchpriority="high"></audio>
+
+    <!-- Slot pre fixné tlačidlá nastavení a celú obrazovku -->
+    <div id="slot-top-controls"></div>
+
+    <div class="workspace-container">
+        <!-- Slot pre bočnú lištu 6 obľúbených tlačidiel -->
+        <div id="slot-radio-sidebar" style="display: contents;"></div>
+
+        <main class="main-content-area">
+            <div class="placeholder-view" id="rightPlaceholder">
+                
+                <!-- Slot pre hodiny, dátum a pesničku -->
+                <div id="slot-clock-block" style="width: 100%; text-align: center;"></div>
+
+                <!-- Spotify prehrávač -->
+                <div id="spotifyPlayerContainer" style="display: none; width: 100%; height: 352px; margin-top: 1vh; border-radius: 12px; overflow: hidden; position: relative; z-index: 50;">
+                    <iframe id="spotifyIframe" src="" width="100%" height="100%" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                </div>
+
+                <!-- Slot pre hlavné počasie na ploche -->
+                <div id="slot-weather-block" style="width: 100%;"></div>
+
+                <!-- Slot pre nočné prvky -->
+                <div id="slot-night-mode" style="width: 100%;"></div>
+
+            </div>
+
+            <!-- Slot pre mriežku nastavení -->
+            <div id="slot-settings-panel" style="display: contents;"></div>
+        </main>
+    </div>
+
+    <!-- Slot pre celoobrazovkový detailný graf počasia -->
+    <div id="slot-weather-detail" style="display: contents;"></div>
+
+    <!-- Načítanie skriptov logiky -->
+    <script src="js/database.js"></script>
+    <script src="js/radio.js"></script>
+    <script src="js/weather.js"></script>
+    <script src="js/clock.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/app.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // 1. Načítame HTML kód hodín z priečinka components
-            await loadComponent('slot-clock', 'components/clock-large.html');
+            // Skladačka: Načítame všetky HTML kocky zo zložky components/
+            await loadComponent('slot-top-controls', 'components/top-controls.html');
+            await loadComponent('slot-radio-sidebar', 'components/radio-sidebar.html');
+            await loadComponent('slot-clock-block', 'components/clock-block.html');
+            await loadComponent('slot-weather-block', 'components/weather-block.html');
+            await loadComponent('slot-night-mode', 'components/night-mode.html');
+            await loadComponent('slot-settings-panel', 'components/settings-panel.html');
+            await loadComponent('slot-weather-detail', 'components/weather-detail.html');
 
-            // 2. Keď je HTML vložené na stránke, spustíme ich tikanie
-            spustiVelkeHodiny();
+            // Po načítaní HTML modulov inicializujeme dáta a render
+            if (typeof renderSidebarFavorites === 'function') renderSidebarFavorites();
+            if (typeof runClockEngine === 'function') runClockEngine();
+            if (typeof fetchWeatherData === 'function') fetchWeatherData();
         });
     </script>
 
