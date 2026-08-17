@@ -1,1 +1,41 @@
 
+<!-- CELOOBRAZOVKOVÉ DETAILNÉ ZOBRAZENIE GRAFU A PREDPOVEDE -->
+<div class="weather-detail-view" id="weatherDetailView" onclick="toggleWeatherView(event)">
+    <!-- Horná lišta: dátum, názov mesta s odkazom na Windy a aktuálny čas -->
+    <div id="weather-location-container-top">
+        <div id="weather-location-date">--.--.----</div>
+        <span style="color: #444;">•</span>
+        <div id="weather-location-main" style="cursor: pointer; background: rgba(255,159,10,0.15); border: 1px solid #ff9f0a; padding: 4px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť mapu Windy">
+            <i class="fa-solid fa-map-location-dot" style="font-size: 0.85em; color: #ff9f0a;"></i>
+            <span id="weather-location-text">---</span>
+        </div>
+        <span style="color: #444;">•</span>
+        <div id="weather-location-time">00:00</div>
+    </div>
+
+    <!-- Východ / Západ slnka a hodinový graf teplôt -->
+    <div id="weather-details-top-inline">
+        <div id="weather-sun-row">
+            <div class="sun-box sun-box-rise">
+                <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v6M4.93 10.93l4.24 4.24M2 18h20M20 18a8 8 0 0 0-16 0"/>
+                    <polyline points="16 6 12 2 8 6"/>
+                </svg>
+                <span id="sun-rise-val">--:--</span>
+            </div>
+            <div class="sun-box sun-box-set">
+                <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="#ff4500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 10v6M4.93 10.93l4.24 4.24M2 18h20M20 18a8 8 0 0 0-16 0"/>
+                    <polyline points="8 12 12 16 16 12"/>
+                </svg>
+                <span id="sun-set-val">--:--</span>
+            </div>
+        </div>
+
+        <!-- Sem JS dynamicky generuje stĺpce hodinového grafu -->
+        <div id="hourly-chart-container"></div>
+    </div>
+
+    <!-- Spodný 6-dňový vyhliadkový pásik -->
+    <div id="extended-forecast-container"></div>
+</div>
