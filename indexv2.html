@@ -2239,102 +2239,80 @@
         async function fetchNamedayData() {
             const now = new Date();
             poslednyNacitanyDen = now.getDate();
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const dd = String(now.getDate()).padStart(2, '0');
+            const currentMonth = now.getMonth() + 1; // 1-12
+            const currentDay = now.getDate();       // 1-31
+
             try {
-                const response = await fetch('https://raw.githubusercontent.com/spacek/slovensky-kalendar-menin/master/sk-meniny.csv');
+                // Načítanie zo spoločného lokálneho súboru meniny.csv
+                const response = await fetch('meniny.csv');
                 const text = await response.text();
-                for (let line of text.split('\n')) {
-                    if (line.includes(`${mm}-${dd}`)) {
-                        // Rozdelíme riadok: na indexe 0 je dátum, na indexe 1 sú mená oddelené čiarkami
-                        let rawNamesLine = line.split(/[;,]/).slice(1).join(',');
-                        // Vyčistíme mená od prázdnych znakov a rozdelíme ich do poľa
-                        dnesneVsetkyMena = rawNamesLine.split(',').map(m => m.trim()).filter(m => m !== "");
+                
+                const lines = text.split('\n');
+                
+                for (let line of lines) {
+                    if (!line.trim()) continue;
+                    
+                    // Rozdelenie riadku CSV
+                    const parts = line.split(',');
+                    if (parts.length < 3) continue;
+
+                    const month = parseInt(parts[0].trim(), 10);
+                    const day = parseInt(parts[1].trim(), 10);
+
+                    if (month === currentMonth && day === currentDay) {
+                        // Očistenie od úvodzoviek
+                        let rawNames = parts.slice(2).join(',').replace(/"/g, '').trim();
+                        
+                        // Rozdelenie mien na jednotlivé položky
+                        dnesneVsetkyMena = rawNames.split(',').map(m => m.trim()).filter(m => m !== "");
 
                         if (dnesneVsetkyMena.length === 0) return;
 
-                        // Hlavné meno bude prvé v poradí
-                        let povodneMeno = dnesneVsetkyMena[0];
-                        dnesneMeno = povodneMeno; 
-                        
                         const bigNameday = document.getElementById('bigNameday');
                         const sep = document.getElementById('dateSeparator');
                         
-                        if(sep) sep.style.display = "inline";
-                        bigNameday.style.color = "#ff9f0a";
+                        if (sep) sep.style.display = "inline";
 
-                        // Priradenie ikoniek podľa tvojich kategórií
-                        if (RODINA.includes(povodneMeno)) {
-                            dnesneMeno = `❤️ ${povodneMeno}`;
-                            bigNameday.style.color = "#ff3b30";
-                        } else if (MOJE_MENA.includes(povodneMeno)) {
-                            dnesneMeno = `⭐ ${povodneMeno}`;
-                        } else if (SPOLUZIACI.includes(povodneMeno)) {
-                            dnesneMeno = `🎓 ${povodneMeno}`;
-                            bigNameday.style.color = "#5ac8fa";
-                        } else if (KOLEGOVIA.includes(povodneMeno)) {
-                            dnesneMeno = `💼 ${povodneMeno}`;
-                            bigNameday.style.color = "#34c759";
-                        }
+                        // Kontrola a formátovanie všetkých mien na daný deň
+                        let dominantnaFarba = "#ff9f0a"; // Štandardná oranžová
+                        let naformatovaneMena = [];
 
-                        // Ak existujú ďalšie mená, pridáme indikátor +X (napr. +2)
-                        if (dnesneVsetkyMena.length > 1) {
-                            const pocetDalsich = dnesneVsetkyMena.length - 1;
-                            bigNameday.innerHTML = `${dnesneMeno} <span style="color: #666; font-size: 0.8em; font-weight: normal; margin-left: 4px;">+${pocetDalsich}</span>`;
-                        } else {
-                            bigNameday.textContent = dnesneMeno;
-                        }
+                        dnesneVsetkyMena.forEach(meno => {
+                            if (RODINA.includes(meno)) {
+                                naformatovaneMena.push(`❤️ ${meno}`);
+                                dominantnaFarba = "#ff3b30";
+                            } else if (MOJE_MENA.includes(meno)) {
+                                naformatovaneMena.push(`⭐ ${meno}`);
+                                dominantnaFarba = "#ff9f0a";
+                            } else if (SPOLUZIACI.includes(meno)) {
+                                naformatovaneMena.push(`🎓 ${meno}`);
+                                dominantnaFarba = "#5ac8fa";
+                            } else if (KOLEGOVIA.includes(meno)) {
+                                naformatovaneMena.push(`💼 ${meno}`);
+                                dominantnaFarba = "#34c759";
+                            } else {
+                                naformatovaneMena.push(meno);
+                            }
+                        });
 
-                        // Nastavíme kliknutie na zobrazenie vyskakovacieho okna
-                        bigNameday.style.cursor = 'pointer';
-                        bigNameday.onclick = (event) => {
-                            event.stopPropagation(); // zabráni spusteniu iných kliknutí (napr. nočného režimu)
-                            otvorOknoMien();
-                        };
+                        // Všetky mená spojené do jedného riadku
+                        dnesneMeno = naformatovaneMena.join(', ');
+                        
+                        bigNameday.style.color = dominantnaFarba;
+                        bigNameday.textContent = dnesneMeno;
+
+                        // Odstránenie kurzora ruky a klikacej udalosti (bez vyskakovacieho okna)
+                        bigNameday.style.cursor = 'default';
+                        bigNameday.onclick = null;
 
                         break;
                     }
                 }
             } catch (e) {
+                console.log("Chyba pri načítaní menín z lokálneho súboru meniny.csv:", e);
                 const sep = document.getElementById('dateSeparator');
-                if(sep) sep.style.display = "none";
+                if (sep) sep.style.display = "none";
             }
-        }
-
-        // Pomocná funkcia, ktorá naplní a zobrazí vyskakovacie okno
-        function otvorOknoMien() {
-            const modal = document.getElementById('namesModal');
-            const listContainer = document.getElementById('modalNamesList');
-            if (!modal || !listContainer) return;
-
-            listContainer.innerHTML = "";
-
-            // Vypíšeme všetky mená pod seba
-            dnesneVsetkyMena.forEach((meno, index) => {
-                const item = document.createElement('div');
-                let symbol = "";
-                
-                // Pridáme symboly k menám aj v okne, ak sa nachádzajú v tvojich zoznamoch
-                if (RODINA.includes(meno)) symbol = "❤️ ";
-                else if (MOJE_MENA.includes(meno)) symbol = "⭐ ";
-                else if (SPOLUZIACI.includes(meno)) symbol = "🎓 ";
-                else if (KOLEGOVIA.includes(meno)) symbol = "💼 ";
-
-                item.textContent = `${symbol}${meno}`;
-                // Prvé meno zvýrazníme, keďže je hlavné
-                if (index === 0) {
-                    item.style.color = "#ff9f0a";
-                    item.style.borderBottom = "1px solid #222";
-                    item.style.paddingBottom = "8px";
-                    item.style.marginBottom = "4px";
-                } else {
-                    item.style.color = "#aaa";
-                    item.style.fontSize = "18px";
-                }
-                listContainer.appendChild(item);
-            });
-
-            modal.style.display = "flex";
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -2816,14 +2794,6 @@
 			});
         
     </script>
-     <!-- Vyskakujúce okno pre zoznam mien -->
-    <div id="namesModal" style="display: none; position: fixed; z-index: 9999999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); justify-content: center; align-items: center;" onclick="this.style.display='none'">
-        <div style="background: #111; border: 1px solid #ff9f0a; padding: 20px; border-radius: 12px; text-align: center; min-width: 250px; max-width: 80%;" onclick="event.stopPropagation()">
-            <h3 style="color: #ff9f0a; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 16px;">Dnes majú meniny</h3>
-            <div id="modalNamesList" style="font-size: 20px; font-weight: bold; color: #fff; display: flex; flex-direction: column; gap: 8px; margin: 15px 0;"></div>
-            <button onclick="document.getElementById('namesModal').style.display='none'" style="background: #222; color: #ff9f0a; border: 1px solid #ff9f0a; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;">Zatvoriť</button>
-        </div>
-    </div>
     
 <!-- INTRO TOUR PRE NOVÝCH POUŽÍVATEĽOV -->
 <div id="tour-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 99999990; pointer-events: none;">
