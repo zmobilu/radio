@@ -1,1 +1,53 @@
+<!-- PANEL NASTAVENÍ A SPRÁVA OBĽÚBENÝCH -->
+<div class="settings-grid-view" id="settingsGridView" onclick="resetSettingsTimer()">               
+    <div class="settings-night-panel" style="grid-column: 1 / -1;" onclick="resetSettingsTimer()">
+        <!-- Nastavenie trvania noci -->
+        <div class="settings-night-row">
+            <i class="fa-solid fa-clock label-icon" title="Trvanie noci"></i>
+            <div>
+                <button onclick="zmenNastavenieCasu('od'); event.stopPropagation();" id="set-night-from">20:00</button>
+                <span style="color: #444; margin: 0 2px;">-</span>
+                <button onclick="zmenNastavenieCasu('do'); event.stopPropagation();" id="set-night-to">05:20</button>
+            </div>
+        </div>
+        
+        <!-- Prerušenie noci (Snooze) -->
+        <div class="settings-night-row">
+            <i class="fa-solid fa-bed label-icon" title="Prerušenie noci (Snooze)"></i>
+            <button onclick="zmenDobuOdkladu(); event.stopPropagation();" id="set-snooze-time">1 min</button>
+        </div>
 
+        <!-- Výber farby nočného zobrazenia -->
+        <div class="settings-night-row">
+            <i class="fa-solid fa-palette label-icon" title="Farba nočného zobrazenia"></i>
+            <div class="color-picker-group">
+                <div onclick="nastavFarbuNoci('#ffff00', this); event.stopPropagation();" class="color-dot" style="background: #ffff00;"></div>
+                <div onclick="nastavFarbuNoci('#eb0028', this); event.stopPropagation();" class="color-dot" style="background: #eb0028;"></div>
+                <div onclick="nastavFarbuNoci('#ffa500', this); event.stopPropagation();" class="color-dot" style="background: #ffa500;"></div>
+                <div onclick="nastavFarbuNoci('#32CD32', this); event.stopPropagation();" class="color-dot" style="background: #32CD32;"></div>
+                <div onclick="nastavFarbuNoci('#ffffff', this); event.stopPropagation();" class="color-dot" style="background: #ffffff;"></div>
+            </div>
+        </div>
+
+        <!-- Nastavenie mesta pre počasie + história -->
+        <div class="settings-night-row" style="flex-direction: column; height: auto; gap: 4px; padding: 6px 8px;">
+            <div style="display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center;">
+                <i class="fa-solid fa-cloud-sun label-icon" title="Mesto pre počasie"></i>
+                <button onclick="zmenNastavenieMesta(); event.stopPropagation();" id="set-weather-coords">Mesto: Bratislava</button>
+            </div>
+            <div id="weather-history-buttons" style="display: flex; gap: 4px; margin-top: 2px; justify-content: center; width: 100%;"></div>
+        </div>
+        
+        <!-- Sprievodca (Tour) -->
+        <div class="settings-night-row">
+            <i class="fa-solid fa-circle-info label-icon" title="Sprievodca"></i>
+            <button onclick="spustiTourZnova(); event.stopPropagation();" style="width: 100%;">▶ Spustiť sprievodcu (Tour)</button>
+        </div>
+        
+        <!-- Návrat na Verziu 1 -->
+        <div class="settings-night-row">
+            <i class="fa-solid fa-circle-arrow-left label-icon" title="Verzia 1"></i>
+            <button onclick="prejdiNaVerziu1(); event.stopPropagation();" style="width: 100%;">Návrat na verziu 1</button>
+        </div>
+    </div>
+</div>
