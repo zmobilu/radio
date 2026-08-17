@@ -1,16 +1,15 @@
-async function loadComponent(elementId, componentPath) {
-    const container = document.getElementById(elementId);
-    if (!container) return;
-
+async function loadComponent(targetId, filePath) {
     try {
-        const response = await fetch(componentPath);
-        if (response.ok) {
-            const html = await response.text();
-            container.innerHTML = html;
-        } else {
-            console.error(`Chyba pri načítaní komponentu: ${componentPath}`);
+        const response = await fetch(filePath);
+        if (!response.ok) {
+            throw new Error(`Nepodarilo sa načítať modul ${filePath}: ${response.statusText}`);
+        }
+        const html = await response.text();
+        const element = document.getElementById(targetId);
+        if (element) {
+            element.innerHTML = html;
         }
     } catch (error) {
-        console.error(`Chyba pri spájaní súboru ${componentPath}:`, error);
+        console.error(`Chyba pri spájaní modulu [${filePath}]:`, error);
     }
 }
