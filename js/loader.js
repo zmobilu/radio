@@ -2,14 +2,14 @@ async function loadComponent(targetId, filePath) {
     try {
         const response = await fetch(filePath);
         if (!response.ok) {
-            throw new Error(`Nepodarilo sa načítať modul ${filePath}: ${response.statusText}`);
+            throw new Error(`Chyba pri načítaní ${filePath}: ${response.status}`);
         }
         const html = await response.text();
-        const element = document.getElementById(targetId);
-        if (element) {
-            element.innerHTML = html;
+        const container = document.getElementById(targetId);
+        if (container) {
+            container.innerHTML = html;
         }
-    } catch (error) {
-        console.error(`Chyba pri spájaní modulu [${filePath}]:`, error);
+    } catch (err) {
+        console.error(`Modul ${filePath} sa nepodarilo načítať:`, err);
     }
 }
