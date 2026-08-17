@@ -480,8 +480,6 @@
             </div>
                         
           <div class="radio-info-wrapper ss-hide">
-			  	<!-- Nový samostatný riadok pre meniny pod hodinami v rádio režime -->
-			<div id="radio-nameday-line" class="ss-hide" style="margin-top: 2px; font-size: 2.2vw; font-weight: 400; text-align: center; color: #aaa;"></div>
                 <!-- Pridaný span pre jednoslovné mesto (bude sa farbiť dynamicky) -->
                 <span id="weather-city-mini" style="font-weight: 500; text-transform: uppercase;">---</span>
                 <span class="separator">|</span>
@@ -493,6 +491,8 @@
                 <span class="separator">|</span>
                 <span id="radio-name">---</span>
             </div>
+			<!-- Nový samostatný riadok pre meniny pod hodinami v rádio režime -->
+			<div id="radio-nameday-line" class="ss-hide" style="margin-top: 2px; font-size: 2.2vw; font-weight: 400; text-align: center; color: #aaa;"></div>
 
             <div id="integrated-spotify-container" class="ss-hide" style="display: none; width: 100%; margin-top: 15px; padding: 0 10px; box-sizing: border-box;">
                 <iframe id="spotify-player-frame" src="" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" style="border-radius: 12px; border: none;"></iframe>
@@ -647,6 +647,7 @@
 	    
 	    const hodinyEl = document.getElementById('time');
 	    const infoRiadokEl = document.querySelector('.radio-info-wrapper');
+		const namedayLineEl = document.getElementById('radio-nameday-line');
 	    const spotifyContainer = document.getElementById('spotify-links-container');
 	    
 	    if (spotifyFrame) spotifyFrame.src = "";
@@ -933,7 +934,6 @@ function updateClock() {
     
     // --- ZOBRAZENIE A VYFARBENIE MENÍN ---
     const menoElementSS = document.getElementById('day-display');
-    const menoElementRadio = document.getElementById('radio-name');
     const menoElementRiadok = document.getElementById('radio-nameday-line');
 
     // 1. Šetrič obrazovky: Zobrazí iba PRVÉ meno zo zoznamu
@@ -942,18 +942,7 @@ function updateClock() {
         menoElementSS.className = 'ss-day ' + dajFarbuMena(dnesneMenoPrve);
     }
 
-    // 2. Info lišta rádia dole: Zobrazí VŠETKY mená spojené čiarkou
-    if (menoElementRadio) {
-        menoElementRadio.textContent = dnesneMenaVsetky;
-        // Ak je v lište iba jedno meno, prefarbí ho, inak nechá štandardnú farbu
-        if (!dnesneMenaVsetky.includes(',')) {
-            menoElementRadio.className = dajFarbuMena(dnesneMenaVsetky);
-        } else {
-            menoElementRadio.className = '';
-        }
-    }
-
-    // 3. Nový riadok pod hodinami: Zobrazí VŠETKY mená a KAŽDÉ vyfarbí osobitne
+    // 2. Samostatný riadok pod mestom/teplotou: Zobrazí VŠETKY mená a KAŽDÉ vyfarbí osobitne
     if (menoElementRiadok && dnesneMenaVsetky) {
         const menaArray = dnesneMenaVsetky.split(',').map(m => m.trim());
         menoElementRiadok.innerHTML = menaArray
