@@ -25,16 +25,27 @@ async function naciatMeninyCSV() {
 
 function ziskajDnesneMeniny(dateObj) {
     if (!meninyDataCSV) return "---";
-    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const dd = String(dateObj.getDate()).padStart(2, '0');
-    const hladanyDatum = `${mm}${dd}`;
+    
+    const curMonth = dateObj.getMonth() + 1;
+    const curDay = dateObj.getDate();
 
     const riadky = meninyDataCSV.split(/\r?\n/);
-    for (let r of riadky) {
-        if (!r.trim()) continue;
-        const stlpce = r.split(';');
-        if (stlpce.length >= 2 && stlpce[0].trim() === hladanyDatum) {
-            return stlpce[1].trim();
+    for (let i = 0; i < riadky.length; i++) {
+        let r = riadky[i].trim();
+        if (!r || i === 0) continue; // Preskočíme prázdne riadky a hlavičku (Month,Day,Names)
+
+        // Regex rozdelí riadok podľa čiarok, ale ignoruje čiarky vo vnútri úvodzoviek
+        const stlpce = r.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+        
+        if (stlpce && stlpce.length >= 3) {
+            const m = parseInt(stlpce[0], 10);
+            const d = parseInt(stlpce[1], 10);
+
+            if (m === curMonth && d === curDay) {
+                // Odstránime úvodzovky a nahradíme čiarky za čiarku s medzerou pre pekné zobrazenie
+                let names = stlpce[2].replace(/^"|"$/g, '').trim();
+                return names.replace(/,/g, ', ');
+            }
         }
     }
     return "---";
