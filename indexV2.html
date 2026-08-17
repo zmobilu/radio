@@ -738,7 +738,28 @@
         .forecast-day-label { font-size: 2.2vmin; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
         .forecast-day-icon { font-size: 6vmin !important; margin: 6px 0 !important; }
         .forecast-day-temp { font-size: 2.6vmin !important; font-weight: 600 !important; white-space: nowrap !important; line-height: 1.1 !important; }
-
+		
+		/* Prispôsobenie pre režim na šírku (Landscape) */
+		@media (orientation: landscape) {
+			.main-weather-container {
+				display: flex !important;
+				flex-direction: row !important;
+				align-items: center !important;
+				justify-content: center !important;
+				gap: 15px !important;
+				width: 100% !important;
+			}
+		
+			.main-weather-container .mini-day-box {
+				flex: 0 0 130px !important; /* Pevná elegantná šírka pre karty po bokoch */
+			}
+		
+		    /* Karty DNES a ZAJTRA vedľa aktuálneho počasia */
+		    .weather-forecast-container {
+		        margin-top: 0;
+		        flex-direction: row;
+		    }
+		}
         /* PORTRAIT RESPONSIVITA (MOBIL NA VÝŠKU) FOR MAIN DASHBOARD */
         @media (orientation: portrait) {
             .workspace-container { flex-direction: column; }
@@ -794,6 +815,13 @@
                 flex: 0 0 auto !important;
                 /* Ponechá si max-width: 480px a flex-direction: column z MAIN */
             }
+			.weather-forecast-container {
+			    display: flex;
+			    flex-direction: row;
+			    gap: 10px;
+			    justify-content: center;
+			    margin-top: 15px;
+			}
 
             /* Ak v budúcnosti niečo pretečie, uvidíš to tu v surovom stave z MAIN */
         }
@@ -1089,47 +1117,48 @@
 				</div>
 				
                 <div class="main-weather-container">
-              		<div class="weather-left-side">
-						<span class="big-clock-city" id="bigClockCity" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">---</span>
-                    
-					    <div class="weather-top-row">
-						    <span id="mainBigIcon" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">☀️</span>
-					        <span id="mainBigTemp" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">--°C</span>
-					       	<div class="weather-sub-row">
-					            <span class="sub-row-item-temp">
-					                <i class="fa-solid fa-temperature-half"></i>
-					                <span id="mainApparent">--°</span>
-					            </span>
-					            <span class="sub-row-item-hum">
-					                <i class="fa-solid fa-droplet"></i>
-					                <span id="mainHumidity">--%</span>
-					            </span>
-					        </div>
-					    </div>
-					    
-					    <div id="mainWeatherDesc" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
-						    ------ <i class="fa-solid fa-satellite-dish" style="color: #ff9f0a; margin-left: 8px; font-size: 0.85em;"></i>
+					<!-- 1. KARTA DNES (vľavo pri režime na šírku) -->
+					<div class="mini-day-box" onclick="otvorGrafPreDen(event, 'teraz');" title="Otvoriť podrobný hodinový graf pre DNES">
+						<span class="mini-label">DNES</span>
+						<div class="mini-data-row">
+							<span id="mainFc0Icon">--</span>
+							<span id="mainFc0Temp">-- / --</span>
 						</div>
 					</div>
+
+					<!-- 2. HLAVNÉ AKTUÁLNE POČASIE (stred) -->
+					<div class="weather-left-side">
+						<span class="big-clock-city" id="bigClockCity" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">---</span>
 					
-					<!-- KLIK NA DNES A ZAJTRA -> OTVORÍ HODINOVÝ GRAF PRE DANÝ DEŇ -->
-					<div class="main-mini-strip">
-					    <div class="mini-day-box" onclick="otvorGrafPreDen(event, 'teraz');" title="Otvoriť podrobný hodinový graf pre DNES">
-					        <span class="mini-label">DNES</span>
-					        <div class="mini-data-row">
-					            <span id="mainFc0Icon">--</span>
-					            <span id="mainFc0Temp">-- / --</span>
-					        </div>
-					    </div>
-					    <div class="mini-day-box" onclick="otvorGrafPreDen(event, 1);" title="Otvoriť podrobný hodinový graf pre ZAJTRA">
-					        <span class="mini-label">ZAJTRA</span>
-					        <div class="mini-data-row">
-					            <span id="mainFc1Icon">--</span>
-					            <span id="mainFc1Temp">-- / --</span>
-					        </div>
-					    </div>
+						<div class="weather-top-row">
+							<span id="mainBigIcon" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">☀️</span>
+							<span id="mainBigTemp" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">--°C</span>
+							<div class="weather-sub-row">
+								<span class="sub-row-item-temp">
+									<i class="fa-solid fa-temperature-half"></i>
+									<span id="mainApparent">--°</span>
+								</span>
+								<span class="sub-row-item-hum">
+									<i class="fa-solid fa-droplet"></i>
+									<span id="mainHumidity">--%</span>
+								</span>
+							</div>
+						</div>
+						
+						<div id="mainWeatherDesc" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
+							------ <i class="fa-solid fa-satellite-dish" style="color: #ff9f0a; margin-left: 8px; font-size: 0.85em;"></i>
+						</div>
 					</div>
-                </div>
+
+					<!-- 3. KARTA ZAJTRA (vpravo pri režime na šírku) -->
+					<div class="mini-day-box" onclick="otvorGrafPreDen(event, 1);" title="Otvoriť podrobný hodinový graf pre ZAJTRA">
+						<span class="mini-label">ZAJTRA</span>
+						<div class="mini-data-row">
+							<span id="mainFc1Icon">--</span>
+							<span id="mainFc1Temp">-- / --</span>
+						</div>
+					</div>
+				</div>
 
                 <div id="nightBottomInfo"></div>
 
