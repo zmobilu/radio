@@ -1,1 +1,31 @@
+<div class="main-weather-container">
+    <div class="weather-left-side">
+        <span class="big-clock-city" id="bigClockCity" onclick="prepniNaDalsieMesto(event);">---</span>
+        <div class="weather-top-row">
+            <span id="mainBigIcon" onclick="prepniNaDalsieMesto(event);">☀️</span>
+            <span id="mainBigTemp" onclick="prepniNaDalsieMesto(event);">--°C</span>
+            <div class="weather-sub-row">
+                <span class="sub-row-item-temp"><i class="fa-solid fa-temperature-half"></i> <span id="mainApparent">--°</span></span>
+                <span class="sub-row-item-hum"><i class="fa-solid fa-droplet"></i> <span id="mainHumidity">--%</span></span>
+            </div>
+        </div>
+        <div id="mainWeatherDesc">------ <i class="fa-solid fa-satellite-dish" style="color: #ff9f0a; margin-left: 8px; font-size: 0.85em;"></i></div>
+    </div>
 
+    <div class="main-mini-strip">
+        <div class="mini-day-box" onclick="otvorGrafPreDen(event, 'teraz');">
+            <span class="mini-label">DNES</span>
+            <div class="mini-data-row">
+                <span id="mainFc0Icon">--</span>
+                <span id="mainFc0Temp">-- / --</span>
+            </div>
+        </div>
+        <div class="mini-day-box" onclick="otvorGrafPreDen(event, 1);">
+            <span class="mini-label">ZAJTRA</span>
+            <div class="mini-data-row">
+                <span id="mainFc1Icon">--</span>
+                <span id="mainFc1Temp">-- / --</span>
+            </div>
+        </div>
+    </div>
+</div>
