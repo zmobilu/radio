@@ -1,1 +1,23 @@
 
+<!-- NOČNÝ REŽIM (INTEGROVANÝ PREHRÁVAČ A SPODNÝ INFORMČNÝ BLOK) -->
+
+<!-- 1. Nočný prehrávač (zobrazí sa len v noci, keď hrá rádio) -->
+<div class="night-player-container" id="nightPlayer">
+    <div class="night-player-station" id="nightStationInfo">
+        <i class="fa-solid fa-radio"></i> <span id="nightStationName">OFFLINE</span>
+    </div>
+    <div class="night-player-controls">
+        <button class="night-btn" onclick="spustiDalsieRadio('vzad'); event.stopPropagation();">
+            <i class="fa-solid fa-backward-step"></i>
+        </button>
+        <button class="night-btn btn-playpause" onclick="toggleNightPlayPause(); event.stopPropagation();" id="nightPlayPauseBtn">
+            <i class="fa-solid fa-circle-pause"></i>
+        </button>
+        <button class="night-btn" onclick="spustiDalsieRadio('vpred'); event.stopPropagation();">
+            <i class="fa-solid fa-forward-step"></i>
+        </button>
+    </div>
+</div>
+
+<!-- 2. Spodný nočný riadok: Meniny • Dátum • Počasie s ikonkou -->
+<div id="nightBottomInfo"></div>
