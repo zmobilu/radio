@@ -1,1 +1,28 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiosk Dashboard</title>
+    
+    <!-- Načítanie pomocných skriptov -->
+    <script src="js/loader.js"></script>
+    <script src="js/clock.js"></script>
+</head>
+<body style="margin:0; background:#000; color:#fff;">
 
+    <!-- Miesto (slot) pre hodiny -->
+    <div id="slot-clock" style="width: 100vw; height: 100vh;"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Načítame HTML kód hodín z priečinka components
+            await loadComponent('slot-clock', 'components/clock-large.html');
+
+            // 2. Keď je HTML vložené na stránke, spustíme ich tikanie
+            spustiVelkeHodiny();
+        });
+    </script>
+
+</body>
+</html>
