@@ -1207,9 +1207,9 @@
 				</div>
 				
                 <div class="main-weather-container">
-				    <div class="weather-left-side" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
+				    <div class="weather-left-side">
 				        
-				        <!-- Mesto nad spodnou lištou pre Landscape (v Portrait sa posunie cez order) -->
+				        <!-- Mesto - prepína na ďalšie mesto -->
 				        <span class="big-clock-city" id="bigClockCity" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">---</span>
 				
 				        <div class="weather-top-row">
@@ -1222,25 +1222,21 @@
 				                </div>
 				            </div>
 				
-				            <!-- HLAVNÝ STRED (IKONA, TEPLOTA, POCIT, DESCRIPTION) -->
-				            <div class="weather-center-block">
-				                <div class="weather-core-horizontal">
-				                    <span id="mainBigIcon">☀️</span>
-				                    <span id="mainBigTemp">--°C</span>
-				                    
-				                    <div class="weather-sub-col">
-				                        <span class="sub-row-item-temp">
-				                            <i class="fa-solid fa-temperature-half"></i>
-				                            <span id="mainApparent">--°</span>
-				                        </span>
-				                        <span class="sub-row-item-hum">
-				                            <i class="fa-solid fa-droplet"></i>
-				                            <span id="mainHumidity">--%</span>
-				                        </span>
-				                    </div>
-				                </div>
-				
-				                <div id="mainWeatherDesc">------</div>
+				            <!-- HLAVNÉ POČASIE (Ikona a teplota prepínajú na ďalšie mesto) -->
+				            <div class="weather-core-row">
+				                <span id="mainBigIcon" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">☀️</span>
+				                <span id="mainBigTemp" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">--°C</span>
+				            </div>
+				            
+				            <div class="weather-sub-row">
+				                <span class="sub-row-item-temp">
+				                    <i class="fa-solid fa-temperature-half"></i>
+				                    <span id="mainApparent">--°</span>
+				                </span>
+				                <span class="sub-row-item-hum">
+				                    <i class="fa-solid fa-droplet"></i>
+				                    <span id="mainHumidity">--%</span>
+				                </span>
 				            </div>
 				
 				            <!-- BOX ZAJTRA -->
@@ -1252,7 +1248,9 @@
 				                </div>
 				            </div>
 				        </div>
-				
+				        
+				        <!-- Popis počasia - otvára meteoradar Windy -->
+				        <div id="mainWeatherDesc" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">------</div>
 				    </div>
 				</div>
 
