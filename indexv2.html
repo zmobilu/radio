@@ -196,15 +196,15 @@
         .big-clock-nameday { color: #ff9f0a; }
 
         /* 1. Hlavný a jediný obal celého počasia - drží všetko pokope ako jeden pevný celok */
+        /* Maximálna šírka pre zobrazenie v jednom riadku na šírku */
         .main-weather-container {
             display: flex;
             flex-direction: column;
             width: 100%;
-            max-width: 680px;            /* Fixná optimálna šírka celého bloku */
+            max-width: 850px; /* Zväčšená šírka, aby sa zmestil celý riadok */
             margin: 0 auto;
             align-items: center;
             justify-content: center;
-            gap: 0;
             box-sizing: border-box;
         }
         
@@ -223,13 +223,12 @@
         /* 3. Spoločný riadok pre ikonu, teplotu a pocitový stĺpec */
         .weather-top-row {
             display: flex;
-            flex-direction: column; /*row;*/
+            flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: center;     /* Dokonalé centrovanie jadra počasia */
-            gap: 5px;                   /* Fixná medzera medzi hlavnou teplotou a pocitovými dátami */
+            justify-content: center;
+            gap: 15px;
             width: 100%;
-            padding: 0 10px;
             box-sizing: border-box;
         }
         
@@ -280,21 +279,18 @@
             height: auto !important;
         }
         
-        /* Boxy predpovede idú vertikálne (label hore, dáta dole) */
+        /* Šírka boxov DNES a ZAJTRA na šírku */
         .mini-day-box {
             display: flex !important;
             flex-direction: column !important;
             align-items: center;
             justify-content: center;
-            flex: 1;
             background: #080808;
             border: 1px solid #111;
-            padding: 1vh 10px !important;
+            padding: 8px 12px !important;
             border-radius: 10px;
             box-sizing: border-box;
-            min-width: 0;
-            width: auto !important;
-            height: auto !important;
+            min-width: 110px;
         }
         
         /* Centrovanie textu DNES / ZAJTRA nad predpoveďou */
@@ -358,6 +354,37 @@
         .sub-row-item-temp i { color: #ffa500; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }
         .sub-row-item-hum i { color: #4dabff; margin-right: 8px; font-size: 0.9em; width: 25px; text-align: center; }        
 
+		/* Horizontálne zoradenie stredu: Ikona | Teplota | (Pocitová + Vlhkosť) */
+		.weather-core-horizontal {
+		    display: flex;
+		    flex-direction: row;
+		    align-items: center;
+		    justify-content: center;
+		    gap: 12px;
+		}
+		
+		/* Stĺpec pre pocitovú teplotu a vlhkosť vpravo */
+		.weather-sub-col {
+		    display: flex;
+		    flex-direction: column;
+		    align-items: flex-start;
+		    justify-content: center;
+		    gap: 2px;
+		    font-size: 1rem;
+		}
+		
+		.weather-sub-col span {
+		    display: flex;
+		    align-items: center;
+		    gap: 4px;
+		}
+		
+		/* Popis počasia pod horizontálnym stredom */
+		.weather-center-block {
+		    display: flex;
+		    flex-direction: column;
+		    align-items: center;
+		}
 
         /* --- EXTRA KOMPAKTNÝ PANEL NASTAVENÍ --- */
         .settings-night-panel {
@@ -837,6 +864,25 @@
 			    justify-content: center;
 			    margin-top: 15px;
 			}
+			.weather-top-row {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .mini-box-dnes {
+                order: 1;
+            }
+            .weather-core-row {
+                order: 2;
+            }
+            .weather-sub-row {
+                order: 3;
+            }
+            #mainWeatherDesc {
+                order: 4;
+            }
+            .mini-box-zajtra {
+                order: 5;
+            }
 
             /* Ak v budúcnosti niečo pretečie, uvidíš to tu v surovom stave z MAIN */
         }
@@ -1132,47 +1178,49 @@
 				</div>
 				
                 <div class="main-weather-container">
-					<!-- 1. KARTA DNES (vľavo pri režime na šírku) -->
-					<div class="mini-day-box" onclick="otvorGrafPreDen(event, 'teraz');" title="Otvoriť podrobný hodinový graf pre DNES">
-						<span class="mini-label">DNES</span>
-						<div class="mini-data-row">
-							<span id="mainFc0Icon">--</span>
-							<span id="mainFc0Temp">-- / --</span>
-						</div>
-					</div>
-
-					<!-- 2. HLAVNÉ AKTUÁLNE POČASIE (stred) -->
-					<div class="weather-left-side">
-						<span class="big-clock-city" id="bigClockCity" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">---</span>
-					
-						<div class="weather-top-row">
-							<span id="mainBigIcon" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">☀️</span>
-							<span id="mainBigTemp" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">--°C</span>
-							<div class="weather-sub-row">
-								<span class="sub-row-item-temp">
-									<i class="fa-solid fa-temperature-half"></i>
-									<span id="mainApparent">--°</span>
-								</span>
-								<span class="sub-row-item-hum">
-									<i class="fa-solid fa-droplet"></i>
-									<span id="mainHumidity">--%</span>
-								</span>
-							</div>
-						</div>
-						
-						<div id="mainWeatherDesc" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
-							------ <i class="fa-solid fa-satellite-dish" style="color: #ff9f0a; margin-left: 8px; font-size: 0.85em;"></i>
-						</div>
-					</div>
-
-					<!-- 3. KARTA ZAJTRA (vpravo pri režime na šírku) -->
-					<div class="mini-day-box" onclick="otvorGrafPreDen(event, 1);" title="Otvoriť podrobný hodinový graf pre ZAJTRA">
-						<span class="mini-label">ZAJTRA</span>
-						<div class="mini-data-row">
-							<span id="mainFc1Icon">--</span>
-							<span id="mainFc1Temp">-- / --</span>
-						</div>
-					</div>
+				    <div class="weather-left-side" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">
+				        
+				        <div class="weather-top-row">
+				            <!-- BOX DNES -->
+				            <div class="mini-day-box mini-box-dnes" onclick="otvorGrafPreDen(event, 'teraz'); event.stopPropagation();" title="Otvoriť podrobný hodinový graf pre DNES">
+				                <span class="mini-label">DNES</span>
+				                <div class="mini-data-row">
+				                    <span id="mainFc0Icon">--</span>
+				                    <span id="mainFc0Temp">-- / --</span>
+				                </div>
+				            </div>
+				
+				            <!-- HLAVNÝ STRED (HORIZONTÁLNY) -->
+				            <div class="weather-center-block">
+				                <div class="weather-core-horizontal">
+				                    <span id="mainBigIcon">☀️</span>
+				                    <span id="mainBigTemp">--°C</span>
+				                    
+				                    <div class="weather-sub-col">
+				                        <span class="sub-row-item-temp">
+				                            <i class="fa-solid fa-temperature-half"></i>
+				                            <span id="mainApparent">--°</span>
+				                        </span>
+				                        <span class="sub-row-item-hum">
+				                            <i class="fa-solid fa-droplet"></i>
+				                            <span id="mainHumidity">--%</span>
+				                        </span>
+				                    </div>
+				                </div>
+				                <div id="mainWeatherDesc">------</div>
+				            </div>
+				
+				            <!-- BOX ZAJTRA -->
+				            <div class="mini-day-box mini-box-zajtra" onclick="otvorGrafPreDen(event, 1); event.stopPropagation();" title="Otvoriť podrobný hodinový graf pre ZAJTRA">
+				                <span class="mini-label">ZAJTRA</span>
+				                <div class="mini-data-row">
+				                    <span id="mainFc1Icon">--</span>
+				                    <span id="mainFc1Temp">-- / --</span>
+				                </div>
+				            </div>
+				        </div>
+				
+				    </div>
 				</div>
 
                 <div id="nightBottomInfo"></div>
