@@ -198,15 +198,39 @@
         /* 1. Hlavný a jediný obal celého počasia - drží všetko pokope ako jeden pevný celok */
         /* Maximálna šírka pre zobrazenie v jednom riadku na šírku */
         .main-weather-container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 850px; /* Zväčšená šírka, aby sa zmestil celý riadok */
-            margin: 0 auto;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
-        }
+		    display: flex;
+		    flex-direction: column;
+		    width: 100%;
+		    max-width: 850px;
+		    margin: 0 auto;
+		    align-items: center;
+		    justify-content: center;
+		    box-sizing: border-box;
+		}
+		
+		.weather-top-row {
+		    display: flex;
+		    flex-direction: row;
+		    flex-wrap: nowrap;
+		    align-items: center;
+		    justify-content: center;
+		    gap: 15px;
+		    width: 100%;
+		    box-sizing: border-box;
+		}
+		
+		.mini-day-box {
+		    display: flex !important;
+		    flex-direction: column !important;
+		    align-items: center;
+		    justify-content: center;
+		    background: #080808;
+		    border: 1px solid #111;
+		    padding: 8px 12px !important;
+		    border-radius: 10px;
+		    box-sizing: border-box;
+		    min-width: 110px;
+		}
         
         /* 2. Zjednotený vnútorný blok pre aktuálne počasie (horný riadok + text pod ním) */
         .weather-left-side {
@@ -220,18 +244,6 @@
             box-sizing: border-box;
         }
 
-        /* 3. Spoločný riadok pre ikonu, teplotu a pocitový stĺpec */
-        .weather-top-row {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
         #mainBigIcon { font-size: 14vmin !important; line-height: 1; }
         #mainBigTemp { font-size: 13vmin !important; font-weight: 800; line-height: 1; white-space: nowrap !important; }
 
@@ -279,19 +291,7 @@
             height: auto !important;
         }
         
-        /* Šírka boxov DNES a ZAJTRA na šírku */
-        .mini-day-box {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center;
-            justify-content: center;
-            background: #080808;
-            border: 1px solid #111;
-            padding: 8px 12px !important;
-            border-radius: 10px;
-            box-sizing: border-box;
-            min-width: 110px;
-        }
+        
         
         /* Centrovanie textu DNES / ZAJTRA nad predpoveďou */
         .mini-label { 
@@ -865,24 +865,33 @@
 			    margin-top: 15px;
 			}
 			.weather-top-row {
-                flex-direction: column !important;
-                gap: 8px !important;
-            }
-            .mini-box-dnes {
-                order: 1;
-            }
-            .weather-core-row {
-                order: 2;
-            }
-            .weather-sub-row {
-                order: 3;
-            }
-            #mainWeatherDesc {
-                order: 4;
-            }
-            .mini-box-zajtra {
-                order: 5;
-            }
+		        flex-direction: column !important;
+		        gap: 8px !important;
+		    }
+		    
+		    .mini-box-dnes {
+		        order: 1 !important;
+		    }
+		    
+		    #bigClockCity {
+		        order: 2 !important;
+		    }
+		    
+		    .weather-core-row {
+		        order: 3 !important;
+		    }
+		    
+		    .weather-sub-row {
+		        order: 4 !important;
+		    }
+		    
+		    #mainWeatherDesc {
+		        order: 5 !important;
+		    }
+		    
+		    .mini-box-zajtra {
+		        order: 6 !important;
+		    }
 
             /* Ak v budúcnosti niečo pretečie, uvidíš to tu v surovom stave z MAIN */
         }
@@ -1190,24 +1199,24 @@
 				                </div>
 				            </div>
 				
-				            <!-- HLAVNÝ STRED (HORIZONTÁLNY) -->
-				            <div class="weather-center-block">
-				                <div class="weather-core-horizontal">
-				                    <span id="mainBigIcon">☀️</span>
-				                    <span id="mainBigTemp">--°C</span>
-				                    
-				                    <div class="weather-sub-col">
-				                        <span class="sub-row-item-temp">
-				                            <i class="fa-solid fa-temperature-half"></i>
-				                            <span id="mainApparent">--°</span>
-				                        </span>
-				                        <span class="sub-row-item-hum">
-				                            <i class="fa-solid fa-droplet"></i>
-				                            <span id="mainHumidity">--%</span>
-				                        </span>
-				                    </div>
-				                </div>
-				                <div id="mainWeatherDesc">------</div>
+				            <!-- PÔVODNÝ MESTSKÝ PRVOK -->
+				            <span class="big-clock-city" id="bigClockCity" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">---</span>
+				
+				            <!-- HLAVNÉ POČASIE (JADRO) -->
+				            <div class="weather-core-row">
+				                <span id="mainBigIcon">☀️</span>
+				                <span id="mainBigTemp">--°C</span>
+				            </div>
+				            
+				            <div class="weather-sub-row">
+				                <span class="sub-row-item-temp">
+				                    <i class="fa-solid fa-temperature-half"></i>
+				                    <span id="mainApparent">--°</span>
+				                </span>
+				                <span class="sub-row-item-hum">
+				                    <i class="fa-solid fa-droplet"></i>
+				                    <span id="mainHumidity">--%</span>
+				                </span>
 				            </div>
 				
 				            <!-- BOX ZAJTRA -->
@@ -1219,7 +1228,8 @@
 				                </div>
 				            </div>
 				        </div>
-				
+				        
+				        <div id="mainWeatherDesc">------</div>
 				    </div>
 				</div>
 
