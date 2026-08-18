@@ -1209,7 +1209,7 @@
                 <div class="main-weather-container">
 				    <div class="weather-left-side">
 				        
-				        <!-- Mesto - prepína na ďalšie mesto -->
+				        <!-- Mesto nad celým riadkom počasia pre Landscape -->
 				        <span class="big-clock-city" id="bigClockCity" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">---</span>
 				
 				        <div class="weather-top-row">
@@ -1222,7 +1222,7 @@
 				                </div>
 				            </div>
 				
-				            <!-- HLAVNÉ POČASIE (Ikona a teplota prepínajú na ďalšie mesto) -->
+				            <!-- HLAVNÉ POČASIE -->
 				            <div class="weather-core-row">
 				                <span id="mainBigIcon" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">☀️</span>
 				                <span id="mainBigTemp" onclick="prepniNaDalsieMesto(event);" title="Prepnúť na ďalšie mesto">--°C</span>
@@ -1249,11 +1249,9 @@
 				            </div>
 				        </div>
 				        
-				        <!-- Popis počasia - otvára meteoradar Windy -->
 				        <div id="mainWeatherDesc" onclick="window.open(`https://www.windy.com/sk/-Meteorologick%C3%BD-radar-radar?radar,${cfgLat},${cfgLon},10`, '_blank'); event.stopPropagation();" title="Otvoriť živý meteoradar Windy pre aktuálnu polohu">------</div>
 				    </div>
 				</div>
-
                 <div id="nightBottomInfo"></div>
 
                 <div class="night-player-container" id="nightPlayer">
