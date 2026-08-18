@@ -92,6 +92,13 @@
             right: 15px !important;
             z-index: 999999 !important;
         }
+		/* Skrytie ľavého bloku rádii a roztiahnutie hlavnej plochy */
+        body.sidebar-hidden .favorites-sidebar {
+            display: none !important;
+        }
+        body.sidebar-hidden .main-content-area {
+            width: 100% !important;
+        }
         
 
         /* --- HLAVNÁ ROZDELENÁ PLOCHA --- */
@@ -1938,7 +1945,16 @@
             renderSettingsGrid();
             resetSettingsTimer();
         }
-        
+        function toggleMainRadioBtn() {
+            const body = document.getElementById('mainBody');
+            const radioBtn = document.getElementById('radioToggleBtn');
+            
+            body.classList.toggle('sidebar-hidden');
+            
+            if (radioBtn) {
+                radioBtn.classList.toggle('active');
+            }
+        }
         function toggleFullscreenMode() {
             const doc = window.document;
             const docEl = doc.documentElement;
