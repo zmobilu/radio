@@ -85,6 +85,14 @@
             right: 15px !important;
             z-index: 999999 !important;
         }
+		#radioToggleBtn.active { color: #ff9f0a; border-color: #ff9f0a; background: #1a1a1a; }
+		#radioToggleBtn {
+            position: absolute !important;
+            top: 110px !important;
+            right: 15px !important;
+            z-index: 999999 !important;
+        }
+        
 
         /* --- HLAVNÁ ROZDELENÁ PLOCHA --- */
         .workspace-container { display: flex; flex: 1; width: 100vw; overflow: hidden; position: relative; }
@@ -1266,6 +1274,9 @@
     </button>
     <button class="btn-settings" id="fullscreenToggleBtn" onclick="toggleFullscreenMode(); event.stopPropagation();" title="Celá obrazovka">
         <i class="fa-solid fa-expand" id="fullscreenIcon"></i>
+    </button>
+	<button class="btn-settings" id="radioToggleBtn" onclick="toggleMainRadioBtn(); event.stopPropagation();" title="Mriežka média">
+        <i class="fa-solid fa-radio"></i>
     </button>
     
     <script>
