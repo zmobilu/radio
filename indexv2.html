@@ -1315,6 +1315,11 @@
                 box-sizing: border-box;
                 transition: height 0.8s cubic-bezier(0.25, 1, 0.5, 1); /* Plynulý dobeh (ease-out) */
             }
+		/* Skrytie tlačidiel Fullscreen a Rádio pri otvorených nastaveniach */
+			#settingsGridView[style*="display: grid"] ~ #fullscreenToggleBtn,
+			#settingsGridView[style*="display: grid"] ~ #radioToggleBtn {
+			    display: none !important;
+			}
 			        
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
