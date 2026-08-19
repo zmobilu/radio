@@ -856,7 +856,7 @@
                 line-height: 0.8; 
                 transform: scaleY(1.05) !important; 
                 transform-origin: center center !important;
-                margin-top: 8vh !important; 
+                margin-top: 4vh !important; 
                 margin-bottom: 0 !important;
                 width: 100%; 
                 display: flex;
@@ -864,10 +864,10 @@
             }
 
             .big-clock-date-wrapper { 
-                margin-top: 5vh !important; 
+                margin-top: 2.5vh !important; 
                 padding-bottom: 1vh;
                 width: 100%; 
-                font-size: 3.8vmin; 
+                font-size: 4vmin !important; 
                 display: flex;         
                 flex-wrap: wrap; 
                 justify-content: center; 
@@ -878,19 +878,22 @@
             .big-clock-date { color: #fff; }
             .big-clock-nameday { margin-top: 0; }
 
-            /* Presné poradie prvkov pre zobrazenie na výšku */
+            /* --- ZVÄČŠENIE A PRISPÔSOBENIE BLOKU POČASIA PRE PORTRAIT --- */
             .weather-left-side {
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
                 width: 100% !important;
+                margin-top: 1vh !important;
             }
 
-            /* 1. MESTO (HORE NAD POČASÍM) */
+            /* 1. MESTO - Výrazne zväčšené */
             #bigClockCity {
                 order: 1 !important;
-                margin-top: 6px !important;
-                margin-bottom: 8px !important;
+                font-size: 6.5vmin !important;
+                letter-spacing: 4px !important;
+                margin-top: 1vh !important;
+                margin-bottom: 1.5vh !important;
             }
 
             /* 2. BLOK PREDPOTEKY (DNES, HLAVNÁ TEPLOTA, ZAJTRA) */
@@ -898,7 +901,31 @@
                 order: 2 !important;
                 flex-direction: column !important;
                 align-items: center !important;
-                gap: 6px !important;
+                gap: 12px !important;
+            }
+
+            /* DNES a ZAJTRA - Štítky */
+            .mini-label {
+                font-size: 4.8vmin !important;
+                margin-bottom: 4px !important;
+            }
+
+            /* DNES a ZAJTRA - Ikona + Teploty */
+            #mainFc0Icon, #mainFc1Icon {
+                font-size: 8vmin !important;
+            }
+
+            #mainFc0Temp, #mainFc1Temp {
+                font-size: 5.5vmin !important;
+            }
+
+            /* Stredná hlavná teplota + Ikona */
+            #mainBigIcon {
+                font-size: 16vmin !important;
+            }
+
+            #mainBigTemp {
+                font-size: 15vmin !important;
             }
 
             .weather-core-row {
@@ -906,23 +933,27 @@
                 flex-direction: row !important;
                 align-items: center !important;
                 justify-content: center !important;
-                gap: 10px !important;
+                gap: 12px !important;
+                margin: 0.5vh 0 !important;
             }
 
+            /* Pocitová teplota a Vlhkosť vzduchu */
             .weather-sub-row {
                 display: flex !important;
                 flex-direction: row !important;
                 align-items: center !important;
                 justify-content: center !important;
-                gap: 16px !important;
-                margin-bottom: 4px !important;
+                gap: 24px !important;
+                font-size: 5vmin !important;
+                margin-bottom: 1vh !important;
             }
 
-            /* 3. POPIS POČASIA (AZÚROVO / ZAMRAČENÉ / POLOJASNO) */
+            /* 3. POPIS POČASIA (ZAMRAČENÉ / POLOJASNO) */
             #mainWeatherDesc {
                 order: 3 !important;
-                margin-top: 2px !important;
-                margin-bottom: 4px !important;
+                font-size: 4.8vmin !important;
+                margin-top: 1vh !important;
+                margin-bottom: 1vh !important;
             }
         }
 
