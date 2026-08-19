@@ -792,6 +792,22 @@
 		        justify-content: center !important;
 		        width: 100% !important;
 		    }
+			.weather-core-row {
+			    display: flex !important;
+			    flex-direction: row !important; /* Vždy vedľa seba (ikona + teplota) */
+			    flex-wrap: nowrap !important;   /* Striktný zákaz zalomenia pod seba */
+			    align-items: center !important;
+			    justify-content: center !important;
+			    gap: 8px !important;
+			}
+			
+			#mainBigIcon {
+			    font-size: 14vmin !important;
+			    line-height: 1 !important;
+			    display: inline-block !important;
+			    vertical-align: middle !important;
+			    margin: 0 !important;
+			}
 		
 		    #bigClockCity {
 		        margin-bottom: 8px !important;
