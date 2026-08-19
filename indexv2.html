@@ -564,7 +564,8 @@
                 z-index: 10;
             }
             
-            body.full-night-mode .night-player-container.active-playing {
+            body.full-night-mode .night-player-container.active-playing, 
+			body.sidebar-hidden .night-player-container.active-playing {
                 display: flex !important;
             }
             
@@ -1252,6 +1253,10 @@
                 box-sizing: border-box;
                 transition: height 0.8s cubic-bezier(0.25, 1, 0.5, 1); /* Plynulý dobeh (ease-out) */
             }
+			/* Biela farba ovládacích tlačidiel prehrávača v dennom režime */
+			body:not(.full-night-mode).sidebar-hidden .night-btn {
+			    color: #ffffff !important;
+			}
 
         
     </style>
