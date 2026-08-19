@@ -869,12 +869,17 @@
 			    vertical-align: middle !important;
 			    margin: 0 !important;
 			}
+			/* Mierne zmenšenie hodín a dátumu, aby sa uvoľnilo miesto pre počasie */
+			.big-clock-time {
+				font-size: clamp(50px, 11vw, 360px) !important;
+				margin-top: 1vh !important;
+			}
 			.big-clock-date-wrapper {
-		        margin-top: 1vh !important;
+		        margin-top: 0.5vh !important;
 		        margin-bottom: 0.5vh !important;
 		    }
 		    #bigClockCity {
-		        margin-bottom: 8px !important;
+		        margin-bottom: 4px !important;
 		    }
 		
 		    .weather-top-row {
@@ -892,6 +897,9 @@
 		    .weather-sub-col {
 		        flex-direction: column !important;
 		        align-items: flex-start !important;
+		    }
+			#mainWeatherDesc {
+		        margin-top: 0.5vh !important;
 		    }
 		}
         /* --- REŽIM NA VÝŠKU (PORTRAIT) --- */
@@ -1336,6 +1344,8 @@
 			    right: auto !important;
 			    transform: none !important;
 			    margin: 1vh 0 !important;
+				margin-top: 0.5vh !important;
+        		margin-bottom: 0.5vh !important;
 			}
 			
 			body:not(.full-night-mode).sidebar-hidden #player-now-playing { order: 4 !important; }
