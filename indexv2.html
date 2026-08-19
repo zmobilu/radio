@@ -598,49 +598,79 @@
             }
             
             
-            /* Špecifické úpravy pre nočný režim na šírku (LANDSCAPE) */
-            @media (orientation: landscape) {
-                body.full-night-mode .placeholder-view {
-                    transform: translateY(0) !important;
-                }
-                body.full-night-mode .big-clock-time {
-                    transform: scaleY(1.30) translateY(-10vh) !important;
-                }
-                body.full-night-mode .night-player-container {
-                    flex-direction: row !important;
-                    gap: 4vw !important;
-                    position: absolute !important;
-                    bottom: 18vh;
-                    width: auto !important;
-                }
-                body.full-night-mode #player-now-playing {
-                    bottom: 11vh !important;
-                    font-size: 2.2vw !important; /* Mierne zmenšenie písma na šírku */
-                }
-                body.full-night-mode .night-player-station {
-                    font-size: 3.5vw !important;
-                    margin-bottom: 0 !important;
-                    border-right: 1px solid rgba(255,255,255,0.15);
-                    padding-right: 4vw;
-                }
-                body.full-night-mode .night-player-station img { height: 4vw !important; }
-                body.full-night-mode .night-player-controls { gap: 5vw !important; }
-                body.full-night-mode .night-btn { font-size: 4.5vw !important; padding: 5px; }
-                body.full-night-mode .night-btn.btn-playpause { font-size: 5.5vw !important; }
-                body.full-night-mode #nightBottomInfo {
-                    font-size: 3.2vw !important;
-                }
-            }
-            
-            /* Špecifické úpravy pre nočný režim na výšku (PORTRAIT) */
+            /* Špecifické úpravy pre nočný aj denný režim na šírku (LANDSCAPE) */
+			@media (orientation: landscape) {
+			    body.full-night-mode .placeholder-view {
+			        transform: translateY(0) !important;
+			    }
+			    body.full-night-mode .big-clock-time {
+			        transform: scaleY(1.30) translateY(-10vh) !important;
+			    }
+			
+			    /* Všeobecný tvar prehrávača na šírku pre noc aj deň */
+			    .night-player-container {
+			        flex-direction: row !important;
+			        gap: 4vw !important;
+			        width: auto !important;
+			    }
+			
+			    /* Iba v NOČNOM režime držíme prehrávač dole na fixed/absolute pozícii */
+			    body.full-night-mode .night-player-container {
+			        position: absolute !important;
+			        bottom: 18vh !important;
+			    }
+			
+			    /* V DENNOM režime pri skrytom paneli zrušíme spodnú pozíciu */
+			    body:not(.full-night-mode).sidebar-hidden .night-player-container {
+			        position: relative !important;
+			        bottom: auto !important;
+			        margin-top: 0.5vh !important;
+			        margin-bottom: 0.5vh !important;
+			    }
+			
+			    body.full-night-mode #player-now-playing {
+			        bottom: 11vh !important;
+			        font-size: 2.2vw !important;
+			    }
+			
+			    /* Prvky stanice bez zviazania výhradne na full-night-mode */
+			    .night-player-station {
+			        font-size: 3.5vw !important;
+			        margin-bottom: 0 !important;
+			        border-right: 1px solid rgba(255,255,255,0.15);
+			        padding-right: 4vw;
+			    }
+			
+			    .night-player-station img { height: 4vw !important; }
+			    .night-player-controls { gap: 5vw !important; }
+			    .night-btn { font-size: 4.5vw !important; padding: 5px; }
+			    .night-btn.btn-playpause { font-size: 5.5vw !important; }
+			
+			    body.full-night-mode #nightBottomInfo {
+			        font-size: 3.2vw !important;
+			    }
+			}
+
+           /* Špecifické úpravy pre nočný aj denný režim na výšku (PORTRAIT) */
             @media (orientation: portrait) {
                 body.full-night-mode .big-clock-time {
                     transform: scaleY(1.90) translateY(-8vh) !important;
                 }
+
+                /* Iba v NOČNOM režime držíme prehrávač dole */
                 body.full-night-mode .night-player-container {
                     position: absolute !important;
-                    bottom: 18vh !important; /* Posun rádia vyššie, aby uvoľnilo miesto pre pesničku */
+                    bottom: 18vh !important;
                     width: 100% !important;
+                }
+
+                /* V DENNOM režime pri schovanom paneli ho presunieme do prirodzeného toku pod dátum */
+                body:not(.full-night-mode).sidebar-hidden .night-player-container {
+                    position: relative !important;
+                    bottom: auto !important;
+                    width: 100% !important;
+                    margin-top: 1vh !important;
+                    margin-bottom: 1vh !important;
                 }
             }
            
