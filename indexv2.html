@@ -429,7 +429,7 @@
     
         #nightBottomInfo { display: none; }
 
-        /* --- INTEGROVANÝ NOČNÝ PREHRÁVAČ --- */
+       /* --- INTEGROVANÝ NOČNÝ PREHRÁVAČ --- */
         .night-player-container {
             display: none;
             flex-direction: column;
@@ -439,6 +439,39 @@
             color: var(--night-color);
             margin-top: 1.5vh;
         }
+
+        /* Zobrazenie v noci ALEBO cez deň pri schovanom paneli */
+        body.full-night-mode .night-player-container.active-playing,
+        body.sidebar-hidden .night-player-container.active-playing {
+            display: flex !important;
+        }
+
+        /* V dennom režime: biela farba a zmenšenie písma pre denné rozloženie */
+        body:not(.full-night-mode).sidebar-hidden .night-player-container {
+            color: #ffffff !important;
+            margin-top: 0.5vh !important;
+            margin-bottom: 1vh !important;
+        }
+
+        body:not(.full-night-mode).sidebar-hidden .night-btn {
+            color: #ffffff !important;
+            font-size: clamp(24px, 4vw, 36px) !important;
+            padding: 2px 10px !important;
+        }
+
+        body:not(.full-night-mode).sidebar-hidden .night-btn.btn-playpause {
+            font-size: clamp(30px, 5vw, 44px) !important;
+        }
+
+        body:not(.full-night-mode).sidebar-hidden .night-player-station {
+            font-size: clamp(14px, 2.5vw, 22px) !important;
+            margin-bottom: 0.5vh !important;
+        }
+
+        body:not(.full-night-mode).sidebar-hidden .night-player-controls {
+            gap: 4vw !important;
+        }
+
         .night-player-station {
             font-size: 5.5vw;
             font-weight: 700;
@@ -564,10 +597,6 @@
                 z-index: 10;
             }
             
-            body.full-night-mode .night-player-container.active-playing, 
-			body.sidebar-hidden .night-player-container.active-playing {
-                display: flex !important;
-            }
             
             /* Špecifické úpravy pre nočný režim na šírku (LANDSCAPE) */
             @media (orientation: landscape) {
@@ -1253,12 +1282,7 @@
                 box-sizing: border-box;
                 transition: height 0.8s cubic-bezier(0.25, 1, 0.5, 1); /* Plynulý dobeh (ease-out) */
             }
-			/* Biela farba ovládacích tlačidiel prehrávača v dennom režime */
-			body:not(.full-night-mode).sidebar-hidden .night-btn {
-			    color: #ffffff !important;
-			}
-
-        
+			        
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 </head>
