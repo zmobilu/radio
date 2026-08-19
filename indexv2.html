@@ -1441,7 +1441,13 @@
                         </div>
                         <div id="weather-history-buttons" style="display: flex; gap: 4px; margin-top: 2px; justify-content: center; width: 100%;"></div>
                     </div>
-                    
+                    <!-- Tlačidlo pre vynútené načítanie kódu z GitHubu -->
+					<div class="settings-night-row">
+					    <i class="fa-solid fa-rotate label-icon" title="Obnoviť z GitHubu"></i>
+					    <button onclick="vynuteneNacitajGitHubKod(); event.stopPropagation();" style="width: 100%;">
+					        <i class="fa-solid fa-arrows-rotate"></i> Obnoviť kód z GitHubu
+					    </button>
+					</div>
                     <!-- Tlačidlo Sprievodca (Tour) -->
                     <div class="settings-night-row">
                         <i class="fa-solid fa-circle-info label-icon" title="Sprievodca"></i>
@@ -2812,7 +2818,20 @@
                 }
             }
         }
-
+		function vynuteneNacitajGitHubKod() {
+		    // 1. Zmazanie Cache Storage ak sa používajú Service Workers / PWA
+		    if ('caches' in window) {
+		        caches.keys().then((names) => {
+		            names.forEach((name) => caches.delete(name));
+		        });
+		    }
+		
+		    // 2. Vynútenie načítania novej verzie index.html obídením prehliadačovej cache
+		    const nepravdepodobnaUrl = window.location.pathname + '?reload=' + Date.now();
+		    
+		    // 3. Presmerovanie a opätovné načítanie
+		    window.location.href = nepravdepodobnaUrl;
+		}
         // --- SCRIPT PRE SPRIEVODCU (INTRO TOUR) ---
             const tourKroky = [
                 {
