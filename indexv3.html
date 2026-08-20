@@ -1600,7 +1600,7 @@
         }
 		function prejdiNaVerziu2() {
             // Zmeníme nastavenú verziu v pamäti na v2
-            localStorage.setItem('kiosk_slots_v2', 'v2');
+            localStorage.setItem('dashboard_version', 'v2');
             
             // Presmerujeme na indexv2.html
             window.location.href = 'indexv2.html';
@@ -2241,7 +2241,7 @@
             resetSettingsTimer();
         }
 		document.addEventListener('DOMContentLoaded', function() {
-		    localStorage.setItem('kiosk_slots_v3', 'v3');
+		    localStorage.setItem('dashboard_version', 'v3');
 		});
         function toggleMainRadioBtn() {
             const body = document.getElementById('mainBody');
