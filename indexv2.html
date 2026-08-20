@@ -2500,14 +2500,11 @@
 
             if ((jeNocnyCas || manualnaNocAktivna) && terazMili > nocnyRezimSnoozeDo && !isSettingsModeActive) {
                 bodyEl.classList.add('full-night-mode');
-                
-            // Pôvodný riadok: let meninyNocturnalText = dnesneMeno ? `${dnesneMeno}    •    ` : "";
-            // NOVÝ RIADOK:
+            
+            // NOVÝ KÓD (čisto bez +1 a so všetkými menami):
             let meninyNocturnalText = "";
             if (dnesneMeno) {
-                // Ak máme v poli viac mien, pridáme k menu "+X" aj pre nočný režim
-                const extraMena = (dnesneVsetkyMena.length > 1) ? ` +${dnesneVsetkyMena.length - 1}` : "";
-                meninyNocturnalText = `${dnesneMeno}${extraMena}    •    `;
+                meninyNocturnalText = `${dnesneMeno}    •    `;
             }
                 
                 if (bottomInfoEl) {
