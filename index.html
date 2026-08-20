@@ -2,8 +2,11 @@
 <html lang="sk">
 <head>
     <script>
-      // Ak si používateľ zvolil V2, automaticky ho presmerujeme
-      if (localStorage.getItem('dashboard_version') === 'v2') {
+      // Zistenie zvolenej verzie pred vykreslením stránky
+      var savedVer = localStorage.getItem('dashboard_version');
+      if (savedVer === 'v3') {
+        window.location.replace('indexv3.html');
+      } else if (savedVer === 'v2') {
         window.location.replace('indexv2.html');
       }
     </script>
