@@ -1498,12 +1498,6 @@
                         <i class="fa-solid fa-circle-arrow-left label-icon" title="Verzia 2"></i>
                         <button onclick="prejdiNaVerziu2(); event.stopPropagation();" style="width: 100%;">Verzia 2</button>
                     </div>
-					<!-- Tlačidlo Návrat na Verziu 3 -->
-                    <div class="settings-night-row">
-                        <i class="fa-solid fa-circle-arrow-left label-icon" title="Verzia 3"></i>
-                        <button onclick="prejdiNaVerziu3(); event.stopPropagation();" style="width: 100%;">Verzia 3</button>
-                    </div>
-					
                 </div>
             </div>
          </main>
@@ -1611,14 +1605,6 @@
             // Presmerujeme na indexv2.html
             window.location.href = 'indexv2.html';
         }
-		function prejdiNaVerziu3() {
-            // Zmeníme nastavenú verziu v pamäti na v3
-            localStorage.setItem('kiosk_slots_v3', 'v3');
-            
-            // Presmerujeme na indexv2.html
-            window.location.href = 'indexv3.html';
-        }
-
 
         function getWeatherText(wCode) { return WEATHER_TEXTS_SK[wCode] || 'Premenlivé'; }
 
@@ -2254,6 +2240,9 @@
             renderSettingsGrid();
             resetSettingsTimer();
         }
+		document.addEventListener('DOMContentLoaded', function() {
+		    localStorage.setItem('kiosk_slots_v3', 'v3');
+		});
         function toggleMainRadioBtn() {
             const body = document.getElementById('mainBody');
             const radioBtn = document.getElementById('radioToggleBtn');
