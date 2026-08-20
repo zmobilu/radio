@@ -1877,8 +1877,12 @@
             }
             
             clearTimeout(pocasieTimer);
-            pocasieTimer = setTimeout(() => { toggleWeatherView(); }, 30000);
-        }
+			pocasieTimer = setTimeout(() => { 
+				const weatherView = document.getElementById('weatherDetailView');
+				if (weatherView && weatherView.style.display === 'flex') {
+					toggleWeatherView(); 
+				}
+			}, 30000);
 
 		// Pomocná funkcia pre priamy prechod z hlavnej plochy do grafu vybraného dňa
 		function otvorGrafPreDen(e, denMod) {
@@ -1886,8 +1890,16 @@
 		    if (isSettingsModeActive) toggleSettingsMode();
 		    
 		    const weatherView = document.getElementById('weatherDetailView');
+		    const fsBtn = document.getElementById('fullscreenToggleBtn');
+		    const radioBtn = document.getElementById('radioToggleBtn');
+		
 		    if (weatherView) {
 		        weatherView.style.display = 'flex';
+		        
+		        // Skryjeme tlačidlá pri otvorení grafu
+		        if (fsBtn) fsBtn.style.display = 'none';
+		        if (radioBtn) radioBtn.style.display = 'none';
+		
 		        vygenerujSpodnuListuDni();
 		        prepniDenGrafu(null, denMod);
 		    }
