@@ -1893,20 +1893,31 @@
 		    }
 		}
         function toggleWeatherView(e) {
-            if (e && (e.target.closest('#settingsToggleBtn') || e.target.closest('#fullscreenToggleBtn'))) return;
-            if (isSettingsModeActive) toggleSettingsMode();
-            
-            const weatherView = document.getElementById('weatherDetailView');
-            
-            if (weatherView.style.display === 'none' || weatherView.style.display === '') {
-                weatherView.style.display = 'flex';
-                vygenerujSpodnuListuDni();
-                prepniDenGrafu(null, 'teraz');
-            } else {
-                clearTimeout(pocasieTimer);
-                weatherView.style.display = 'none';
-            }
-        }
+		    if (e && (e.target.closest('#settingsToggleBtn') || e.target.closest('#fullscreenToggleBtn'))) return;
+		    if (isSettingsModeActive) toggleSettingsMode();
+		
+		    const weatherView = document.getElementById('weatherDetailView');
+		    const fsBtn = document.getElementById('fullscreenToggleBtn');
+		    const radioBtn = document.getElementById('radioToggleBtn');
+		
+		    if (weatherView.style.display === 'none' || weatherView.style.display === '') {
+		        weatherView.style.display = 'flex';
+		        
+		        // Skryjeme tlačidlá pri otvorení grafu
+		        if (fsBtn) fsBtn.style.display = 'none';
+		        if (radioBtn) radioBtn.style.display = 'none';
+		
+		        vygenerujSpodnuListuDni();
+		        prepniDenGrafu(null, 'teraz');
+		    } else {
+		        clearTimeout(pocasieTimer);
+		        weatherView.style.display = 'none';
+		
+		        // Vrátime tlačidlá pri zavretí grafu
+		        if (fsBtn) fsBtn.style.display = 'flex';
+		        if (radioBtn) radioBtn.style.display = 'flex';
+		    }
+		}
 
         function vygenerujSpodnuListuDni() {
             const extendedContainer = document.getElementById('extended-forecast-container');
