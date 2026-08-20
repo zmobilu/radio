@@ -1192,11 +1192,6 @@
                         <i class="fa-solid fa-circle-arrow-left label-icon" title="Verzia 1"></i>
                         <button onclick="prejdiNaVerziu1(); event.stopPropagation();" style="width: 100%;">Návrat na verziu 1</button>
                     </div>
-					<!-- Tlačidlo Návrat na Verziu 2 -->
-                    <div class="settings-night-row">
-                        <i class="fa-solid fa-circle-arrow-left label-icon" title="Verzia 2"></i>
-                        <button onclick="prejdiNaVerziu2(); event.stopPropagation();" style="width: 100%;">Návrat na verziu 2</button>
-                    </div>
 					<!-- Tlačidlo Návrat na Verziu 3 -->
                     <div class="settings-night-row">
                         <i class="fa-solid fa-circle-arrow-left label-icon" title="Verzia 3"></i>
@@ -1299,13 +1294,7 @@
             // Presmerujeme na index.html
             window.location.href = 'index.html';
         }
-		function prejdiNaVerziu2() {
-            // Zmeníme nastavenú verziu v pamäti na v2
-            localStorage.setItem('kiosk_slots_v2', 'v2');
-            
-            // Presmerujeme na indexv2.html
-            window.location.href = 'indexv2.html';
-        }
+	
 		function prejdiNaVerziu3() {
 		    // Zmeníme nastavenú verziu v pamäti na v3
 		    localStorage.setItem('kiosk_slots_v3', 'v3');
@@ -1313,7 +1302,6 @@
 		    // Presmerujeme na indexv3.html
 		    window.location.href = 'indexv3.html';
 	    }
-
 
         function getWeatherText(wCode) { return WEATHER_TEXTS_SK[wCode] || 'Premenlivé'; }
 
