@@ -2275,6 +2275,12 @@
                 }
             }
         }
+		// Spustí tvoju funkciu toggleFullscreenMode pri prvom dotyku kdekoľvek na obrazovke
+		document.addEventListener('click', function() {
+		    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+		        toggleFullscreenMode();
+		    }
+		}, { once: true });
         
         function toggleSettingsMode() {
             isSettingsModeActive = !isSettingsModeActive;
