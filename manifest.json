@@ -1,6 +1,14 @@
 {
   "short_name": "Kiosk",
   "name": "Meteo Kiosk",
+  "id": "/radio/",
+  "description": "Kiosk aplikacia pre meteorologicke udaje a radio",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "kiosk-ikona.png",
@@ -13,9 +21,20 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "./index.html",
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "display": "fullscreen",
-  "orientation": "any"
+  "screenshots": [
+    {
+      "src": "kiosk-ikona.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Kiosk Dashboard"
+    },
+    {
+      "src": "kiosk-ikona.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Kiosk Dashboard Mobile"
+    }
+  ]
 }
