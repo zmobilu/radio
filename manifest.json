@@ -1,0 +1,21 @@
+{
+  "short_name": "Kiosk",
+  "name": "Meteo Kiosk",
+  "icons": [
+    {
+      "src": "kiosk-ikona.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "kiosk-ikona.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "display": "fullscreen",
+  "orientation": "any"
+}
