@@ -2275,9 +2275,11 @@
                 }
             }
         }
-		// Spustí tvoju funkciu toggleFullscreenMode pri prvom dotyku kdekoľvek na obrazovke
+		// Spustí tvoju funkciu toggleFullscreenMode pri prvom dotyku IBA na mobilných zariadeniach
 		document.addEventListener('click', function() {
-		    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+		    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
+		    
+		    if (isMobile && !document.fullscreenElement && !document.webkitFullscreenElement) {
 		        toggleFullscreenMode();
 		    }
 		}, { once: true });
