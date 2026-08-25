@@ -1,1 +1,8 @@
-
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.zmobilu.twa",
+        "sha256_cert_fingerprints": ["33:AD:7D:D9:12:5A:FE:AA:D9:4C:30:9A:17:CC:A4:6F:E7:27:85:DB:DD:7D:10:BA:E2:4D:32:6B:E8:B8:E8:5D"]
+      }
+    }]
