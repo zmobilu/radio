@@ -394,8 +394,8 @@
     <div class="buttons-section">
         <button onpointerdown="stopRadio()" class="btn vypni" style="padding: 20px 0; min-height: 90px; width: 100%;"><i class="fa-solid fa-power-off"></i></button>
         <button onclick="playRadio('https://icecast.stv.livebox.sk/slovensko_128.mp3', this, 'slovensko')" class="btn rozhlas" style="background:#00547E;" data-type="slovensko"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png" style="max-width:80%; max-height:70%; object-fit:contain;"></button>
-        <button onclick="playRadio('https://stream.funradio.sk/fun192.mp3', this, 'fun')" class="btn fun" style="background:#ffffff;" data-type="fun"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png" style="max-width:75%; max-height:70%; object-fit:contain;"></button>
-        <button onclick="playRadio('https://stream.bauermedia.sk/rock-hi.mp3', this, 'rock')" class="btn rock" style="background:#000000;" data-type="rock"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png" style="max-width:70%; max-height:60%; object-fit:contain;"></button>
+        <button onclick="playRadio('https://funradio-proxy.zmobilu.workers.dev/fun128.mp3', this, 'fun')" class="btn fun" style="background:#ffffff;"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png" style="max-width:75%; max-height:70%; object-fit:contain;"></button>
+		<button onclick="playRadio('https://stream.bauermedia.sk/rock-hi.mp3', this, 'rock')" class="btn rock" style="background:#000000;" data-type="rock"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png" style="max-width:70%; max-height:60%; object-fit:contain;"></button>
         <button onclick="playRadio('https://ice.abradio.cz/blanikcz128.mp3', this, 'blanik')" class="btn blanik" style="background:#005ea6;" data-type="blanik"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png" style="max-width:80%; max-height:70%; object-fit:contain;"></button>
         <button onclick="playRadio('https://stream.sunshine-live.de/techno/mp3-192/', this, 'S-techno')" class="btn cro" style="background:#000000; color:#307CEB;" data-type="S-techno"><i class="fa-solid fa-bolt" style="font-size:60px;"></i></button>
         <button onclick="showSpotify()" class="btn spotify" style="background:#21D844;"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoSpotifySET.png" style="max-width:75%; max-height:70%; object-fit:contain;"></button>
@@ -537,10 +537,10 @@
             </div>
             
             <div id="fun-links-container" class="ss-hide" style="display: none; flex-direction: row; justify-content: center; gap: 12px; margin-top: 25px; width: 100%;">
-                <button onclick="playRadio('https://stream.funradio.sk/chill128.mp3', this, 'funchill')" class="sub-btn" data-type="funchill"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunChill.png"></button>
-                <button onclick="playRadio('https://stream.funradio.sk/cs128.mp3', this, 'funczsk')" class="sub-btn" data-type="funczsk"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunCZSK.png"></button>
-                <button onclick="playRadio('https://stream.funradio.sk/80-90-128.mp3', this, 'fun8090')" class="sub-btn" data-type="fun8090"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun8090.png"></button>
-                <button onclick="playRadio('https://stream.funradio.sk/milenialky128.mp3', this, 'milenialky')" class="sub-btn" data-type="milenialky"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun2000.png"></button>
+                <button onclick="playRadio('https://funradio-proxy.zmobilu.workers.dev/chill128.mp3', this, 'funchill')" class="sub-btn" data-type="funchill"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunChill.png"></button>
+                <button onclick="playRadio('https://funradio-proxy.zmobilu.workers.dev/cs128.mp3', this, 'funczsk')" class="sub-btn" data-type="funczsk"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunCZSK.png"></button>
+                <button onclick="playRadio('https://funradio-proxy.zmobilu.workers.dev/80-90-128.mp3', this, 'fun8090')" class="sub-btn" data-type="fun8090"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun8090.png"></button>
+                <button onclick="playRadio('https://funradio-proxy.zmobilu.workers.dev/milenialky128.mp3', this, 'milenialky')" class="sub-btn" data-type="milenialky"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun2000.png"></button>
             </div>
 
             <div id="rock-links-container" class="ss-hide" style="display: none; flex-direction: row; justify-content: center; gap: 12px; margin-top: 25px; width: 100%;">
