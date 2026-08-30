@@ -1472,7 +1472,10 @@
                     <div class="settings-night-row" style="flex-direction: column; height: auto; gap: 4px; padding: 6px 8px;">
                         <div style="display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center;">
                             <i class="fa-solid fa-cloud-sun label-icon" title="Mesto pre počasie"></i>
-                            <button onclick="zmenNastavenieMesta(); event.stopPropagation();" id="set-weather-coords">Mesto: Bratislava</button>
+                            <div style="display: flex; align-items: center; gap: 5px;">
+							    <button id="set-weather-coords" onclick="zmenNastavenieMesta()">Mesto: --</button>
+							    <button id="add-weather-city" onclick="pridajNoveMesto()" style="background: #252525; color: #ff9f0a; border: 1px solid #ff9f0a; padding: 2px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold;">+</button>
+							</div>
                         </div>
                         <div id="weather-history-buttons" style="display: flex; gap: 4px; margin-top: 2px; justify-content: center; width: 100%;"></div>
                     </div>
@@ -2058,21 +2061,35 @@
                 aktivneMestoIndex = (aktivneMestoIndex + 1) % cfgHistoriaMest.length;
                 let vybraneMesto = cfgHistoriaMest[aktivneMestoIndex];
                 
-                vyhladajMestoPodlaTextu(vybraneMesto, false); // false = nepridávať znova na začiatok pola
+                vyhladajMestoPodlaTextu(vybraneMesto, false);
             }
         }
 
-        function zmenNastavenieMesta() {
-            let vybraneMesto = cfgHistoriaMest[aktivneMestoIndex] || cfgMestoNazov;
-            let navrhMesta = prompt("Zadaj nový názov pre označené mesto:", vybraneMesto);
-            
-            if (navrhMesta && navrhMesta.trim() !== "") {
-                vyhladajMestoPodlaTextu(navrhMesta.trim(), true); // true = prepísať aktívne mesto
+        // Tlačidlo "+" prida NOVÉ mesto do zoznamu
+        function pridajNoveMesto() {
+            let noveMesto = prompt("Zadaj názov nového mesta pre pridanie:");
+            if (noveMesto && noveMesto.trim() !== "") {
+                vyhladajMestoPodlaTextu(noveMesto.trim(), "pridat");
             }
             resetSettingsTimer();
         }
 
-        function vyhladajMestoPodlaTextu(cisteMesto, prepisatAktivne = false) {
+        // Kliknutie na hlavné tlačidlo mesta zmení/prepíše LEN označené mesto
+        function zmenNastavenieMesta() {
+            if (!cfgHistoriaMest || cfgHistoriaMest.length === 0) {
+                pridajNoveMesto();
+                return;
+            }
+            let vybraneMesto = cfgHistoriaMest[aktivneMestoIndex] || cfgMestoNazov;
+            let navrhMesta = prompt("Upraviť názov označeného mesta:", vybraneMesto);
+            
+            if (navrhMesta && navrhMesta.trim() !== "") {
+                vyhladajMestoPodlaTextu(navrhMesta.trim(), "prepisat");
+            }
+            resetSettingsTimer();
+        }
+
+        function vyhladajMestoPodlaTextu(cisteMesto, rezim = "nacitat") {
             fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cisteMesto)}&count=1&language=sk&format=json`)
                 .then(res => res.json())
                 .then(data => {
@@ -2086,14 +2103,28 @@
                         localStorage.setItem('cfg_weather_lon', cfgLon);
                         localStorage.setItem('cfg_weather_name', cfgMestoNazov);
                         
-                        if (prepisatAktivne) {
-                            // Prepíšeme len mesto na aktuálnom indexe
-                            cfgHistoriaMest[aktivneMestoIndex] = cfgMestoNazov;
+                        // Zistíme, či už mesto v zozname existuje
+                        let existujuciIndex = cfgHistoriaMest.findIndex(m => m.toLowerCase() === cfgMestoNazov.toLowerCase());
+
+                        if (rezim === "pridat") {
+                            if (existujuciIndex !== -1) {
+                                // Ak už existuje, nepridávame ho znova, len naň prepneme
+                                aktivneMestoIndex = existujuciIndex;
+                            } else {
+                                cfgHistoriaMest.push(cfgMestoNazov);
+                                aktivneMestoIndex = cfgHistoriaMest.length - 1;
+                            }
+                        } else if (rezim === "prepisat") {
+                            if (cfgHistoriaMest.length > 0) {
+                                cfgHistoriaMest[aktivneMestoIndex] = cfgMestoNazov;
+                            } else {
+                                cfgHistoriaMest.push(cfgMestoNazov);
+                                aktivneMestoIndex = 0;
+                            }
                         } else {
-                            // Zistíme index mesta, ak už v zozname existuje
-                            let foundIdx = cfgHistoriaMest.findIndex(m => m.toLowerCase() === cfgMestoNazov.toLowerCase());
-                            if (foundIdx !== -1) {
-                                aktivneMestoIndex = foundIdx;
+                            // Režim "nacitat"
+                            if (existujuciIndex !== -1) {
+                                aktivneMestoIndex = existujuciIndex;
                             }
                         }
                         
@@ -2112,7 +2143,7 @@
             if (event) event.stopPropagation();
             aktivneMestoIndex = index;
             let mesto = cfgHistoriaMest[index];
-            vyhladajMestoPodlaTextu(mesto, false);
+            vyhladajMestoPodlaTextu(mesto, "nacitat");
             resetSettingsTimer();
         }
 
@@ -2128,7 +2159,6 @@
                     histBtn.style.cssText = "background: #252525; color: #aaa; border: 1px solid #333; padding: 2px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; margin: 0 2px;";
                     histBtn.textContent = mesto;
                     
-                    // Zvýrazníme tlačidlo, ktoré je momentálne označené/aktívne
                     if (index === aktivneMestoIndex) {
                         histBtn.style.borderColor = "#ff9f0a";
                         histBtn.style.color = "#ff9f0a";
