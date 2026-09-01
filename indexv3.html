@@ -2220,6 +2220,20 @@
 		        container.appendChild(card);
 		    }
 		}
+		function otvorNastaveniaPreSlot() {
+		    if (!isSettingsModeActive) {
+		        toggleSettingsMode();
+		    }
+		    
+		    // Plynulý posun obrazovky na začiatok mriežky s rádiami
+		    setTimeout(() => {
+		        const grid = document.getElementById('settingsGridView');
+		        const separator = grid ? grid.querySelector('.settings-label-separator') : null;
+		        if (separator) {
+		            separator.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		        }
+		    }, 100);
+		}
         function renderSettingsGrid() {
             const grid = document.getElementById('settingsGridView');
             if(!grid) return;
@@ -2239,7 +2253,7 @@
                     separator.textContent = currentCategory;
                     grid.appendChild(separator);
                 }
-
+				
                 const card = document.createElement('div');
                 card.className = "cfg-mini-card";
                 
@@ -2371,7 +2385,11 @@
 
         function handleFavCardClick(item) {
 			if (isSettingsModeActive) return;
-		
+			// Ak kliknete na prázdnu pozíciu s '+', otvoríme panel nastavení pre priradenie stanice
+		    if (!item) {
+		        toggleSettingsMode();
+		        return;
+		    }
 			const spotifyContainer = document.getElementById('spotifyPlayerContainer');
 			const spotifyIframe = document.getElementById('spotifyIframe');
 			const weatherBlock = document.querySelector('.main-weather-container');
