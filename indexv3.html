@@ -1560,7 +1560,8 @@
     </button>
     
     <script>
-        let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v3')) || ["slovensko", "funchill", "rock", "blanik", "fun", "spotify"];
+        // Zväčšenie štartovacieho poľa z 6 na 8 položiek (+ pridané rádio jazz a topolcany)
+		let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v3')) || ["slovensko", "funchill", "rock", "blanik", "fun", "jazz", null, null];
         
         const audio = document.getElementById('audioPlayer');
         let currentPlayingType = "";
@@ -2188,37 +2189,37 @@
         }
 
         function renderSidebarFavorites() {
-            const container = document.getElementById('favSidebarContainer');
-            if(!container) return;
-            container.innerHTML = "";
-
-            for (let i = 0; i < 6; i++) {
-                const id = slotFavorites[i];
-                const item = DATABASE.find(d => d.id === id);
-                const card = document.createElement('div');
-                
-                if (item && id !== null) {
-                card.className = "fav-card";
-                
-                if (currentPlayingType === item.id && !audio.paused) {
-                    card.classList.add("playing");
-                }
-                
-                card.onclick = () => handleFavCardClick(item);
-
-                if (item.img) {
-                    card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
-                } else if (item.icon) {
-                    card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
-                }
-            } else {
-                    card.className = "fav-card empty";
-                    card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
-                }
-                container.appendChild(card);
-            }
-        }
-
+		    const container = document.getElementById('favSidebarContainer');
+		    if(!container) return;
+		    container.innerHTML = "";
+		
+		    // Zmena cyklu z 6 na 8 pozícií
+		    for (let i = 0; i < 8; i++) {
+		        const id = slotFavorites[i];
+		        const item = DATABASE.find(d => d.id === id);
+		        const card = document.createElement('div');
+		        
+		        if (item && id !== null) {
+		            card.className = "fav-card";
+		            
+		            if (currentPlayingType === item.id && !audio.paused) {
+		                card.classList.add("playing");
+		            }
+		            
+		            card.onclick = () => handleFavCardClick(item);
+		
+		            if (item.img) {
+		                card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
+		            } else if (item.icon) {
+		                card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
+		            }
+		        } else {
+		            card.className = "fav-card empty";
+		            card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
+		        }
+		        container.appendChild(card);
+		    }
+		}
         function renderSettingsGrid() {
             const grid = document.getElementById('settingsGridView');
             if(!grid) return;
@@ -2260,23 +2261,23 @@
         }
 
         function handleChannelSelectionToggle(id) {
-            const existingIndex = slotFavorites.indexOf(id);
-            if (existingIndex !== -1) {
-                slotFavorites[existingIndex] = null;
-            } else {
-                const freeSlotIndex = slotFavorites.indexOf(null);
-                if (freeSlotIndex !== -1) {
-                    slotFavorites[freeSlotIndex] = id;
-                } else {
-                    alert("Všetkých 6 pozícií je plných. Najprv kliknutím uvoľnite niektoré miesto.");
-                    return;
-                }
-            }
-            localStorage.setItem('kiosk_slots_v3', JSON.stringify(slotFavorites));
-            renderSidebarFavorites();
-            renderSettingsGrid();
-            resetSettingsTimer();
-        }
+		    const existingIndex = slotFavorites.indexOf(id);
+		    if (existingIndex !== -1) {
+		        slotFavorites[existingIndex] = null;
+		    } else {
+		        const freeSlotIndex = slotFavorites.indexOf(null);
+		        if (freeSlotIndex !== -1) {
+		            slotFavorites[freeSlotIndex] = id;
+		        } else {
+		            alert("Všetkých 8 pozícií je plných. Najprv kliknutím uvoľnite niektoré miesto.");
+		            return;
+		        }
+		    }
+		    localStorage.setItem('kiosk_slots_v3', JSON.stringify(slotFavorites));
+		    renderSidebarFavorites();
+		    renderSettingsGrid();
+		    resetSettingsTimer();
+		}
 		document.addEventListener('DOMContentLoaded', function() {
 		    localStorage.setItem('dashboard_version', 'v3');
 		});
@@ -2471,8 +2472,8 @@
             let novyIndex = currentIndex;
             let najdeneRadio = null;
 
-            for (let i = 0; i < 6; i++) {
-                novyIndex = (smer === 'vpred') ? (novyIndex + 1) % 6 : (novyIndex - 1 + 6) % 6;
+            for (let i = 0; i < 8; i++) {
+                novyIndex = (smer === 'vpred') ? (novyIndex + 1) % 8 : (novyIndex - 1 + 8) % 8;
                 const idKandidata = slotFavorites[novyIndex];
                 if (!idKandidata) continue;
 
@@ -3094,9 +3095,23 @@
                     element.style.animation = 'cloudFloat 5s infinite ease-in-out';
                 }
             }
-        // --- INTELIGENTNÁ NOČNÁ AKTUALIZÁCIA SO ZNOVU-SPUSTENÍM RÁDIA ---
+        // --- INTELIGENTNÁ NOČNÁ AKTUALIZÁCIA SO ZNOVU-SPUSTENÍM RÁDIA A WAKE LOCKOM ---
 
 			let poslednaNocnaKontrolaDen = localStorage.getItem('poslednaNocnaAktualizacia');
+			
+			// Globálna premenná pre držanie zapnutého displeja
+			let wakeLockSentinel = null;
+			
+			async function zapniWakeLock() {
+			    if ('wakeLock' in navigator) {
+			        try {
+			            wakeLockSentinel = await navigator.wakeLock.request('screen');
+			            console.log('Wake Lock je aktívny - displej nezhasne.');
+			        } catch (err) {
+			            console.log('Wake Lock chyba:', err);
+			        }
+			    }
+			}
 			
 			async function spravAktualizaciu() {
 			    console.log("Sťahujem najnovšiu verziu kódu...");
@@ -3107,7 +3122,15 @@
 			            localStorage.setItem('poslednaNocnaAktualizacia', dnesnyDen);
 			            poslednaNocnaKontrolaDen = dnesnyDen;
 			            
-			            // 2. Kontrola, či audio REÁLNE hrá (nie je paused a má aktívny stream)
+			            // 1. Správna detekcia triedy full-night-mode
+			            const isNightMode = document.body.classList.contains('full-night-mode') || manualnaNocAktivna;
+			            if (isNightMode) {
+			                localStorage.setItem('kiosk_autorestart_nightmode', 'true');
+			            } else {
+			                localStorage.removeItem('kiosk_autorestart_nightmode');
+			            }
+			
+			            // 2. Kontrola, či audio REÁLNE hrá
 			            const isAudioPlaying = typeof audio !== 'undefined' && audio && !audio.paused && audio.currentTime > 0 && audio.readyState > 2;
 			            const hasValidType = currentPlayingType && currentPlayingType !== "" && currentPlayingType !== "none" && currentPlayingType !== "settings";
 			
@@ -3117,11 +3140,22 @@
 			                localStorage.removeItem('kiosk_autorestart_radio');
 			            }
 			
-			            // 3. Spravíme reload stránky
+			            // 3. Reload stránky
 			            window.location.reload(true);
 			        }
 			    } catch (e) {
 			        console.log("Aktualizácia zlyhala (offline):", e);
+			    }
+			}
+			
+			function skontrolujObnovuNocnehoRezimu() {
+			    const chcelNocnyRezim = localStorage.getItem('kiosk_autorestart_nightmode');
+			    localStorage.removeItem('kiosk_autorestart_nightmode');
+			
+			    if (chcelNocnyRezim === 'true') {
+			        manualnaNocAktivna = true;
+			        document.body.classList.add('full-night-mode');
+			        runClockEngine();
 			    }
 			}
 			
@@ -3130,7 +3164,6 @@
 			    const aktualnyDen = teraz.getDate().toString();
 			    const hodina = teraz.getHours();
 			
-			    // Čas na aktualizáciu: presne o 3:00 ráno ALEBO ráno po 6:00 (ak bol kiosk v noci vypnutý)
 			    const jeCasNaAktualizaciu = (hodina === 3) || (hodina >= 6 && poslednaNocnaKontrolaDen !== aktualnyDen);
 			
 			    if (jeCasNaAktualizaciu && poslednaNocnaKontrolaDen !== aktualnyDen) {
@@ -3140,9 +3173,6 @@
 			
 			function skontrolujAutoStartRadiaPoReloadu() {
 			    const chcelAutoStart = localStorage.getItem('kiosk_autorestart_radio');
-			    
-			    // IHNEĎ zmažeme príznak z pamäte! 
-			    // Ak by prišiel akýkoľvek iný/náhodný refresh, rádio už zbytočne nezačne hrať.
 			    localStorage.removeItem('kiosk_autorestart_radio');
 			
 			    if (chcelAutoStart === 'true') {
@@ -3151,10 +3181,9 @@
 			        
 			        if (savedRadioUrl && savedRadioType) {
 			            setTimeout(() => {
-			                // Pokus o reštart rádia
-			                playRadio(savedRadioUrl, null, savedRadioType);
+			                // Opravený volací tvar (iba 2 parametre: url a id)
+			                playRadio(savedRadioUrl, savedRadioType);
 			                
-			                // Ošetrenie pre iOS (ak prehliadač zablokuje autoplay po reloadu)
 			                if (typeof audio !== 'undefined' && audio) {
 			                    const playPromise = audio.play();
 			                    if (playPromise !== undefined) {
@@ -3168,16 +3197,32 @@
 			    }
 			}
 			
-			// 1. Kontrola aktualizácie a opätovného spustenia rádia pri načítaní stránky
+			function skontrolujObnovuNocnehoRezimu() {
+			    const chcelNocnyRezim = localStorage.getItem('kiosk_autorestart_nightmode');
+			    localStorage.removeItem('kiosk_autorestart_nightmode');
+			
+			    if (chcelNocnyRezim === 'true') {
+			        if (typeof zapniNocnyRezim === 'function') {
+			            zapniNocnyRezim();
+			        } else {
+			            document.body.classList.add('night-mode');
+			        }
+			    }
+			}
+			
+			// Spustenie pri načítaní stránky
+			zapniWakeLock();
 			skontrolujNochnuAktualizaciu();
 			skontrolujAutoStartRadiaPoReloadu();
+			skontrolujObnovuNocnehoRezimu();
 			
-			// 2. Pravidelná kontrola každú minútu (pre nonstop bežiaci kiosk)
+			// Pravidelná kontrola každú minútu
 			setInterval(skontrolujNochnuAktualizaciu, 60000);
 			
-			// 3. Kontrola pri prebudení displeja / otvorenia z plochy (pre iOS / Android)
+			// Kontrola a obnovenie Wake Locku pri prebudení displeja / zviditeľnení
 			document.addEventListener('visibilitychange', () => {
 			    if (document.visibilityState === 'visible') {
+			        zapniWakeLock();
 			        skontrolujNochnuAktualizaciu();
 			    }
 			});
