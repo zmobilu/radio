@@ -1067,6 +1067,22 @@
 		        justify-content: space-around !important; /* Rovnomerne rozloží hodiny, dátum a počasie */
 		        padding-bottom: calc(2vh + env(safe-area-inset-bottom)) !important;
 		    }
+			.main-content-area {
+		        width: 100%;
+		        height: auto; /* Prispôsobí sa hodinám a počasiu */
+		    }
+		
+		    .favorites-sidebar {
+		        width: 100%;
+		        height: 40vh; /* Alebo flex: 1 na vyplnenie zvyšku */
+		        border-right: none;
+		        border-top: 1px solid #111;
+		        grid-template-columns: repeat(4, 1fr); /* 4 stĺpce */
+		        grid-template-rows: repeat(2, 1fr);    /* 2 riadky */
+		        padding-left: 6px;
+		        padding-bottom: calc(6px + env(safe-area-inset-bottom));
+		    }
+			
         }
 
         .settings-grid-view { padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important; }
