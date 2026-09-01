@@ -104,14 +104,14 @@
         /* --- HLAVNÁ ROZDELENÁ PLOCHA --- */
         .workspace-container { display: flex; flex: 1; width: 100vw; overflow: hidden; position: relative; }
 
-        /* Ľavá sekcia: 8 obľúbených položiek (4x2 na šírku) */
+        /* Ľavá sekcia: 8 obľúbených položiek (2x4 na šírku) */
 		.favorites-sidebar {
 		    width: 30%; 
 		    background: #050505; 
 		    border-right: 1px solid #111;
 		    display: grid; 
-		    grid-template-columns: repeat(4, 1fr); 
-		    grid-template-rows: repeat(2, 1fr);
+		    grid-template-columns: repeat(2, 1fr); 
+		    grid-template-rows: repeat(4, 1fr);
 		    gap: 6px; 
 		    padding: 6px; 
 		    box-sizing: border-box;
@@ -855,8 +855,8 @@
 		@media (orientation: landscape) {
 			.sidebar-favorites {
 		        display: grid;
-		        grid-template-columns: repeat(2, 1fr);
-		        grid-template-rows: repeat(4, 1fr);
+		        grid-template-columns: repeat(4, 1fr);
+		        grid-template-rows: repeat(2, 1fr);
 		        gap: 8px;
 		        height: 100%;
 		    }
@@ -927,18 +927,6 @@
             .workspace-container { 
                 flex-direction: column; 
             }
-            .favorites-sidebar {
-		        display: grid;
-		        grid-template-columns: repeat(4, 1fr);
-		        grid-template-rows: repeat(2, 1fr);
-		        gap: 8px;
-		        width: 100%;
-		    }
-			.fav-card img {
-		        width: 70%;
-		        height: 70%;
-		        object-fit: contain;
-		    }
             .main-content-area { 
                 width: 100vw; 
                 flex: 1; 
