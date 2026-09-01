@@ -2262,17 +2262,32 @@
 
         function handleChannelSelectionToggle(id) {
 		    const existingIndex = slotFavorites.indexOf(id);
+		    
+		    // 1. Ak už rádio v obľúbených je, kliknutím ho odstránime (nahradíme null)
 		    if (existingIndex !== -1) {
 		        slotFavorites[existingIndex] = null;
 		    } else {
-		        const freeSlotIndex = slotFavorites.indexOf(null);
-		        if (freeSlotIndex !== -1) {
+		        // 2. Hľadáme index prvého voľného miesta (kde je null, undefined alebo "")
+		        let freeSlotIndex = slotFavorites.findIndex(slot => !slot);
+		        
+		        // Ak je pole kratšie ako 8, môžeme pridať nový slot
+		        if (freeSlotIndex === -1 && slotFavorites.length < 8) {
+		            freeSlotIndex = slotFavorites.length;
+		        }
+		
+		        if (freeSlotIndex !== -1 && freeSlotIndex < 8) {
 		            slotFavorites[freeSlotIndex] = id;
 		        } else {
 		            alert("Všetkých 8 pozícií je plných. Najprv kliknutím uvoľnite niektoré miesto.");
 		            return;
 		        }
 		    }
+		    
+		    // Garantujeme, že pole má vždy presne 8 položiek
+		    while (slotFavorites.length < 8) {
+		        slotFavorites.push(null);
+		    }
+		
 		    localStorage.setItem('kiosk_slots_v3', JSON.stringify(slotFavorites));
 		    renderSidebarFavorites();
 		    renderSettingsGrid();
