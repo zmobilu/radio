@@ -853,6 +853,19 @@
 		
 		/* --- REŽIM NA ŠÍRKU (LANDSCAPE) --- */
 		@media (orientation: landscape) {
+			.sidebar-favorites {
+		        display: grid;
+		        grid-template-columns: repeat(2, 1fr);
+		        grid-template-rows: repeat(4, 1fr);
+		        gap: 8px;
+		        height: 100%;
+		    }
+		
+		    .fav-card img {
+		        width: 75%;
+		        height: 75%;
+		        object-fit: contain;
+		    }
 		    .main-weather-container {
 		        display: flex !important;
 		        flex-direction: column !important;
@@ -914,23 +927,18 @@
             .workspace-container { 
                 flex-direction: column; 
             }
-
             .favorites-sidebar {
-		        width: 100vw; 
-		        height: auto; 
-		        flex-shrink: 0; 
-		        order: 2;
-		        grid-template-columns: repeat(2, 1fr); 
-		        grid-template-rows: repeat(4, 1fr);
-		        border-right: none; 
-		        border-top: 1px solid #111; 
-		        gap: 6px; 
-		        padding: 6px;
-		        padding-bottom: calc(6px + env(safe-area-inset-bottom)) !important;
-		        padding-left: calc(6px + env(safe-area-inset-left));
-		        padding-right: calc(6px + env(safe-area-inset-right));
+		        display: grid;
+		        grid-template-columns: repeat(4, 1fr);
+		        grid-template-rows: repeat(2, 1fr);
+		        gap: 8px;
+		        width: 100%;
 		    }
-
+			.fav-card img {
+		        width: 70%;
+		        height: 70%;
+		        object-fit: contain;
+		    }
             .main-content-area { 
                 width: 100vw; 
                 flex: 1; 
