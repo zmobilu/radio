@@ -1459,8 +1459,8 @@
                             <span style="color: #444; margin: 0 2px;">-</span>
                             <button onclick="zmenNastavenieCasu('do'); event.stopPropagation();" id="set-night-to">05:20</button>
                         </div>
-                    </div>
-                    
+						<span style="font-size: 0.8em; color: #888; font-weight: bold;">Nočný režim</span>
+					</div>              
                     <div class="settings-night-row">
                         <i class="fa-solid fa-bed label-icon" title="Prerušenie noci (Snooze)"></i>
                         <button onclick="zmenDobuOdkladu(); event.stopPropagation();" id="set-snooze-time">1 min</button>
@@ -2185,7 +2185,7 @@
             clearTimeout(settingsTimeout);
             settingsTimeout = setTimeout(() => {
                 if (isSettingsModeActive) toggleSettingsMode();
-            }, 10000);
+            }, 30000);
         }
 
         function renderSidebarFavorites() {
