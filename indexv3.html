@@ -2649,9 +2649,8 @@
         async function fetchNamedayData() {
 		    const now = new Date();
 		    poslednyNacitanyDen = now.getDate();
-		    
-		    const currentMonth = now.getMonth() + 1;
-		    const currentDay = now.getDate();
+		    const currentMonth = now.getMonth() + 1; // 1-12
+		    const currentDay = now.getDate();       // 1-31
 		
 		    // Zajtrajší dátum
 		    const tomorrow = new Date(now);
@@ -2660,79 +2659,96 @@
 		    const tomorrowDay = tomorrow.getDate();
 		
 		    try {
+		        // Načítanie zo spoločného lokálneho súboru meniny.csv
 		        const response = await fetch('meniny.csv');
-		        if (!response.ok) throw new Error("Súbor meniny.csv sa nenašiel");
-		
 		        const text = await response.text();
+		        
 		        const lines = text.split('\n');
-		
+		        
 		        let dnesneMenaArray = [];
 		        let zajtrajsieMenaArray = [];
-		
-		        // 1. Prejdeme všetky riadky v CSV a nájdeme dnešok aj zajtrajšok
+		        
 		        for (let line of lines) {
 		            if (!line.trim()) continue;
-		
+		            
+		            // Rozdelenie riadku CSV
 		            const parts = line.split(',');
 		            if (parts.length < 3) continue;
 		
 		            const month = parseInt(parts[0].trim(), 10);
 		            const day = parseInt(parts[1].trim(), 10);
 		
+		            // Vyhľadanie dnešných mien
 		            if (month === currentMonth && day === currentDay) {
 		                let rawNames = parts.slice(2).join(',').replace(/"/g, '').trim();
 		                dnesneMenaArray = rawNames.split(',').map(m => m.trim()).filter(m => m !== "");
 		            }
 		
+		            // Vyhľadanie zajtrajších mien
 		            if (month === tomorrowMonth && day === tomorrowDay) {
 		                let rawNames = parts.slice(2).join(',').replace(/"/g, '').trim();
 		                zajtrajsieMenaArray = rawNames.split(',').map(m => m.trim()).filter(m => m !== "");
 		            }
 		        }
 		
+		        if (dnesneMenaArray.length === 0) return;
+		
 		        const bigNameday = document.getElementById('bigNameday');
 		        const sep = document.getElementById('dateSeparator');
-		
-		        // Ak sa nenašli žiadne dnešné mená, skryjeme oddeľovač a skončíme
-		        if (dnesneMenaArray.length === 0) {
-		            if (bigNameday) bigNameday.textContent = "";
-		            if (sep) sep.style.display = "none";
-		            return;
-		        }
-		
+		        
 		        if (sep) sep.style.display = "inline";
 		
-		        // 2. Formátovanie dnešných mien + určenie farby
-		        let dominantnaFarba = "#ff9f0a";
-		        let naformatovaneDnes = dnesneMenaArray.map(meno => {
-		            if (typeof RODINA !== 'undefined' && RODINA.includes(meno)) { dominantnaFarba = "#ff3b30"; return `❤️ ${meno}`; }
-		            if (typeof MOJE_MENA !== 'undefined' && MOJE_MENA.includes(meno)) { dominantnaFarba = "#ff9f0a"; return `⭐ ${meno}`; }
-		            if (typeof SPOLUZIACI !== 'undefined' && SPOLUZIACI.includes(meno)) { dominantnaFarba = "#5ac8fa"; return `🎓 ${meno}`; }
-		            if (typeof KOLEGOVIA !== 'undefined' && KOLEGOVIA.includes(meno)) { dominantnaFarba = "#34c759"; return `💼 ${meno}`; }
-		            return meno;
+		        // Kontrola a formátovanie všetkých mien na dnešný deň
+		        let dominantnaFarba = "#ff9f0a"; // Štandardná oranžová
+		        let naformatovaneMena = [];
+		
+		        dnesneMenaArray.forEach(meno => {
+		            if (RODINA.includes(meno)) {
+		                naformatovaneMena.push(`❤️ ${meno}`);
+		                dominantnaFarba = "#ff3b30";
+		            } else if (MOJE_MENA.includes(meno)) {
+		                naformatovaneMena.push(`⭐ ${meno}`);
+		                dominantnaFarba = "#ff9f0a";
+		            } else if (SPOLUZIACI.includes(meno)) {
+		                naformatovaneMena.push(`🎓 ${meno}`);
+		                dominantnaFarba = "#5ac8fa";
+		            } else if (KOLEGOVIA.includes(meno)) {
+		                naformatovaneMena.push(`💼 ${meno}`);
+		                dominantnaFarba = "#34c759";
+		            } else {
+		                naformatovaneMena.push(meno);
+		            }
 		        });
 		
-		        // 3. Formátovanie zajtrajších mien
-		        let naformatovaneZajtra = zajtrajsieMenaArray.map(meno => {
-		            if (typeof RODINA !== 'undefined' && RODINA.includes(meno)) return `❤️ ${meno}`;
-		            if (typeof MOJE_MENA !== 'undefined' && MOJE_MENA.includes(meno)) return `⭐ ${meno}`;
-		            if (typeof SPOLUZIACI !== 'undefined' && SPOLUZIACI.includes(meno)) return `🎓 ${meno}`;
-		            if (typeof KOLEGOVIA !== 'undefined' && KOLEGOVIA.includes(meno)) return `💼 ${meno}`;
-		            return meno;
+		        // Formátovanie zajtrajších mien
+		        let naformatovaneZajtra = [];
+		        zajtrajsieMenaArray.forEach(meno => {
+		            if (RODINA.includes(meno)) {
+		                naformatovaneZajtra.push(`❤️ ${meno}`);
+		            } else if (MOJE_MENA.includes(meno)) {
+		                naformatovaneZajtra.push(`⭐ ${meno}`);
+		            } else if (SPOLUZIACI.includes(meno)) {
+		                naformatovaneZajtra.push(`🎓 ${meno}`);
+		            } else if (KOLEGOVIA.includes(meno)) {
+		                naformatovaneZajtra.push(`💼 ${meno}`);
+		            } else {
+		                naformatovaneZajtra.push(meno);
+		            }
 		        });
 		
-		        // 4. Skladanie textu podla orientácie displeja
-		        let vyslednyText = naformatovaneDnes.join(', ');
+		        // Všetky mená spojené do jedného riadku (zajtrajšie len v režime na šírku)
+		        dnesneMeno = naformatovaneMena.join(', ');
+		        
 		        const isLandscape = window.matchMedia("(orientation: landscape)").matches;
-		
 		        if (isLandscape && naformatovaneZajtra.length > 0) {
-		            vyslednyText += ` | zajtra: ${naformatovaneZajtra.join(', ')}`;
+		            dnesneMeno += ` | zajtra: ${naformatovaneZajtra.join(', ')}`;
 		        }
-		
-		        dnesneMeno = vyslednyText;
+		        
 		        if (bigNameday) {
 		            bigNameday.style.color = dominantnaFarba;
 		            bigNameday.textContent = dnesneMeno;
+		
+		            // Odstránenie kurzora ruky a klikacej udalosti
 		            bigNameday.style.cursor = 'default';
 		            bigNameday.onclick = null;
 		        }
