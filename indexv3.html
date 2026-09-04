@@ -2639,12 +2639,12 @@
         let poslednyNacitanyDen = -1;
         let dnesneMeno = ""; // Deklarovaná globálna premenná
 
-        async function skontrolujAObnovMeniny() {
-            const teraz = new Date();
-            if (poslednyNacitanyDen !== teraz.getDate()) {
-                await fetchNamedayData();
-            }
-        }
+        function skontrolujAObnovMeniny() {
+		    const teraz = new Date();
+		    if (poslednyNacitanyDen !== teraz.getDate()) {
+		        fetchNamedayData();
+		    }
+		}
 
         async function fetchNamedayData() {
             const now = new Date();
