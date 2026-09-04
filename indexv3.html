@@ -2653,7 +2653,6 @@
 		    const currentMonth = now.getMonth() + 1;
 		    const currentDay = now.getDate();
 		
-		    // Zajtrajší dátum
 		    const tomorrow = new Date(now);
 		    tomorrow.setDate(now.getDate() + 1);
 		    const tomorrowMonth = tomorrow.getMonth() + 1;
@@ -2700,7 +2699,6 @@
 		
 		        if (sep) sep.style.display = "inline";
 		
-		        // Formátovanie dnešných mien + určenie farby
 		        let dominantnaFarba = "#ff9f0a";
 		        let naformatovaneDnes = dnesneMenaArray.map(meno => {
 		            if (typeof RODINA !== 'undefined' && RODINA.includes(meno)) { dominantnaFarba = "#ff3b30"; return `❤️ ${meno}`; }
@@ -2710,7 +2708,6 @@
 		            return meno;
 		        });
 		
-		        // Formátovanie zajtrajších mien
 		        let naformatovaneZajtra = zajtrajsieMenaArray.map(meno => {
 		            if (typeof RODINA !== 'undefined' && RODINA.includes(meno)) return `❤️ ${meno}`;
 		            if (typeof MOJE_MENA !== 'undefined' && MOJE_MENA.includes(meno)) return `⭐ ${meno}`;
@@ -2719,7 +2716,6 @@
 		            return meno;
 		        });
 		
-		        // Zobrazenie "zajtra" len v režime na šírku (landscape)
 		        let vyslednyText = naformatovaneDnes.join(', ');
 		        const isLandscape = window.matchMedia("(orientation: landscape)").matches;
 		
@@ -2741,25 +2737,21 @@
 		        if (sep) sep.style.display = "none";
 		    }
 		}
-
-        document.addEventListener('DOMContentLoaded', () => {
-		    const sep = document.getElementById('dateSeparator');
-		    if(sep) sep.style.display = "none";
 		
-		    // Pri načítaní stránky preveríme a stiahneme meniny
+		document.addEventListener('DOMContentLoaded', () => {
+		    const sep = document.getElementById('dateSeparator');
+		    if (sep) sep.style.display = "none";
+		
 		    skontrolujAObnovMeniny();
 		    
-		    // Kontrola pri každom kliknutí/dotyku kdekoľvek na stránke
 		    document.addEventListener('click', skontrolujAObnovMeniny);
 		    
-		    // Kontrola pri prebudení obrazovky / návrate na kartu
 		    document.addEventListener('visibilitychange', () => {
 		        if (document.visibilityState === 'visible') {
 		            skontrolujAObnovMeniny();
 		        }
 		    });
 		
-		    // ➕ DOPLNENÉ: Okamžitá obnova pri preklopení obrazovky (na výšku / na šírku)
 		    window.addEventListener('resize', () => {
 		        fetchNamedayData();
 		    });
