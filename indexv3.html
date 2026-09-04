@@ -2653,6 +2653,7 @@
 		    const currentMonth = now.getMonth() + 1;
 		    const currentDay = now.getDate();
 		
+		    // Zajtrajší dátum
 		    const tomorrow = new Date(now);
 		    tomorrow.setDate(now.getDate() + 1);
 		    const tomorrowMonth = tomorrow.getMonth() + 1;
@@ -2661,13 +2662,14 @@
 		    try {
 		        const response = await fetch('meniny.csv');
 		        if (!response.ok) throw new Error("Súbor meniny.csv sa nenašiel");
-		        
+		
 		        const text = await response.text();
 		        const lines = text.split('\n');
 		
 		        let dnesneMenaArray = [];
 		        let zajtrajsieMenaArray = [];
 		
+		        // 1. Prejdeme všetky riadky v CSV a nájdeme dnešok aj zajtrajšok
 		        for (let line of lines) {
 		            if (!line.trim()) continue;
 		
@@ -2691,6 +2693,7 @@
 		        const bigNameday = document.getElementById('bigNameday');
 		        const sep = document.getElementById('dateSeparator');
 		
+		        // Ak sa nenašli žiadne dnešné mená, skryjeme oddeľovač a skončíme
 		        if (dnesneMenaArray.length === 0) {
 		            if (bigNameday) bigNameday.textContent = "";
 		            if (sep) sep.style.display = "none";
@@ -2699,6 +2702,7 @@
 		
 		        if (sep) sep.style.display = "inline";
 		
+		        // 2. Formátovanie dnešných mien + určenie farby
 		        let dominantnaFarba = "#ff9f0a";
 		        let naformatovaneDnes = dnesneMenaArray.map(meno => {
 		            if (typeof RODINA !== 'undefined' && RODINA.includes(meno)) { dominantnaFarba = "#ff3b30"; return `❤️ ${meno}`; }
@@ -2708,6 +2712,7 @@
 		            return meno;
 		        });
 		
+		        // 3. Formátovanie zajtrajších mien
 		        let naformatovaneZajtra = zajtrajsieMenaArray.map(meno => {
 		            if (typeof RODINA !== 'undefined' && RODINA.includes(meno)) return `❤️ ${meno}`;
 		            if (typeof MOJE_MENA !== 'undefined' && MOJE_MENA.includes(meno)) return `⭐ ${meno}`;
@@ -2716,6 +2721,7 @@
 		            return meno;
 		        });
 		
+		        // 4. Skladanie textu podla orientácie displeja
 		        let vyslednyText = naformatovaneDnes.join(', ');
 		        const isLandscape = window.matchMedia("(orientation: landscape)").matches;
 		
