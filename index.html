@@ -2,12 +2,14 @@
 <html lang="sk">
 <head>
     <script>
-      // Zistenie zvolenej verzie pred vykreslením stránky
-      var savedVer = localStorage.getItem('dashboard_version');
+      // Načítanie nastavenej verzie v index.html
+      var savedVer = localStorage.getItem('dashboard_version') || 'v1';
       if (savedVer === 'v3') {
-        window.location.replace('indexv3.html');
+          window.location.replace('indexv3.html');
       } else if (savedVer === 'v2') {
-        window.location.replace('indexv2.html');
+          window.location.replace('indexv2.html');
+      } else {
+          window.location.replace('indexv1.html');
       }
     </script>
     <meta charset="UTF-8">
@@ -403,9 +405,9 @@
     
     <div class="clock-section">
         <!-- Tlačidlo prechod na V2 -->
-		<button id="v2-btn" class="v2-banner-btn ss-hide" onclick="switchToV2()">
+		<button id="v2-btn" class="v2-banner-btn ss-hide" onclick="switchToV1()">
 		    <i class="fa-solid fa-rocket rocket-icon"></i>
-    		    <span class="v2-text">V2 dostupná</span>
+		    <span class="v2-text">V1 dostupná</span>
 		</button>
         <div class="ss-left-col ss-only">
             <div id="ss-weather-trigger" style="cursor: pointer; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
@@ -606,27 +608,23 @@
         let cfgSnoozeMin = parseInt(localStorage.getItem('cfg_snooze_min') || "1");
         let cfgFarbaNoci = localStorage.getItem('cfg_night_color') || "#ffff00";
 
-        // Verzia buildu V2 (pri vydaní veľkých zmien zmeňte napr. na '2.1' a banner sa znova zvýrazní)
-		const CURRENT_V2_BUILD = '2.0';
-		
-		function switchToV2() {
-		    // Zapamätáme si, že používateľ túto verziu otvoril/videl
-		    localStorage.setItem('v2_seen_build', CURRENT_V2_BUILD);
-		    localStorage.setItem('dashboard_version', 'v2');
-		    window.location.replace('indexv2.html');
+       const CURRENT_V1_BUILD = '1.0';
+
+		function switchToV1() {
+		    localStorage.setItem('v1_seen_build', CURRENT_V1_BUILD);
+		    localStorage.setItem('dashboard_version', 'v1');
+		    window.location.replace('indexv1.html');
 		}
 		
-		function skontrolujV2Tlacidlo() {
+		function skontrolujV1Tlacidlo() {
 		    const btn = document.getElementById('v2-btn');
 		    if (!btn) return;
 		
-		    const lastSeenBuild = localStorage.getItem('v2_seen_build');
-		
-		    // Ak používateľ túto verziu už videl/otvoril, prepneme tlačidlo na sivý kruh
-		    if (lastSeenBuild === CURRENT_V2_BUILD) {
+		    const lastSeenBuild = localStorage.getItem('v1_seen_build');
+		    if (lastSeenBuild === CURRENT_V1_BUILD) {
 		        btn.classList.add('is-seen');
 		    }
-		}
+		}	
 
         function inicializujPlochuNastaveni() {
             if(document.getElementById('set-night-from')) document.getElementById('set-night-from').textContent = cfgNocOd;
