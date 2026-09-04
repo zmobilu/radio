@@ -1498,6 +1498,11 @@
                         <i class="fa-solid fa-circle-info label-icon" title="Sprievodca"></i>
                         <button onclick="spustiTourZnova(); event.stopPropagation();" style="width: 100%;">▶ Spustiť sprievodcu (Tour)</button>
                     </div>
+					<!-- Tlačidlá prepínania verzií v Nastaveniach -->
+					<div class="settings-night-row">
+					    <i class="fa-solid fa-house label-icon" title="Základ"></i>
+					    <button onclick="prejdiNaZaklad(); event.stopPropagation();" style="width: 100%;">Základ (Main)</button>
+					</div>
                     <!-- Tlačidlo Návrat na Verziu 1 -->
                     <div class="settings-night-row">
                         <i class="fa-solid fa-circle-arrow-left label-icon" title="Verzia 1"></i>
@@ -1602,20 +1607,20 @@
             82: 'Silné prehánky', 95: 'Búrka', 96: 'Búrka s krupobitím'
         };
 	
-        function prejdiNaVerziu1() {
-            // Zmeníme nastavenú verziu v pamäti na v1
-            localStorage.setItem('dashboard_version', 'v1');
-            
-            // Presmerujeme na index.html
-            window.location.href = 'index.html';
-        }
+        function prejdiNaZaklad() {
+		    localStorage.removeItem('dashboard_version'); // Resetne predvolenú hodnotu
+		    window.location.replace('index.html');
+		}
+		
+		function prejdiNaVerziu1() {
+		    localStorage.setItem('dashboard_version', 'v1');
+		    window.location.replace('indexv1.html');
+		}
+		
 		function prejdiNaVerziu2() {
-            // Zmeníme nastavenú verziu v pamäti na v2
-            localStorage.setItem('dashboard_version', 'v2');
-            
-            // Presmerujeme na indexv2.html
-            window.location.href = 'indexv2.html';
-        }
+		    localStorage.setItem('dashboard_version', 'v2');
+		    window.location.replace('indexv2.html');
+		}
 
         function getWeatherText(wCode) { return WEATHER_TEXTS_SK[wCode] || 'Premenlivé'; }
 
