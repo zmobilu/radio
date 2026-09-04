@@ -2650,11 +2650,10 @@
 		    const now = new Date();
 		    poslednyNacitanyDen = now.getDate();
 		    
-		    // Dnešný dátum
 		    const currentMonth = now.getMonth() + 1;
 		    const currentDay = now.getDate();
 		
-		    // Zajtrajší dátum (správne ošetrí aj prechod na nový mesiac/rok)
+		    // Zajtrajší dátum
 		    const tomorrow = new Date(now);
 		    tomorrow.setDate(now.getDate() + 1);
 		    const tomorrowMonth = tomorrow.getMonth() + 1;
@@ -2662,6 +2661,8 @@
 		
 		    try {
 		        const response = await fetch('meniny.csv');
+		        if (!response.ok) throw new Error("Súbor meniny.csv sa nenašiel");
+		        
 		        const text = await response.text();
 		        const lines = text.split('\n');
 		
@@ -2677,71 +2678,62 @@
 		            const month = parseInt(parts[0].trim(), 10);
 		            const day = parseInt(parts[1].trim(), 10);
 		
-		            // Vyhľadanie dnešných mien
 		            if (month === currentMonth && day === currentDay) {
 		                let rawNames = parts.slice(2).join(',').replace(/"/g, '').trim();
 		                dnesneMenaArray = rawNames.split(',').map(m => m.trim()).filter(m => m !== "");
 		            }
 		
-		            // Vyhľadanie zajtrajších mien
 		            if (month === tomorrowMonth && day === tomorrowDay) {
 		                let rawNames = parts.slice(2).join(',').replace(/"/g, '').trim();
 		                zajtrajsieMenaArray = rawNames.split(',').map(m => m.trim()).filter(m => m !== "");
 		            }
 		        }
 		
-		        if (dnesneMenaArray.length === 0) return;
-		
 		        const bigNameday = document.getElementById('bigNameday');
 		        const sep = document.getElementById('dateSeparator');
-		        
+		
+		        if (dnesneMenaArray.length === 0) {
+		            if (bigNameday) bigNameday.textContent = "";
+		            if (sep) sep.style.display = "none";
+		            return;
+		        }
+		
 		        if (sep) sep.style.display = "inline";
 		
-		        // Formátovanie dnešných mien + určenie dominantnej farby
+		        // Formátovanie dnešných mien + určenie farby
 		        let dominantnaFarba = "#ff9f0a";
 		        let naformatovaneDnes = dnesneMenaArray.map(meno => {
-		            if (RODINA.includes(meno)) {
-		                dominantnaFarba = "#ff3b30";
-		                return `❤️ ${meno}`;
-		            } else if (MOJE_MENA.includes(meno)) {
-		                dominantnaFarba = "#ff9f0a";
-		                return `⭐ ${meno}`;
-		            } else if (SPOLUZIACI.includes(meno)) {
-		                dominantnaFarba = "#5ac8fa";
-		                return `🎓 ${meno}`;
-		            } else if (KOLEGOVIA.includes(meno)) {
-		                dominantnaFarba = "#34c759";
-		                return `💼 ${meno}`;
-		            }
+		            if (typeof RODINA !== 'undefined' && RODINA.includes(meno)) { dominantnaFarba = "#ff3b30"; return `❤️ ${meno}`; }
+		            if (typeof MOJE_MENA !== 'undefined' && MOJE_MENA.includes(meno)) { dominantnaFarba = "#ff9f0a"; return `⭐ ${meno}`; }
+		            if (typeof SPOLUZIACI !== 'undefined' && SPOLUZIACI.includes(meno)) { dominantnaFarba = "#5ac8fa"; return `🎓 ${meno}`; }
+		            if (typeof KOLEGOVIA !== 'undefined' && KOLEGOVIA.includes(meno)) { dominantnaFarba = "#34c759"; return `💼 ${meno}`; }
 		            return meno;
 		        });
 		
-		        // Formátovanie zajtrajších mien (s ikonkami, ak sú v zoznamoch)
+		        // Formátovanie zajtrajších mien
 		        let naformatovaneZajtra = zajtrajsieMenaArray.map(meno => {
-		            if (RODINA.includes(meno)) return `❤️ ${meno}`;
-		            if (MOJE_MENA.includes(meno)) return `⭐ ${meno}`;
-		            if (SPOLUZIACI.includes(meno)) return `🎓 ${meno}`;
-		            if (KOLEGOVIA.includes(meno)) return `💼 ${meno}`;
+		            if (typeof RODINA !== 'undefined' && RODINA.includes(meno)) return `❤️ ${meno}`;
+		            if (typeof MOJE_MENA !== 'undefined' && MOJE_MENA.includes(meno)) return `⭐ ${meno}`;
+		            if (typeof SPOLUZIACI !== 'undefined' && SPOLUZIACI.includes(meno)) return `🎓 ${meno}`;
+		            if (typeof KOLEGOVIA !== 'undefined' && KOLEGOVIA.includes(meno)) return `💼 ${meno}`;
 		            return meno;
 		        });
 		
-		        // Zostavenie výsledného reťazca
+		        // Zobrazenie "zajtra" len v režime na šírku (landscape)
+		        let vyslednyText = naformatovaneDnes.join(', ');
 		        const isLandscape = window.matchMedia("(orientation: landscape)").matches;
-
-				if (naformatovaneZajtra.length > 0) {
-					if (isLandscape) {
-						vyslednyText += ` | zajtra: ${naformatovaneZajtra.join(', ')}`;
-					} else {
-						vyslednyText += ` (zajtra: ${naformatovaneZajtra.join(', ')})`;
-					}
-				}
+		
+		        if (isLandscape && naformatovaneZajtra.length > 0) {
+		            vyslednyText += ` | zajtra: ${naformatovaneZajtra.join(', ')}`;
+		        }
 		
 		        dnesneMeno = vyslednyText;
-		        bigNameday.style.color = dominantnaFarba;
-		        bigNameday.textContent = dnesneMeno;
-		
-		        bigNameday.style.cursor = 'default';
-		        bigNameday.onclick = null;
+		        if (bigNameday) {
+		            bigNameday.style.color = dominantnaFarba;
+		            bigNameday.textContent = dnesneMeno;
+		            bigNameday.style.cursor = 'default';
+		            bigNameday.onclick = null;
+		        }
 		
 		    } catch (e) {
 		        console.log("Chyba pri načítaní menín z lokálneho súboru meniny.csv:", e);
@@ -2751,21 +2743,27 @@
 		}
 
         document.addEventListener('DOMContentLoaded', () => {
-            const sep = document.getElementById('dateSeparator');
-            if(sep) sep.style.display = "none";
-
-            // Pri načítaní stránky preveríme a stiahneme meniny
-            skontrolujAObnovMeniny();
-            
-            // Kontrola pri každom kliknutí/dotyku kdekoľvek na stránke
-            document.addEventListener('click', skontrolujAObnovMeniny);
-            
-            // Kontrola pri prebudení obrazovky / návrate na kartu
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible') {
-                    skontrolujAObnovMeniny();
-                }
-            });
+		    const sep = document.getElementById('dateSeparator');
+		    if(sep) sep.style.display = "none";
+		
+		    // Pri načítaní stránky preveríme a stiahneme meniny
+		    skontrolujAObnovMeniny();
+		    
+		    // Kontrola pri každom kliknutí/dotyku kdekoľvek na stránke
+		    document.addEventListener('click', skontrolujAObnovMeniny);
+		    
+		    // Kontrola pri prebudení obrazovky / návrate na kartu
+		    document.addEventListener('visibilitychange', () => {
+		        if (document.visibilityState === 'visible') {
+		            skontrolujAObnovMeniny();
+		        }
+		    });
+		
+		    // ➕ DOPLNENÉ: Okamžitá obnova pri preklopení obrazovky (na výšku / na šírku)
+		    window.addEventListener('resize', () => {
+		        fetchNamedayData();
+		    });
+		});
             
             // --- CENTRÁLNY AUDIO EVENT MANAŽMENT PRE STOP/PAUSE S ČASOVAČOM ---
             audio.addEventListener('play', () => {
