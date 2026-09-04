@@ -1196,14 +1196,19 @@
                     
                     <!-- Tlačidlo Návrat na Verziu 1 -->
                     <div class="settings-night-row">
-                        <i class="fa-solid fa-circle-arrow-left label-icon" title="Verzia 1"></i>
-                        <button onclick="prejdiNaVerziu1(); event.stopPropagation();" style="width: 100%;">Návrat na verziu 1</button>
-                    </div>
-					<!-- Tlačidlo Návrat na Verziu 3 -->
-                    <div class="settings-night-row">
-                        <i class="fa-solid fa-circle-arrow-left label-icon" title="Verzia 3"></i>
-                        <button onclick="prejdiNaVerziu3(); event.stopPropagation();" style="width: 100%;">Prechod na verziu 3</button>
-                    </div>
+					    <i class="fa-solid fa-house label-icon" title="Základ"></i>
+					    <button onclick="prejdiNaZaklad(); event.stopPropagation();" style="width: 100%;">Základ (Main)</button>
+					</div>
+					
+					<div class="settings-night-row">
+					    <i class="fa-solid fa-circle-arrow-right label-icon" title="Verzia 1"></i>
+					    <button onclick="prejdiNaVerziu1(); event.stopPropagation();" style="width: 100%;">Kiosk v1</button>
+					</div>
+				
+					<div class="settings-night-row">
+					    <i class="fa-solid fa-circle-arrow-right label-icon" title="Verzia 3"></i>
+					    <button onclick="prejdiNaVerziu3(); event.stopPropagation();" style="width: 100%;">Kiosk v3</button>
+					</div>
                 </div>
             </div>
          </main>
@@ -1294,22 +1299,20 @@
             82: 'Silné prehánky', 95: 'Búrka', 96: 'Búrka s krupobitím'
         };
 	
-        function prejdiNaVerziu1() {
-            // Zmeníme nastavenú verziu v pamäti na v1
-            localStorage.setItem('dashboard_version', 'v1');
-            
-            // Presmerujeme na index.html
-            window.location.href = 'index.html';
-        }
+        function prejdiNaZaklad() {
+		    localStorage.removeItem('dashboard_version'); // Resetne predvolenú hodnotu
+		    window.location.replace('index.html');
+		}
+		
+		function prejdiNaVerziu1() {
+		    localStorage.setItem('dashboard_version', 'v1');
+		    window.location.replace('indexv1.html');
+		}
 	
 		function prejdiNaVerziu3() {
-		    // Zmeníme nastavenú verziu v pamäti na v3
 		    localStorage.setItem('dashboard_version', 'v3');
-		            
-		    // Presmerujeme na indexv3.html
-		    window.location.href = 'indexv3.html';
-	    }
-
+		    window.location.replace('indexv3.html');
+		}
         function getWeatherText(wCode) { return WEATHER_TEXTS_SK[wCode] || 'Premenlivé'; }
 
         document.addEventListener('click', function enableNoSleep() {
