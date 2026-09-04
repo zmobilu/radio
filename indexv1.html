@@ -588,7 +588,21 @@
                 </div>
             </div>
         </div>
-
+	<!-- Tlačidlá pre prechod medzi verziami na konci nastavení -->
+		<div class="settings-night-row">
+		    <i class="fa-solid fa-house label-icon" title="Základ"></i>
+		    <button onclick="prejdiNaZaklad(); event.stopPropagation();" style="width: 100%;">Základ (Main)</button>
+		</div>
+		
+		<div class="settings-night-row">
+		    <i class="fa-solid fa-circle-arrow-right label-icon" title="Verzia 2"></i>
+		    <button onclick="prejdiNaVerziu2(); event.stopPropagation();" style="width: 100%;">Kiosk v2</button>
+		</div>
+		
+		<div class="settings-night-row">
+		    <i class="fa-solid fa-circle-arrow-right label-icon" title="Verzia 3"></i>
+		    <button onclick="prejdiNaVerziu3(); event.stopPropagation();" style="width: 100%;">Kiosk v3</button>
+		</div>
     </div>
             
     <script>
@@ -671,7 +685,21 @@
 	        currentPlayingType = "settings";
 	    }
 	    aktualizujTitulokStranky();
-	}
+		}
+		function prejdiNaZaklad() {
+		    localStorage.removeItem('dashboard_version'); // Resetne predvolenú hodnotu
+		    window.location.replace('index.html');
+		}
+		
+		function prejdiNaVerziu2() {
+		    localStorage.setItem('dashboard_version', 'v2');
+		    window.location.replace('indexv2.html');
+		}
+		
+		function prejdiNaVerziu3() {
+		    localStorage.setItem('dashboard_version', 'v3');
+		    window.location.replace('indexv3.html');
+		}
 	        
 	function zmenNastavenieCasu(typ) {
 	    let povodny = (typ === 'od') ? cfgNocOd : cfgNocDo;
