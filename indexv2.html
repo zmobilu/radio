@@ -92,7 +92,7 @@
         /* Ľavá sekcia: 6 obľúbených položiek (35%) */
         .favorites-sidebar {
             width: 30%; background: #050505; border-right: 1px solid #111;
-            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr);
+            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, 1fr);
             gap: 6px; padding: 6px; box-sizing: border-box;
             padding-left: calc(6px + env(safe-area-inset-left));
         }
@@ -1254,7 +1254,7 @@
     </button>
     
     <script>
-        let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v2')) || ["slovensko", "funchill", "rock", "blanik", "fun", "spotify"];
+        let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v2')) || ["slovensko", "funchill", "rock", "blanik", "fun", "jazz", null, null];
         
         const audio = document.getElementById('audioPlayer');
         let currentPlayingType = "";
@@ -1799,7 +1799,7 @@
             if(!container) return;
             container.innerHTML = "";
 
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 8; i++) {
                 const id = slotFavorites[i];
                 const item = DATABASE.find(d => d.id === id);
                 const card = document.createElement('div');
@@ -1867,18 +1867,33 @@
         }
 
         function handleChannelSelectionToggle(id) {
-            const existingIndex = slotFavorites.indexOf(id);
-            if (existingIndex !== -1) {
-                slotFavorites[existingIndex] = null;
-            } else {
-                const freeSlotIndex = slotFavorites.indexOf(null);
-                if (freeSlotIndex !== -1) {
-                    slotFavorites[freeSlotIndex] = id;
-                } else {
-                    alert("Všetkých 6 pozícií je plných. Najprv kliknutím uvoľnite niektoré miesto.");
-                    return;
-                }
-            }
+		    const existingIndex = slotFavorites.indexOf(id);
+		    
+		    // 1. Ak už rádio v obľúbených je, kliknutím ho odstránime (nahradíme null)
+		    if (existingIndex !== -1) {
+		        slotFavorites[existingIndex] = null;
+		    } else {
+		        // 2. Hľadáme index prvého voľného miesta (kde je null, undefined alebo "")
+		        let freeSlotIndex = slotFavorites.findIndex(slot => !slot);
+		        
+		        // Ak je pole kratšie ako 8, môžeme pridať nový slot
+		        if (freeSlotIndex === -1 && slotFavorites.length < 8) {
+		            freeSlotIndex = slotFavorites.length;
+		        }
+		
+		        if (freeSlotIndex !== -1 && freeSlotIndex < 8) {
+		            slotFavorites[freeSlotIndex] = id;
+		        } else {
+		            alert("Všetkých 8 pozícií je plných. Najprv kliknutím uvoľnite niektoré miesto.");
+		            return;
+		        }
+		    }
+		    
+		    // Garantujeme, že pole má vždy presne 8 položiek
+		    while (slotFavorites.length < 8) {
+		        slotFavorites.push(null);
+		    }
+			
             localStorage.setItem('kiosk_slots_v2', JSON.stringify(slotFavorites));
             renderSidebarFavorites();
             renderSettingsGrid();
@@ -2023,8 +2038,8 @@
             let novyIndex = currentIndex;
             let najdeneRadio = null;
 
-            for (let i = 0; i < 6; i++) {
-                novyIndex = (smer === 'vpred') ? (novyIndex + 1) % 6 : (novyIndex - 1 + 6) % 6;
+            for (let i = 0; i < 8; i++) {
+                novyIndex = (smer === 'vpred') ? (novyIndex + 1) % 8 : (novyIndex - 1 + 8) % 8;
                 const idKandidata = slotFavorites[novyIndex];
                 if (!idKandidata) continue;
 
