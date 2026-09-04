@@ -2634,17 +2634,18 @@
             document.title = `${aktualnaTeplotaText} | ${stavRadia}`;
         }
 
-        // Globálna premenná, kde si uložíme kompletný zoznam mien pre daný deň
+        // Globálne premenné pre meniny
         let dnesneVsetkyMena = [];
         let poslednyNacitanyDen = -1;
+        let dnesneMeno = ""; // Deklarovaná globálna premenná
 
         async function skontrolujAObnovMeniny() {
-		    const teraz = new Date();
-		    if (poslednyNacitanyDen !== teraz.getDate()) {
-		        await fetchNamedayData();         // Tvoja pôvodná funkcia načítajúca dnešok
-		        await fetchTomorrowNamedayData(); // Nová samostatná funkcia pre zajtrajšok
-		    }
-		}
+            const teraz = new Date();
+            if (poslednyNacitanyDen !== teraz.getDate()) {
+                await fetchNamedayData();
+            }
+        }
+
         async function fetchNamedayData() {
             const now = new Date();
             poslednyNacitanyDen = now.getDate();
@@ -2654,6 +2655,7 @@
             try {
                 // Načítanie zo spoločného lokálneho súboru meniny.csv
                 const response = await fetch('meniny.csv');
+                if (!response.ok) return;
                 const text = await response.text();
                 
                 const lines = text.split('\n');
@@ -2687,16 +2689,16 @@
                         let naformatovaneMena = [];
 
                         dnesneVsetkyMena.forEach(meno => {
-                            if (RODINA.includes(meno)) {
+                            if (typeof RODINA !== 'undefined' && RODINA.includes(meno)) {
                                 naformatovaneMena.push(`❤️ ${meno}`);
                                 dominantnaFarba = "#ff3b30";
-                            } else if (MOJE_MENA.includes(meno)) {
+                            } else if (typeof MOJE_MENA !== 'undefined' && MOJE_MENA.includes(meno)) {
                                 naformatovaneMena.push(`⭐ ${meno}`);
                                 dominantnaFarba = "#ff9f0a";
-                            } else if (SPOLUZIACI.includes(meno)) {
+                            } else if (typeof SPOLUZIACI !== 'undefined' && SPOLUZIACI.includes(meno)) {
                                 naformatovaneMena.push(`🎓 ${meno}`);
                                 dominantnaFarba = "#5ac8fa";
-                            } else if (KOLEGOVIA.includes(meno)) {
+                            } else if (typeof KOLEGOVIA !== 'undefined' && KOLEGOVIA.includes(meno)) {
                                 naformatovaneMena.push(`💼 ${meno}`);
                                 dominantnaFarba = "#34c759";
                             } else {
@@ -2707,12 +2709,15 @@
                         // Všetky mená spojené do jedného riadku
                         dnesneMeno = naformatovaneMena.join(', ');
                         
-                        bigNameday.style.color = dominantnaFarba;
-                        bigNameday.textContent = dnesneMeno;
+                        if (bigNameday) {
+                            bigNameday.style.color = dominantnaFarba;
+                            bigNameday.textContent = dnesneMeno;
+                            bigNameday.style.cursor = 'default';
+                            bigNameday.onclick = null;
+                        }
 
-                        // Odstránenie kurzora ruky a klikacej udalosti (bez vyskakovacieho okna)
-                        bigNameday.style.cursor = 'default';
-                        bigNameday.onclick = null;
+                        // Po úspešnom načítaní dneška bezpečne doplníme zajtrajšok
+                        fetchTomorrowNamedayData();
 
                         break;
                     }
@@ -2723,81 +2728,82 @@
                 if (sep) sep.style.display = "none";
             }
         }
-		
-		async function fetchTomorrowNamedayData() {
-		    // Spustíme len v režime na šírku
-		    if (!window.matchMedia("(orientation: landscape)").matches) return;
-		
-		    const now = new Date();
-		    const tomorrow = new Date(now);
-		    tomorrow.setDate(now.getDate() + 1);
-		    
-		    const tomorrowMonth = tomorrow.getMonth() + 1;
-		    const tomorrowDay = tomorrow.getDate();
-		
-		    try {
-		        const response = await fetch('meniny.csv');
-		        const text = await response.text();
-		        const lines = text.split('\n');
-		
-		        for (let line of lines) {
-		            if (!line.trim()) continue;
-		            const parts = line.split(',');
-		            if (parts.length < 3) continue;
-		
-		            const month = parseInt(parts[0].trim(), 10);
-		            const day = parseInt(parts[1].trim(), 10);
-		
-		            if (month === tomorrowMonth && day === tomorrowDay) {
-		                let rawNames = parts.slice(2).join(',').replace(/"/g, '').trim();
-		                let zajtrajsieMena = rawNames.split(',').map(m => m.trim()).filter(m => m !== "");
-		
-		                if (zajtrajsieMena.length === 0) return;
-		
-		                // Formátovanie mien (pridanie ikoniek, ak sú v zoznamoch)
-		                let naformatovane = zajtrajsieMena.map(meno => {
-		                    if (typeof RODINA !== 'undefined' && RODINA.includes(meno)) return `❤️ ${meno}`;
-		                    if (typeof MOJE_MENA !== 'undefined' && MOJE_MENA.includes(meno)) return `⭐ ${meno}`;
-		                    if (typeof SPOLUZIACI !== 'undefined' && SPOLUZIACI.includes(meno)) return `🎓 ${meno}`;
-		                    if (typeof KOLEGOVIA !== 'undefined' && KOLEGOVIA.includes(meno)) return `💼 ${meno}`;
-		                    return meno;
-		                });
-		
-		                const bigNameday = document.getElementById('bigNameday');
-		                if (bigNameday && bigNameday.textContent) {
-		                    bigNameday.textContent += ` | zajtra: ${naformatovane.join(', ')}`;
-		                }
-		                break;
-		            }
-		        }
-		    } catch (e) {
-		        console.log("Chyba pri načítaní zajtrajších menín:", e);
-		    }
-		}
+        
+        async function fetchTomorrowNamedayData() {
+            // Spustíme len v režime na šírku
+            if (!window.matchMedia("(orientation: landscape)").matches) return;
+        
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(now.getDate() + 1);
+            
+            const tomorrowMonth = tomorrow.getMonth() + 1;
+            const tomorrowDay = tomorrow.getDate();
+        
+            try {
+                const response = await fetch('meniny.csv');
+                if (!response.ok) return;
+                const text = await response.text();
+                const lines = text.split('\n');
+        
+                for (let line of lines) {
+                    if (!line.trim()) continue;
+                    const parts = line.split(',');
+                    if (parts.length < 3) continue;
+        
+                    const month = parseInt(parts[0].trim(), 10);
+                    const day = parseInt(parts[1].trim(), 10);
+        
+                    if (month === tomorrowMonth && day === tomorrowDay) {
+                        let rawNames = parts.slice(2).join(',').replace(/"/g, '').trim();
+                        let zajtrajsieMena = rawNames.split(',').map(m => m.trim()).filter(m => m !== "");
+        
+                        if (zajtrajsieMena.length === 0) return;
+        
+                        // Formátovanie mien (pridanie ikoniek, ak sú v zoznamoch)
+                        let naformatovane = zajtrajsieMena.map(meno => {
+                            if (typeof RODINA !== 'undefined' && RODINA.includes(meno)) return `❤️ ${meno}`;
+                            if (typeof MOJE_MENA !== 'undefined' && MOJE_MENA.includes(meno)) return `⭐ ${meno}`;
+                            if (typeof SPOLUZIACI !== 'undefined' && SPOLUZIACI.includes(meno)) return `🎓 ${meno}`;
+                            if (typeof KOLEGOVIA !== 'undefined' && KOLEGOVIA.includes(meno)) return `💼 ${meno}`;
+                            return meno;
+                        });
+        
+                        const bigNameday = document.getElementById('bigNameday');
+                        if (bigNameday && dnesneMeno !== "") {
+                            bigNameday.textContent = `${dnesneMeno} | zajtra: ${naformatovane.join(', ')}`;
+                        }
+                        break;
+                    }
+                }
+            } catch (e) {
+                console.log("Chyba pri načítaní zajtrajších menín:", e);
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
-		    const sep = document.getElementById('dateSeparator');
-		    if(sep) sep.style.display = "none";
-		
-		    // Pri načítaní stránky preveríme a stiahneme meniny
-		    skontrolujAObnovMeniny();
-		    
-		    // Kontrola pri každom kliknutí/dotyku kdekoľvek na stránke
-		    document.addEventListener('click', skontrolujAObnovMeniny);
-		    
-		    // Kontrola pri prebudení obrazovky / návrate na kartu
-		    document.addEventListener('visibilitychange', () => {
-		        if (document.visibilityState === 'visible') {
-		            skontrolujAObnovMeniny();
-		        }
-		    });
-		
-		    // Pridané: obnova menín pri preklopení displeja alebo zmene veľkosti okna
-		    window.addEventListener('resize', () => {
-		        poslednyNacitanyDen = null; // Vynulovanie zabezpečí prevolanie funkcií
-		        skontrolujAObnovMeniny();
-		    });
-		});
+            const sep = document.getElementById('dateSeparator');
+            if (sep) sep.style.display = "none";
+        
+            // Pri načítaní stránky preveríme a stiahneme meniny
+            skontrolujAObnovMeniny();
+            
+            // Kontrola pri každom kliknutí/dotyku kdekoľvek na stránke
+            document.addEventListener('click', skontrolujAObnovMeniny);
+            
+            // Kontrola pri prebudení obrazovky / návrate na kartu
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    skontrolujAObnovMeniny();
+                }
+            });
+        
+            // Obnova menín pri preklopení displeja alebo zmene veľkosti okna
+            window.addEventListener('resize', () => {
+                poslednyNacitanyDen = -1;
+                skontrolujAObnovMeniny();
+            });
+        });
             
             // --- CENTRÁLNY AUDIO EVENT MANAŽMENT PRE STOP/PAUSE S ČASOVAČOM ---
             audio.addEventListener('play', () => {
