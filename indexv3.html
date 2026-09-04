@@ -2637,7 +2637,7 @@
         // Globálne premenné pre meniny
 			let dnesneVsetkyMena = [];
 			let poslednyNacitanyDen = -1;
-			let dnesneMeno = ""; 
+			dnesneMeno = ""; 
 			
 			function skontrolujAObnovMeniny() {
 			    const teraz = new Date();
@@ -2649,11 +2649,10 @@
 			async function fetchNamedayData() {
 			    const now = new Date();
 			    const currentDay = now.getDate();
-			    poslednyNacitanyDen = currentDay; // Okamžité označenie načítaného dňa
+			    poslednyNacitanyDen = currentDay;
 			
 			    const currentMonth = now.getMonth() + 1;
 			    
-			    // Výpočet pre zajtrajšok
 			    const tomorrow = new Date(now);
 			    tomorrow.setDate(now.getDate() + 1);
 			    const tomorrowMonth = tomorrow.getMonth() + 1;
@@ -2676,7 +2675,6 @@
 			            const month = parseInt(parts[0].trim(), 10);
 			            const day = parseInt(parts[1].trim(), 10);
 			
-			            // DNEŠNÉ MENINY
 			            if (month === currentMonth && day === currentDay) {
 			                let rawNames = parts.slice(2).join(',').replace(/"/g, '').trim();
 			                dnesneVsetkyMena = rawNames.split(',').map(m => m.trim()).filter(m => m !== "");
@@ -2699,7 +2697,6 @@
 			                }
 			            }
 			
-			            // ZAJTRAJŠIE MENINY (len v Landscape)
 			            if (window.matchMedia("(orientation: landscape)").matches && month === tomorrowMonth && day === tomorrowDay) {
 			                let rawNames = parts.slice(2).join(',').replace(/"/g, '').trim();
 			                let zajtraMena = rawNames.split(',').map(m => m.trim()).filter(m => m !== "");
@@ -2714,7 +2711,6 @@
 			            }
 			        }
 			
-			        // Zobrazenie výsledku bez duplicitného volania
 			        const bigNameday = document.getElementById('bigNameday');
 			        const sep = document.getElementById('dateSeparator');
 			
