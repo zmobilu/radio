@@ -2436,25 +2436,27 @@
 		
 			// Bežné zapínanie/vypínanie rádia
 			if (item.url) {
-				if (currentPlayingType === item.id) {
-					audio.pause(); 
-					document.getElementById("player-now-playing").innerText = "";
-					renderSidebarFavorites(); 
-				} else {
-					playRadio(item.url, item.id);
-				}
+			    if (currentPlayingType === item.id) {
+			        manualnePozastavene = true; // <--- Pridané
+			        audio.pause(); 
+			        document.getElementById("player-now-playing").innerText = "";
+			        renderSidebarFavorites(); 
+			    } else {
+			        manualnePozastavene = false; // <--- Pridané (pri spustení nového rádia)
+			        playRadio(item.url, item.id);
+			    }
 			}
-		}
 
         function toggleNightPlayPause() {
-            if (!currentPlayingType || currentPlayingType === "") return;
-            if (audio.paused) {
-                audio.play().catch(e => console.log("Chyba nočného prebudenia prúdu:", e));
-            } else {
-                audio.pause();
-            }
-        }
-
+		    if (!currentPlayingType || currentPlayingType === "") return;
+		    if (audio.paused) {
+		        manualnePozastavene = false; // <--- Pridané
+		        audio.play().catch(e => console.log("Chyba nočného prebudenia prúdu:", e));
+		    } else {
+		        manualnePozastavene = true;  // <--- Pridané
+		        audio.pause();
+		    }
+		}
         function aktualizujNochnyPrehravacVizual() {
             const pBox = document.getElementById('nightPlayer');
             const pInfo = document.getElementById('nightStationInfo');
@@ -2763,33 +2765,38 @@
                 aktualizujNochnyPrehravacVizual();
             });
 
-            audio.addEventListener('pause', () => {
-                // OKAMŽITÉ VYMAZANIE TEXTU PRI AKOMKOĽVEK PAUSE
-                document.getElementById("player-now-playing").innerText = "";
-                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
-                renderSidebarFavorites();
-                aktualizujNochnyPrehravacVizual();
-
-                // SPUSŤ 5-MINÚTOVÝ ČASOVAČ DO TVRDEHO STOPU
-                clearTimeout(globalPauseToStopTimeout);
-                console.log("Audio pozastavené, spúšťam 5-minútový limit pre automatický STOP...");
-                globalPauseToStopTimeout = setTimeout(() => {
-                    console.log("Limit vypršal: Vykonávam automatický HARD STOP na uvoľnenie streamu.");
-                    audio.src = "";
-                    audio.load();
-                    currentPlayingType = "";
-                    if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
-                    renderSidebarFavorites();
-                    runClockEngine();
-                    aktualizujNochnyPrehravacVizual();
-                    if (metadataController) metadataController.abort();
-                    if (bauerIntervalId) {
-                        clearInterval(bauerIntervalId);
-                        bauerIntervalId = null;
-                    }
-                    document.getElementById("player-now-playing").innerText = "";
-                }, CAS_PRE_HARD_STOP);
-            });
+            // Globálna premenná na odlíšenie ručnej pauzy (pridaj k ostatným let premenným)
+			let manualnePozastavene = false;
+			
+			audio.addEventListener('pause', () => {
+			    document.getElementById("player-now-playing").innerText = "";
+			    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
+			    renderSidebarFavorites();
+			    aktualizujNochnyPrehravacVizual();
+			
+			    // Časovač spustíme LEN vtedy, ak bola pauza vyvolaná ručne tlačidlom
+			    clearTimeout(globalPauseToStopTimeout);
+			    if (manualnePozastavene) {
+			        console.log("Ručné pozastavenie: Spúšťam 5-minútový limit pre HARD STOP...");
+			        globalPauseToStopTimeout = setTimeout(() => {
+			            console.log("Limit vypršal: Vykonávam HARD STOP na uvoľnenie streamu.");
+			            audio.src = "";
+			            audio.load();
+			            currentPlayingType = "";
+			            if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
+			            renderSidebarFavorites();
+			            runClockEngine();
+			            aktualizujNochnyPrehravacVizual();
+			            if (metadataController) metadataController.abort();
+			            if (bauerIntervalId) {
+			                clearInterval(bauerIntervalId);
+			                bauerIntervalId = null;
+			            }
+			            document.getElementById("player-now-playing").innerText = "";
+			            manualnePozastavene = false; // Reset príznaku
+			        }, CAS_PRE_HARD_STOP);
+			    }
+			});
                 
             fetchWeatherData();
             setInterval(fetchWeatherData, 15 * 60 * 1000);
