@@ -2768,36 +2768,48 @@
             });
 
             // Globálna premenná na odlíšenie ručnej pauzy (pridaj k ostatným let premenným)
-			let manualnePozastavene = false;
+			manualnePozastavene = false;
 			
+			// Nahradiť pôvodný blok audio.addEventListener('pause', ...) týmto úsekom:
 			audio.addEventListener('pause', () => {
-			    document.getElementById("player-now-playing").innerText = "";
-			    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
-			    renderSidebarFavorites();
-			    aktualizujNochnyPrehravacVizual();
+				document.getElementById("player-now-playing").innerText = "";
+				if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
+				renderSidebarFavorites();
+				aktualizujNochnyPrehravacVizual();
 			
-			    // Časovač spustíme LEN vtedy, ak bola pauza vyvolaná ručne tlačidlom
-			    clearTimeout(globalPauseToStopTimeout);
-			    if (manualnePozastavene) {
-			        console.log("Ručné pozastavenie: Spúšťam 5-minútový limit pre HARD STOP...");
-			        globalPauseToStopTimeout = setTimeout(() => {
-			            console.log("Limit vypršal: Vykonávam HARD STOP na uvoľnenie streamu.");
-			            audio.src = "";
-			            audio.load();
-			            currentPlayingType = "";
-			            if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
-			            renderSidebarFavorites();
-			            runClockEngine();
-			            aktualizujNochnyPrehravacVizual();
-			            if (metadataController) metadataController.abort();
-			            if (bauerIntervalId) {
-			                clearInterval(bauerIntervalId);
-			                bauerIntervalId = null;
-			            }
-			            document.getElementById("player-now-playing").innerText = "";
-			            manualnePozastavene = false; // Reset príznaku
-			        }, CAS_PRE_HARD_STOP);
-			    }
+				// Časovač pre uvoľnenie streamu sa spustí LEN vtedy, ak si klikol na PAUSE ručne
+				clearTimeout(globalPauseToStopTimeout);
+				if (manualnePozastavene) {
+					globalPauseToStopTimeout = setTimeout(() => {
+						audio.src = "";
+						audio.load();
+						currentPlayingType = "";
+						if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
+						renderSidebarFavorites();
+						runClockEngine();
+						aktualizujNochnyPrehravacVizual();
+						manualnePozastavene = false;
+					}, CAS_PRE_HARD_STOP);
+				}
+			});
+			
+			// PRIDAŤ: Automatické opätovné načítanie pri výpadku pripojenia
+			audio.addEventListener('stalled', () => {
+				if (!manualnePozastavene && audio.src) {
+					console.log("Stream vypadol, obnovujem...");
+					audio.load();
+					audio.play().catch(e => console.log("Čakám na sieť...", e));
+				}
+			});
+			
+			audio.addEventListener('error', () => {
+				if (!manualnePozastavene && currentPlayingType) {
+					setTimeout(() => {
+						console.log("Pokus o opätovné pripojenie po chybe...");
+						audio.load();
+						audio.play().catch(e => console.log(e));
+					}, 3000);
+				}
 			});
                 
             fetchWeatherData();
