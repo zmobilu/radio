@@ -680,7 +680,25 @@
                 }
             }
            
-        
+        #spotifyPlayerContainer {
+		    display: none;
+		    position: absolute !important;
+		    top: 0 !important;
+		    left: 0 !important;
+		    width: 100% !important;
+		    height: 100% !important;
+		    margin: 0 !important;
+		    border-radius: 0 !important;
+		    border: none !important;
+		    z-index: 100 !important;
+		    background: #000;
+		}
+		
+		#spotifyIframe {
+		    width: 100% !important;
+		    height: 100% !important;
+		    border: none !important;
+		}
         /* --- CELOOBRAZOVKOVÉ DETAILNÉ ZOBRAZENIE GRAFU --- */
         .weather-detail-view {
             display: none; 
@@ -1669,6 +1687,7 @@
 
 			{ id: "sp1", name: "Ach TucTuc", embedUrl: "https://open.spotify.com/embed/playlist/1mv2iWdWfEfffZfa8kOBFs?utm_source=generator", icon: "fa-brands fa-spotify", color: "#1DB954", style: "background:#111;", category: "Súkromne playlisty" }, 
 			{ id: "sp2", name: "Ah Rock", embedUrl: "https://open.spotify.com/embed/playlist/2xLrXn0HleL3pJvnRWnRcJ?utm_source=generator", icon: "fa-brands fa-spotify", color: "#1DB954", style: "background:#111;", category: "Súkromne playlisty" },
+			{ id: "sp3", name: "Spotify-proxy", embedUrl: "https://spotify-proxy.zmobilu.workers.dev", icon: "fa-brands fa-spotify", color: "#1DB954", style: "background:#111;", category: "Súkromne playlisty" },
 			
         ];
 
