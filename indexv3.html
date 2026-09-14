@@ -2417,34 +2417,29 @@
 		        toggleSettingsMode();
 		        return;
 		    }
-		    
+		
 		    const spotifyContainer = document.getElementById('spotifyPlayerContainer');
 		    const spotifyIframe = document.getElementById('spotifyIframe');
 		    const weatherBlock = document.querySelector('.main-weather-container');
 		
-		    // Ak ide o Spotify playlist
-		    if (item.embedUrl || (item.id && item.id.startsWith('sp'))) {
+		    // Kontrola, či ide o externú streamovaciu platformu (Spotify, Apple Music, YouTube a pod.)
+		    const isExternalApp = item.isExternal || 
+		                          (item.id && (item.id.startsWith('sp') || item.id.startsWith('ext_'))) || 
+		                          item.embedUrl;
+		
+		    if (isExternalApp) {
 		        clearTimeout(globalPauseToStopTimeout);
 		        manualnePozastavene = false;
-		        audio.pause();
-		        audio.src = "";
 		
-		        if (currentPlayingType === item.id && spotifyContainer && spotifyContainer.style.display === 'block') {
+		        // Ak uz nejaky iframe bezi v kiosku, zatvorime ho a vratime pocacie
+		        if (spotifyContainer && spotifyContainer.style.display === 'block') {
 		            spotifyContainer.style.display = 'none';
-		            spotifyIframe.src = "about:blank";
+		            if (spotifyIframe) spotifyIframe.src = "about:blank";
 		            if (weatherBlock) weatherBlock.style.display = 'flex';
-		            currentPlayingType = "";
-		            document.getElementById("player-now-playing").innerText = "";
-		        } else {
-		            if (weatherBlock) weatherBlock.style.display = 'none';
-		            if (spotifyContainer && spotifyIframe) {
-		                spotifyIframe.src = item.embedUrl;
-		                spotifyContainer.style.display = 'block';
-		            }
-		            currentPlayingType = item.id;
-		            document.getElementById("player-now-playing").innerText = "Playlist: " + item.name;
 		        }
-		        renderSidebarFavorites();
+		
+		        // Otvorenie externeho streamu v samostatnom popup okne
+		        triggerExternalApp(item.url || item.embedUrl, item.id);
 		        return;
 		    }
 		
@@ -2574,13 +2569,20 @@
         }
 
         function triggerExternalApp(url, id) {
-            audio.pause(); 
-            audio.src = ""; 
-            currentPlayingType = id;
-            renderSidebarFavorites();
-            setTimeout(() => { window.location.href = url; }, 300);
-        }
-
+			// Zastavenie interného audio prehrávača kiosku
+			if (typeof audio !== 'undefined') {
+				audio.pause(); 
+				audio.src = ""; 
+			}
+			
+			currentPlayingType = id;
+			if (typeof renderSidebarFavorites === 'function') {
+				renderSidebarFavorites();
+			}
+		
+			// Otvorenie akejkoľvek externej aplikácie/streamu v samostatnom popup okne
+			window.open(url, '_blank', 'popup=yes,width=1200,height=800,scrollbars=yes,resizable=yes');
+		}
         function handleBigClockClick() {
             if (typeof noSleep !== 'undefined') {
                 noSleep.enable().catch(e => console.log("WakeLock chyba:", e));
