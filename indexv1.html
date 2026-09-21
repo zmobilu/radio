@@ -679,9 +679,9 @@
             'slovensko': 0.3, 'fm': 0.5, 'devin': 0.5, 'litera': 0.5, 'junior': 0.5, 'regina': 0.5,
             'fun': 1.0, 'funchill': 0.5, 'funczsk': 0.5, 'fun8090': 0.5, 'milenialky': 0.5,
             'expres': 1.0, 'europa2': 1.0, 'melody': 1.0, 'vlna': 1.0,
-            'blanik': 0.5, 'rockzone': 0.5, 'rockrepublika': 0.5, 'beat': 0.5, 'casrock': 0.5, 
+            'blanik': 0.5, 'rockzone': 1.0, 'rockrepublika': 0.5, 'beat': 0.5, 'casrock': 0.5, 
             'S-techno': 1.0, 'schranz': 1.0, 'melodic': 1.0, 'h-techno': 1.0, 'Drumcode': 1.0,
-            'impuls': 0.5 // PRIDANÉ SEM
+            'impuls': 1.0 // PRIDANÉ SEM
         };
             // --- LOGIKA PRE PLOCHU NASTAVENÍ ---
         let cfgNocOd = localStorage.getItem('cfg_night_from') || "20:00";
@@ -1364,7 +1364,7 @@ const audio = document.getElementById('audioPlayer');
         const hlavnyRock = document.querySelector('.btn.rock');
         if (hlavnyRock) hlavnyRock.classList.add('playing');
     }
-    if (['expres', 'europa2', 'melody', 'vlna', 'blanik', 'topolcany'].includes(type)) {
+    if (['expres', 'europa2', 'melody', 'vlna', 'blanik', 'rockzone', 'impuls' ].includes(type)) {
         const hlavnyBlanik = document.querySelector('.btn.blanik');
         if (hlavnyBlanik) hlavnyBlanik.classList.add('playing');
     }
@@ -1410,7 +1410,7 @@ function aktualizujSubPanely(type) {
 
     if (slovenskoContainer) slovenskoContainer.style.display = ['slovensko', 'fm', 'devin', 'litera', 'junior', 'regina'].includes(type) ? 'flex' : 'none';
     if (funContainer) funContainer.style.display = ['fun', 'funchill', 'funczsk', 'fun8090', 'milenialky'].includes(type) ? 'flex' : 'none';
-    if (komerceContainer) komerceContainer.style.display = ['blanik', 'expres', 'europa2', 'melody', 'vlna', 'topolcany'].includes(type) ? 'flex' : 'none';
+    if (komerceContainer) komerceContainer.style.display = ['blanik', 'expres', 'europa2', 'melody', 'vlna', 'rockzone', 'impuls'].includes(type) ? 'flex' : 'none';
     if (spotifyContainer) spotifyContainer.style.display = (type === 'spotify' || type === 'settings') ? 'flex' : 'none';
     if (rockContainer) rockContainer.style.display = ['rockrepublika', 'beat', 'casrock'].includes(type) ? 'flex' : 'none';
     if (croContainer) croContainer.style.display = ['S-techno', 'schranz', 'melodic', 'h-techno', 'Drumcode'].includes(type) ? 'flex' : 'none';
