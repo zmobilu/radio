@@ -73,6 +73,68 @@
 		.v2-banner-btn.is-seen .v2-text {
 		    display: none; /* Schová text "V2 dostupná" */
 		}
+
+		/* --- OVLÁDAČ HLASITOSTI VPRAVO (Z V3) --- */
+        .volume-panel-container {
+            position: absolute !important;
+            top: 65px !important; /* Pozícia presne pod tlačidlom V2 */
+            right: 17px !important;
+            z-index: 999999 !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 44px;
+        }
+
+        /* Tlačidlá + a - */
+        .vol-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #111;
+            border: 1px solid #222;
+            color: #666;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s, background 0.2s, border-color 0.2s;
+            padding: 0;
+        }
+
+        .vol-btn:active {
+            color: #ff9f0a;
+            border-color: #ff9f0a;
+            background: #1a1a1a;
+        }
+
+        .volume-slider-wrapper {
+            height: 100px; /* Dĺžka slidera */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2px 0;
+        }
+
+        /* Vertikálny slider */
+        #mainVolumeSlider {
+            -webkit-appearance: slider-vertical;
+            appearance: slider-vertical;
+            width: 6px;
+            height: 100%;
+            accent-color: #ff9f0a;
+            cursor: pointer;
+        }
+
+        /* Pravidlá skrytia pri nočnom režime a grafe počasia */
+        body.full-night-mode .volume-panel-container,
+        body.weather-details-mode .volume-panel-container {
+            display: none !important;
+        }
+		 
         /* Riadenie viditeľnosti pre Inline režim počasia */
         body:not(.weather-details-mode) .weather-details-only { display: none !important; }
         body.weather-details-mode .weather-details-hide { display: none !important; }
@@ -409,6 +471,24 @@
 		    <i class="fa-solid fa-rocket rocket-icon"></i>
     		    <span class="v2-text">V2 dostupná</span>
 		</button>
+		<!-- Ovládač hlasitosti z V3 -->
+        <div class="volume-panel-container" id="volumePanel">
+            <button class="vol-btn" onpointerdown="event.stopPropagation(); changeVolumeStep(0.05);" title="Zvýšiť hlasitosť">+</button>
+            <div class="volume-slider-wrapper">
+                <input 
+                    type="range" 
+                    id="mainVolumeSlider" 
+                    min="0" 
+                    max="1" 
+                    step="0.01" 
+                    value="0.8" 
+                    orient="vertical"
+                    oninput="onVolumeSliderInput(this.value)"
+                    onpointerdown="event.stopPropagation();"
+                >
+            </div>
+            <button class="vol-btn" onpointerdown="event.stopPropagation(); changeVolumeStep(-0.05);" title="Znížiť hlasitosť">-</button>
+        </div>
         <div class="ss-left-col ss-only">
             <div id="ss-weather-trigger" style="cursor: pointer; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
                 <div class="current-weather-group">
@@ -644,6 +724,7 @@
         }
 	function prepniNastavenia() {
 	    audio.pause(); audio.src = "";
+		const volPanel = document.getElementById('volumePanel');
 	    const settingsBox = document.getElementById('settings-container');
 	    const spotifyFrame = document.getElementById('spotify-player-frame');
 	    const isVisible = settingsBox.style.display === 'block';
@@ -658,6 +739,7 @@
 	    
 	    if (isVisible) {
 	        settingsBox.style.display = 'none';
+			if (volPanel) volPanel.style.display = 'flex';
 	        if (hodinyEl) hodinyEl.style.display = 'flex';
 	        if (infoRiadokEl) infoRiadokEl.style.display = 'flex';
 			if (namedayLineEl) namedayLineEl.style.display = 'block'; // Znova zobrazí riadok mien
@@ -666,6 +748,7 @@
 	    } else {
 	        document.body.classList.remove('weather-details-mode');
 	        settingsBox.style.display = 'block';
+			if (volPanel) volPanel.style.display = 'none';
 	        if (hodinyEl) hodinyEl.style.display = 'none';
 	        if (infoRiadokEl) infoRiadokEl.style.display = 'none';
 			if (namedayLineEl) namedayLineEl.style.display = 'none'; // Schová riadok mien v nastaveniach
@@ -1291,7 +1374,17 @@ const audio = document.getElementById('audioPlayer');
 
     aktualizujSubPanely(type);
     
-    audio.volume = VOLUME_MAP[type] || 1.0;
+    // Načítanie individuálnej uloženej hlasitosti pre stanicu z V3
+        const savedRadioVol = localStorage.getItem(`vol_radio_${type}`);
+        let initialVol;
+        
+        if (savedRadioVol !== null) {
+            initialVol = parseFloat(savedRadioVol);
+        } else {
+            initialVol = VOLUME_MAP[type] !== undefined ? VOLUME_MAP[type] : 0.8;
+        }
+        
+        applyAndSaveVolume(initialVol);
     audio.src = url; 
     audio.play();
     resetIdleTimer(false);
@@ -1701,7 +1794,32 @@ if (ua.includes('iPhone') && ua.includes('OS 16_')) {
     }
 }
 
+// Aplikuje hlasitosť a uloží ju pre dané rádio do localStorage
+        function applyAndSaveVolume(newVol) {
+            const clampedVol = Math.min(1, Math.max(0, newVol));
+            
+            if (audio) {
+                audio.volume = clampedVol;
+            }
+            
+            const slider = document.getElementById('mainVolumeSlider');
+            if (slider) {
+                slider.value = clampedVol;
+            }
 
+            if (currentPlayingType && currentPlayingType !== "" && currentPlayingType !== "none" && currentPlayingType !== "settings") {
+                localStorage.setItem(`vol_radio_${currentPlayingType}`, clampedVol);
+            }
+        }
+
+        function onVolumeSliderInput(val) {
+            applyAndSaveVolume(parseFloat(val));
+        }
+
+        function changeVolumeStep(delta) {
+            const currentVol = audio ? audio.volume : 0.8;
+            applyAndSaveVolume(currentVol + delta);
+        }
 updateNameday();
 setInterval(updateNameday, 3600000);
 
