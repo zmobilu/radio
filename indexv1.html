@@ -396,7 +396,7 @@
         <button onclick="playRadio('https://icecast.stv.livebox.sk/slovensko_128.mp3', this, 'slovensko')" class="btn rozhlas" style="background:#00547E;" data-type="slovensko"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png" style="max-width:80%; max-height:70%; object-fit:contain;"></button>
         <button onclick="playRadio('https://funradio-proxy.zmobilu.workers.dev/fun128.mp3', this, 'fun')" class="btn fun" style="background:#ffffff;"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png" style="max-width:75%; max-height:70%; object-fit:contain;"></button>
 		<button onclick="playRadio('https://stream.bauermedia.sk/rock-hi.mp3', this, 'rock')" class="btn rock" style="background:#000000;" data-type="rock"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png" style="max-width:70%; max-height:60%; object-fit:contain;"></button>
-        <button onclick="playRadio('https://ice.abradio.cz/blanikcz128.mp3', this, 'blanik')" class="btn blanik" style="background:#005ea6;" data-type="blanik"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png" style="max-width:80%; max-height:70%; object-fit:contain;"></button>
+	    <button onclick="playRadio('https://ice.abradio.cz/blanikcz128.mp3', this, 'blanik')" class="btn blanik" style="background:#005ea6;" data-type="blanik"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png" style="max-width:80%; max-height:70%; object-fit:contain;"></button>
         <button onclick="playRadio('https://stream.sunshine-live.de/techno/mp3-192/', this, 'S-techno')" class="btn cro" style="background:#000000; color:#307CEB;" data-type="S-techno"><i class="fa-solid fa-bolt" style="font-size:60px;"></i></button>
         <button onclick="showSpotify()" class="btn spotify" style="background:#21D844;"><img src="https://raw.githubusercontent.com/zmobilu/assets/main/LogoSpotifySET.png" style="max-width:75%; max-height:70%; object-fit:contain;"></button>
     </div>
@@ -588,21 +588,7 @@
                 </div>
             </div>
         </div>
-	<!-- Tlačidlá pre prechod medzi verziami na konci nastavení -->
-		<div class="settings-night-row">
-		    <i class="fa-solid fa-house label-icon" title="Základ"></i>
-		    <button onclick="prejdiNaZaklad(); event.stopPropagation();" style="width: 100%;">Základ (Main)</button>
-		</div>
-		
-		<div class="settings-night-row">
-		    <i class="fa-solid fa-circle-arrow-right label-icon" title="Verzia 2"></i>
-		    <button onclick="prejdiNaVerziu2(); event.stopPropagation();" style="width: 100%;">Kiosk v2</button>
-		</div>
-		
-		<div class="settings-night-row">
-		    <i class="fa-solid fa-circle-arrow-right label-icon" title="Verzia 3"></i>
-		    <button onclick="prejdiNaVerziu3(); event.stopPropagation();" style="width: 100%;">Kiosk v3</button>
-		</div>
+
     </div>
             
     <script>
@@ -685,21 +671,7 @@
 	        currentPlayingType = "settings";
 	    }
 	    aktualizujTitulokStranky();
-		}
-		function prejdiNaZaklad() {
-		    localStorage.removeItem('dashboard_version'); // Resetne predvolenú hodnotu
-		    window.location.replace('index.html');
-		}
-		
-		function prejdiNaVerziu2() {
-		    localStorage.setItem('dashboard_version', 'v2');
-		    window.location.replace('indexv2.html');
-		}
-		
-		function prejdiNaVerziu3() {
-		    localStorage.setItem('dashboard_version', 'v3');
-		    window.location.replace('indexv3.html');
-		}
+	}
 	        
 	function zmenNastavenieCasu(typ) {
 	    let povodny = (typ === 'od') ? cfgNocOd : cfgNocDo;
