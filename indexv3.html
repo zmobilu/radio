@@ -2071,6 +2071,7 @@
 		    const weatherView = document.getElementById('weatherDetailView');
 		    const fsBtn = document.getElementById('fullscreenToggleBtn');
 		    const radioBtn = document.getElementById('radioToggleBtn');
+			const volPanel = document.getElementById('volumePanel');
 		
 		    if (weatherView.style.display === 'none' || weatherView.style.display === '') {
 		        weatherView.style.display = 'flex';
@@ -2078,6 +2079,7 @@
 		        // Skryjeme tlačidlá pri otvorení grafu
 		        if (fsBtn) fsBtn.style.display = 'none';
 		        if (radioBtn) radioBtn.style.display = 'none';
+				if (volPanel) volPanel.style.display = 'none';
 		
 		        vygenerujSpodnuListuDni();
 		        prepniDenGrafu(null, 'teraz');
@@ -2088,6 +2090,7 @@
 		        // Vrátime tlačidlá pri zavretí grafu
 		        if (fsBtn) fsBtn.style.display = 'flex';
 		        if (radioBtn) radioBtn.style.display = 'flex';
+				if (volPanel) volPanel.style.display = 'flex';
 		    }
 		}
 
@@ -2497,6 +2500,7 @@
 			// Odkazy na tlačidlá, ktoré chcemo schovať pri otvorených nastaveniach
             const fsBtn = document.getElementById('fullscreenToggleBtn');
             const radioBtn = document.getElementById('radioToggleBtn');
+			const volPanel = document.getElementById('volumePanel');
 
             if (isSettingsModeActive) {
                 btn.classList.add('active');
@@ -2506,6 +2510,7 @@
 				// Skryjeme zbytočné tlačidlá vpravo hore
                 if (fsBtn) fsBtn.style.display = 'none';
                 if (radioBtn) radioBtn.style.display = 'none';
+				if (volPanel) volPanel.style.display = 'none';
                 renderSettingsGrid();
                 resetSettingsTimer(); 
             } else {
@@ -2517,6 +2522,7 @@
 				// Vrátime tlačidlá vpravo hore
                 if (fsBtn) fsBtn.style.display = 'flex';
                 if (radioBtn) radioBtn.style.display = 'flex';
+				if (volPanel) volPanel.style.display = 'flex';
             }
         }
 
