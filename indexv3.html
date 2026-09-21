@@ -400,7 +400,7 @@
 		    top: 165px !important; /* Presne pod tretie tlačidlo (radioToggleBtn na 110px) */
 		    right: 15px !important;
 		    z-index: 999999 !important;
-		    display: flex;
+		    display: none; /* <--- Zmenené z flex na none */
 		    flex-direction: column;
 		    align-items: center;
 		    gap: 8px;
@@ -2092,7 +2092,8 @@
 		        // Vrátime tlačidlá pri zavretí grafu
 		        if (fsBtn) fsBtn.style.display = 'flex';
 		        if (radioBtn) radioBtn.style.display = 'flex';
-				if (volPanel) volPanel.style.display = 'flex';
+				if (volPanel) {
+            		volPanel.style.display = (audio && !audio.paused) ? 'flex' : 'none';
 		    }
 		}
 
@@ -2913,6 +2914,8 @@
                 if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
                 renderSidebarFavorites();
                 aktualizujNochnyPrehravacVizual();
+				const volPanel = document.getElementById('volumePanel');
+    			if (volPanel) volPanel.style.display = 'flex';
             });
 
             // Globálna premenná na odlíšenie ručnej pauzy (pridaj k ostatným let premenným)
@@ -2924,6 +2927,9 @@
 				if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
 				renderSidebarFavorites();
 				aktualizujNochnyPrehravacVizual();
+
+				const volPanel = document.getElementById('volumePanel');
+    			if (volPanel) volPanel.style.display = 'none';
 			
 				// Časovač pre uvoľnenie streamu sa spustí LEN vtedy, ak si klikol na PAUSE ručne
 				clearTimeout(globalPauseToStopTimeout);
