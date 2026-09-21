@@ -80,7 +80,7 @@
             top: 65px !important; /* Pozícia presne pod tlačidlom V2 */
             right: 17px !important;
             z-index: 999999 !important;
-            display: flex;
+            display: none; /* <--- Zmenené z flex na none */
             flex-direction: column;
             align-items: center;
             gap: 8px;
@@ -1388,6 +1388,9 @@ const audio = document.getElementById('audioPlayer');
     audio.src = url; 
     audio.play();
     resetIdleTimer(false);
+		
+	const volPanel = document.getElementById('volumePanel');
+            if (volPanel) volPanel.style.display = 'flex';
     
     const radioInfoEl = document.getElementById('ss-radio-info');
     if (radioInfoEl) {
@@ -1421,7 +1424,11 @@ function stopRadio() {
         audio.pause(); 
         audio.src = "";
         currentPlayingType = "";
-        
+		
+        // PRIDAŤ: Skrytie panelu hlasitosti pri zastavení rádia
+        const volPanel = document.getElementById('volumePanel');
+        if (volPanel) volPanel.style.display = 'none';
+		
         document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('playing'));
         document.querySelectorAll('.sub-btn').forEach(btn => btn.classList.remove('playing')); 
         
@@ -1632,7 +1639,11 @@ function zatvorPocasie(e) {
     
     document.body.classList.remove('weather-details-mode');
     document.querySelectorAll('.mini-item').forEach(box => box.classList.remove('day-box-active'));
-
+	const volPanel = document.getElementById('volumePanel');
+	if (volPanel) {
+		volPanel.style.display = (audio && !audio.paused && currentPlayingType !== "") ? 'flex' : 'none';
+	}
+	
     // Návrat presne do režimu, z ktorého bolo počasie otvorené
     if (weatherOpenedFrom === 'screensaver') {
         document.body.classList.add('screensaver-mode');
