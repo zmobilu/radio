@@ -92,7 +92,7 @@
             top: 110px !important; /* Pozícia priamo pod tlačidlom celoplošnej obrazovky */
             right: 15px !important;
             z-index: 999999 !important;
-            display: flex;
+            display: none; /* <--- Zmenené z flex na none */
             flex-direction: column;
             align-items: center;
             gap: 8px;
@@ -1735,7 +1735,9 @@
                 clearTimeout(pocasieTimer);
                 weatherView.style.display = 'none';
 				if (fsBtn) fsBtn.style.display = 'flex';
-                if (volPanel) volPanel.style.display = 'flex';
+                if (volPanel) {
+                    volPanel.style.display = (audio && !audio.paused) ? 'flex' : 'none';
+                }
             }
         }
 
@@ -2446,6 +2448,8 @@
                 if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
                 renderSidebarFavorites();
                 aktualizujNochnyPrehravacVizual();
+				const volPanel = document.getElementById('volumePanel');
+                if (volPanel) volPanel.style.display = 'flex';
             });
 
             audio.addEventListener('pause', () => {
@@ -2454,6 +2458,8 @@
                 if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
                 renderSidebarFavorites();
                 aktualizujNochnyPrehravacVizual();
+				const volPanel = document.getElementById('volumePanel');
+                if (volPanel) volPanel.style.display = 'none';
 
                 // SPUSŤ 5-MINÚTOVÝ ČASOVAČ DO TVRDEHO STOPU
                 clearTimeout(globalPauseToStopTimeout);
