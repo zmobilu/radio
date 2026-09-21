@@ -86,6 +86,66 @@
             z-index: 999999 !important;
         }
 
+		/* --- OVLÁDAČ HLASITOSTI VPRAVO (Z KIOSK V3) --- */
+        .volume-panel-container {
+            position: absolute !important;
+            top: 110px !important; /* Pozícia priamo pod tlačidlom celoplošnej obrazovky */
+            right: 15px !important;
+            z-index: 999999 !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 44px;
+        }
+
+        /* Tlačidlá + a - v rovnakom štýle ako .btn-settings */
+        .vol-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #111;
+            border: 1px solid #222;
+            color: #666;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s, background 0.2s, border-color 0.2s;
+            padding: 0;
+        }
+
+        .vol-btn:active {
+            color: #ff9f0a;
+            border-color: #ff9f0a;
+            background: #1a1a1a;
+        }
+
+        .volume-slider-wrapper {
+            height: 100px; /* Dĺžka slidera medzi tlačidlami + a - */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2px 0;
+        }
+
+        /* Vertikálny slider */
+        #mainVolumeSlider {
+            -webkit-appearance: slider-vertical;
+            appearance: slider-vertical;
+            width: 6px;
+            height: 100%;
+            accent-color: #ff9f0a;
+            cursor: pointer;
+        }
+
+        /* Skrytie pri nočnom režime */
+        body.full-night-mode .volume-panel-container {
+            display: none !important;
+        }
+		
         /* --- HLAVNÁ ROZDELENÁ PLOCHA --- */
         .workspace-container { display: flex; flex: 1; width: 100vw; overflow: hidden; position: relative; }
 
@@ -1211,6 +1271,24 @@
 					</div>
                 </div>
             </div>
+			<!-- Ovládač hlasitosti z V3 -->
+		    <div class="volume-panel-container" id="volumePanel">
+		        <button class="vol-btn" onclick="changeVolumeStep(0.05); event.stopPropagation();" title="Zvýšiť hlasitosť">+</button>
+		        <div class="volume-slider-wrapper">
+		            <input 
+		                type="range" 
+		                id="mainVolumeSlider" 
+		                min="0" 
+		                max="1" 
+		                step="0.01" 
+		                value="0.8" 
+		                orient="vertical"
+		                oninput="onVolumeSliderInput(this.value)"
+		                onclick="event.stopPropagation();"
+		            >
+		        </div>
+		        <button class="vol-btn" onclick="changeVolumeStep(-0.05); event.stopPropagation();" title="Znížiť hlasitosť">-</button>
+		    </div>
          </main>
         
     </div>
@@ -1362,6 +1440,35 @@
 
         const VOLUME_MAP = { 'slovensko': 0.5, 'fm': 0.5, 'devin': 0.5, 'litera': 0.5, 'junior': 0.5, 'regina': 0.5, 'rock': 0.5, 'fun': 1.0, 'funchill': 0.5, 'funczsk': 0.5, 'fun8090': 0.5, 'milenialky': 0.5, 'expres': 1.0, 'europa2': 1.0, 'melody': 1.0, 'vlna': 1.0, 'blanik': 0.5, 'topolcany': 0.5, 'h-techno': 1.0 };
 
+		// Aplikuje a uloží hlasitosť pre aktívne rádio
+        function applyAndSaveVolume(newVol) {
+            const clampedVol = Math.min(1, Math.max(0, newVol));
+            
+            if (audio) {
+                audio.volume = clampedVol;
+            }
+            
+            const slider = document.getElementById('mainVolumeSlider');
+            if (slider) {
+                slider.value = clampedVol;
+            }
+
+            if (currentPlayingType && currentPlayingType !== "") {
+                localStorage.setItem(`vol_radio_${currentPlayingType}`, clampedVol);
+            }
+        }
+
+        // Zmena potiahnutím slidera
+        function onVolumeSliderInput(val) {
+            applyAndSaveVolume(parseFloat(val));
+        }
+
+        // Zmena tlačidlami + a -
+        function changeVolumeStep(delta) {
+            const currentVol = audio ? audio.volume : 0.8;
+            applyAndSaveVolume(currentVol + delta);
+        }
+		
         function getTempColor(t) {
             if (t < 0) return '#00bfff';
             if (t < 10) return '#87CEEB';
@@ -1600,8 +1707,12 @@
 		    if (isSettingsModeActive) toggleSettingsMode();
 		    
 		    const weatherView = document.getElementById('weatherDetailView');
+			const fsBtn = document.getElementById('fullscreenToggleBtn');
+            const volPanel = document.getElementById('volumePanel');
 		    if (weatherView) {
 		        weatherView.style.display = 'flex';
+				if (fsBtn) fsBtn.style.display = 'none';
+                if (volPanel) volPanel.style.display = 'none';
 		        vygenerujSpodnuListuDni();
 		        prepniDenGrafu(null, denMod);
 		    }
@@ -1611,14 +1722,20 @@
             if (isSettingsModeActive) toggleSettingsMode();
             
             const weatherView = document.getElementById('weatherDetailView');
+			const fsBtn = document.getElementById('fullscreenToggleBtn');
+            const volPanel = document.getElementById('volumePanel');
             
             if (weatherView.style.display === 'none' || weatherView.style.display === '') {
                 weatherView.style.display = 'flex';
+				if (fsBtn) fsBtn.style.display = 'none';
+                if (volPanel) volPanel.style.display = 'none';
                 vygenerujSpodnuListuDni();
                 prepniDenGrafu(null, 'teraz');
             } else {
                 clearTimeout(pocasieTimer);
                 weatherView.style.display = 'none';
+				if (fsBtn) fsBtn.style.display = 'flex';
+                if (volPanel) volPanel.style.display = 'flex';
             }
         }
 
@@ -1940,12 +2057,16 @@
             const placeholder = document.getElementById('rightPlaceholder');
             const gridView = document.getElementById('settingsGridView');
             const weatherView = document.getElementById('weatherDetailView');
+			const fsBtn = document.getElementById('fullscreenToggleBtn');
+            const volPanel = document.getElementById('volumePanel');
 
             if (isSettingsModeActive) {
                 btn.classList.add('active');
                 placeholder.style.display = 'none';
                 weatherView.style.display = 'none';
                 gridView.style.display = 'grid';
+				if (fsBtn) fsBtn.style.display = 'none';
+                if (volPanel) volPanel.style.display = 'none';
                 renderSettingsGrid();
                 resetSettingsTimer(); 
             } else {
@@ -1954,6 +2075,8 @@
                 placeholder.style.display = 'flex';
                 gridView.style.display = 'none';
                 weatherView.style.display = 'none';
+				if (fsBtn) fsBtn.style.display = 'flex';
+                if (volPanel) volPanel.style.display = 'flex';
             }
         }
 
@@ -2066,7 +2189,17 @@
             currentPlayingType = id;
             localStorage.setItem('kiosk_last_radio_url', url);
             localStorage.setItem('kiosk_last_radio_type', id);
-            audio.volume = VOLUME_MAP[id] !== undefined ? VOLUME_MAP[id] : 1.0;
+           // Načítanie individuálnej uloženej hlasitosti pre stanicu
+            const savedRadioVol = localStorage.getItem(`vol_radio_${id}`);
+            let initialVol;
+            
+            if (savedRadioVol !== null) {
+                initialVol = parseFloat(savedRadioVol);
+            } else {
+                initialVol = VOLUME_MAP[id] !== undefined ? VOLUME_MAP[id] : 0.8;
+            }
+            
+            applyAndSaveVolume(initialVol);
             audio.play()
             .then(() => {
                 if (typeof noSleep !== 'undefined') {
