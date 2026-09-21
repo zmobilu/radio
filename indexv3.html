@@ -393,7 +393,68 @@
 		    flex-direction: column;
 		    align-items: center;
 		}
+		
+		/* --- OVLÁDAČ HLASITOSTI ZLADENÝ S TLAČIDLAMI VPRAVO --- */
+		.volume-panel-container {
+		    position: absolute !important;
+		    top: 165px !important; /* Presne pod tretie tlačidlo (radioToggleBtn na 110px) */
+		    right: 15px !important;
+		    z-index: 999999 !important;
+		    display: flex;
+		    flex-direction: column;
+		    align-items: center;
+		    gap: 8px;
+		    width: 44px;
+		}
+		
+		/* Tlačidlá + a - v rovnakom štýle ako .btn-settings */
+		.vol-btn {
+		    width: 44px;
+		    height: 44px;
+		    border-radius: 50%;
+		    background: #111;
+		    border: 1px solid #222;
+		    color: #666;
+		    font-size: 20px;
+		    font-weight: bold;
+		    cursor: pointer;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    transition: color 0.2s, background 0.2s, border-color 0.2s;
+		    padding: 0;
+		}
+		
+		.vol-btn:active {
+		    color: #ff9f0a;
+		    border-color: #ff9f0a;
+		    background: #1a1a1a;
+		}
+		
+		.volume-slider-wrapper {
+		    height: 100px; /* Dĺžka slidera medzi tlačidlami */
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    margin: 2px 0;
+		}
+		
+		/* Vertikálny slider s oranžovou farbou ako aktívne tlačidlá */
+		#mainVolumeSlider {
+		    -webkit-appearance: slider-vertical;
+		    appearance: slider-vertical;
+		    width: 6px;
+		    height: 100%;
+		    accent-color: #ff9f0a;
+		    cursor: pointer;
+		}
+		
+		/* Skrytie pri nočnom režime */
+		body.full-night-mode .volume-panel-container {
+		    display: none !important;
+		}
 
+		
         /* --- EXTRA KOMPAKTNÝ PANEL NASTAVENÍ --- */
         .settings-night-panel {
             background: #0d0d0d; padding: 8px; border-bottom: 2px solid #1a1a1a;
@@ -1393,6 +1454,7 @@
         <main class="main-content-area">
                                                                     
             <div class="placeholder-view" id="rightPlaceholder">
+				
                 <div class="big-clock-time" onclick="handleBigClockClick(); event.stopPropagation();">
                     <span class="big-clock-hours" id="bigHours">00</span>
                     <span class="big-clock-minutes" id="bigMinutes">00</span>
@@ -1586,7 +1648,24 @@
 	<button class="btn-settings" id="radioToggleBtn" onclick="toggleMainRadioBtn(); event.stopPropagation();" title="Mriežka média">
         <i class="fa-solid fa-radio"></i>
     </button>
-    
+		<!-- Ovládač hlasitosti pod tlačidlami -->
+		<div class="volume-panel-container" id="volumePanel">
+			<button class="vol-btn" onclick="changeVolumeStep(0.05); event.stopPropagation();" title="Zvýšiť hlasitosť">+</button>
+			<div class="volume-slider-wrapper">
+				<input 
+					type="range" 
+					id="mainVolumeSlider" 
+					min="0" 
+					max="1" 
+					step="0.01" 
+					value="0.8" 
+					orient="vertical"
+					oninput="onVolumeSliderInput(this.value)"
+					onclick="event.stopPropagation();"
+				>
+			</div>
+			<button class="vol-btn" onclick="changeVolumeStep(-0.05); event.stopPropagation();" title="Znížiť hlasitosť">-</button>
+		</div>
     <script>
         // Zväčšenie štartovacieho poľa z 6 na 8 položiek (+ pridané rádio jazz a topolcany)
 		let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v3')) || ["slovensko", "funchill", "rock", "blanik", "fun", "jazz", null, null];
@@ -1697,7 +1776,37 @@
         const MOJE_MENA = ['Peter', 'Lenka', 'Daniel', 'Hana', 'Lucia', 'Katarína', 'Andrej', 'Zuzana', 'Radoslav', 'Martina', 'Róbert', 'Milan', 'Juraj', 'Ladislav', 'Pavol']; 
 
         const VOLUME_MAP = { 'slovensko': 0.5, 'fm': 0.5, 'devin': 0.5, 'litera': 0.7, 'junior': 0.5, 'regina': 0.5, 'rock': 0.7, 'fun': 1.0, 'funchill': 0.5, 'funczsk': 0.5, 'fun8090': 0.5, 'milenialky': 0.5, 'expres': 1.0, 'europa2': 1.0, 'melody': 1.0, 'vlna': 0.5, 'blanik': 1.0, 'jazz': 1.0, 'h-techno': 1.0 };
+		
+		// Aplikuje a uloží hlasitosť pre aktuálne vybrané rádio
+		function applyAndSaveVolume(newVol) {
+		    const clampedVol = Math.min(1, Math.max(0, newVol));
+		    
+		    if (audio) {
+		        audio.volume = clampedVol;
+		    }
+		    
+		    const slider = document.getElementById('mainVolumeSlider');
+		    if (slider) {
+		        slider.value = clampedVol;
+		    }
+		
+		    if (currentPlayingType && currentPlayingType !== "") {
+		        localStorage.setItem(`vol_radio_${currentPlayingType}`, clampedVol);
+		    }
+		}
+		
+		// Zmena potiahnutím slidera
+		function onVolumeSliderInput(val) {
+		    applyAndSaveVolume(parseFloat(val));
+		}
+		
+		// Zmena tlačidlami + a -
+		function changeVolumeStep(delta) {
+		    const currentVol = audio ? audio.volume : 0.8;
+		    applyAndSaveVolume(currentVol + delta);
+		}
 
+		
         function getTempColor(t) {
             if (t < 0) return '#00bfff';
             if (t < 10) return '#87CEEB';
@@ -2554,7 +2663,17 @@
             currentPlayingType = id;
             localStorage.setItem('kiosk_last_radio_url', url);
             localStorage.setItem('kiosk_last_radio_type', id);
-            audio.volume = VOLUME_MAP[id] !== undefined ? VOLUME_MAP[id] : 1.0;
+            // Načítanie individuálnej uloženej hlasitosti pre stanicu
+			const savedRadioVol = localStorage.getItem(`vol_radio_${id}`);
+			let initialVol;
+			
+			if (savedRadioVol !== null) {
+			    initialVol = parseFloat(savedRadioVol);
+			} else {
+			    initialVol = VOLUME_MAP[id] !== undefined ? VOLUME_MAP[id] : 0.8;
+			}
+			
+			applyAndSaveVolume(initialVol);
             audio.play()
             .then(() => {
                 if (typeof noSleep !== 'undefined') {
