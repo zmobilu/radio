@@ -2052,6 +2052,7 @@
 		    const weatherView = document.getElementById('weatherDetailView');
 		    const fsBtn = document.getElementById('fullscreenToggleBtn');
 		    const radioBtn = document.getElementById('radioToggleBtn');
+			const volPanel = document.getElementById('volumePanel');
 		
 		    if (weatherView) {
 		        weatherView.style.display = 'flex';
@@ -2059,6 +2060,7 @@
 		        // Skryjeme tlačidlá pri otvorení grafu
 		        if (fsBtn) fsBtn.style.display = 'none';
 		        if (radioBtn) radioBtn.style.display = 'none';
+				if (volPanel) volPanel.style.display = 'none';
 		
 		        vygenerujSpodnuListuDni();
 		        prepniDenGrafu(null, denMod);
