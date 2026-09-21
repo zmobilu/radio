@@ -2,14 +2,16 @@
 <html lang="sk">
 <head>
     <script>
-      // Zistenie zvolenej verzie pred vykreslením stránky
-      var savedVer = localStorage.getItem('dashboard_version');
-      if (savedVer === 'v3') {
-        window.location.replace('indexv3.html');
-      } else if (savedVer === 'v2') {
-        window.location.replace('indexv2.html');
-      }
-    </script>
+	  // Zistenie zvolenej verzie pred vykreslením hlavnej stránky index.html
+	  var savedVer = localStorage.getItem('dashboard_version');
+	  if (savedVer === 'v3') {
+	    window.location.replace('indexv3.html');
+	  } else if (savedVer === 'v2') {
+	    window.location.replace('indexv2.html');
+	  } else if (savedVer === 'v1') {
+	    window.location.replace('indexv1.html');
+	  }
+	</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
