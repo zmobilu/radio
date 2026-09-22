@@ -105,33 +105,116 @@
         .workspace-container { display: flex; flex: 1; width: 100vw; overflow: hidden; position: relative; }
 
         /* Ľavá sekcia: 8 obľúbených položiek (35%) */
+        /* Ľavá sekcia: 4 riadky (1. Obľúbené + 3x 3D karusel) */
         .favorites-sidebar {
-            width: 30%; 
-			background: #050505; 
-			border-right: 1px solid #111;
-            display: grid; 
-			grid-template-columns: 1fr 1fr; 
-			grid-template-rows: repeat(4, 1fr);
-            gap: 6px; 
-			padding: 6px; 
-			box-sizing: border-box;
-            padding-left: calc(6px + env(safe-area-inset-left));
+            width: 32%; 
+            background: #050505; 
+            border-right: 1px solid #111;
+            display: flex;
+            flex-direction: column;
+            gap: 8px; 
+            padding: 8px 4px; 
+            box-sizing: border-box;
+            overflow: hidden;
         }
-        .fav-card {
-            background: #111; border: 1px solid #222; border-radius: 12px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; padding: 6px; box-sizing: border-box; position: relative; overflow: hidden;
-            transition: transform 0.1s, border-color 0.15s;
-        }
-        .fav-card:not(.empty):active { transform: scale(0.97); }
-        .fav-card.playing { border: 2px solid #ff9f0a !important; background: #151515; }
-        .fav-card img { width: 75%; height: 75%; object-fit: contain; }
-        .fav-card i { font-size: 30px; }
-        .fav-card span { font-size: 11px; font-weight: 600; text-transform: uppercase; text-align: center; margin-top: 2px; }
-        
-        .fav-card.empty { border: 1px dashed #222; background: transparent; cursor: default; }
-        .fav-card.empty i { color: #333; font-size: 22px; }
 
+        /* Riadok 1: Statické obľúbené (3 karty) */
+        .fav-static-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            height: 23%;
+        }
+
+        /* Riadky 2, 3, 4: Rotujúce kategórie */
+        .category-row {
+            display: flex;
+            flex-direction: column;
+            height: 24%;
+            background: #0a0a0a;
+            border-radius: 10px;
+            padding: 4px;
+            border: 1px solid #181818;
+            position: relative;
+        }
+
+        .category-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ff9f0a;
+            margin-bottom: 2px;
+            padding-left: 6px;
+        }
+
+        /* 3D Kontajner karuselu */
+        .carousel-container {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 500px;
+        }
+
+        /* Karta rádia v 3D karuseli */
+        .carousel-card {
+            position: absolute;
+            width: 55%;
+            height: 85%;
+            background: #121212;
+            border: 1px solid #222;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            box-sizing: border-box;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .carousel-card img { width: 75%; height: 75%; object-fit: contain; pointer-events: none; }
+        .carousel-card i { font-size: 22px; pointer-events: none; }
+        .carousel-card span { font-size: 9px; font-weight: 600; text-transform: uppercase; margin-top: 2px; pointer-events: none; }
+
+        /* Pozície v 3D priestore */
+        .carousel-card.center {
+            transform: translateX(0) translateZ(0) scale(1);
+            z-index: 10;
+            opacity: 1;
+            border-color: #333;
+        }
+
+        .carousel-card.left {
+            transform: translateX(-60%) translateZ(-70px) rotateY(20deg);
+            z-index: 5;
+            opacity: 0.35;
+            filter: grayscale(0.6);
+        }
+
+        .carousel-card.right {
+            transform: translateX(60%) translateZ(-70px) rotateY(-20deg);
+            z-index: 5;
+            opacity: 0.35;
+            filter: grayscale(0.6);
+        }
+
+        .carousel-card.hidden {
+            transform: translateX(0) translateZ(-120px) scale(0.5);
+            z-index: 1;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .carousel-card.playing, .fav-card.playing {
+            border: 2px solid #ff9f0a !important;
+            box-shadow: 0 0 12px rgba(255, 159, 10, 0.4);
+        }
         /* Pravá sekcia: Hlavný obsah alebo nastavenia (65%) */
         .main-content-area { width: 70%; background: #000; position: relative; overflow: hidden; }
         
@@ -2333,38 +2416,91 @@
             }, 30000);
         }
 
+        let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v4')) || [null, null, null];
+		let categoryIndices = { "Slovensko a FUN": 0, "Alternatívne": 0, "Komerčné": 0 };
+
         function renderSidebarFavorites() {
-		    const container = document.getElementById('favSidebarContainer');
-		    if(!container) return;
-		    container.innerHTML = "";
-		
-		    // Zmena cyklu z 6 na 8 pozícií
-		    for (let i = 0; i < 8; i++) {
-		        const id = slotFavorites[i];
-		        const item = DATABASE.find(d => d.id === id);
-		        const card = document.createElement('div');
-		        
-		        if (item && id !== null) {
-		            card.className = "fav-card";
-		            
-		            if (currentPlayingType === item.id && !audio.paused) {
-		                card.classList.add("playing");
-		            }
-		            
-		            card.onclick = () => handleFavCardClick(item);
-		
-		            if (item.img) {
-		                card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
-		            } else if (item.icon) {
-		                card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
-		            }
-		        } else {
-		            card.className = "fav-card empty";
-		            card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
-		        }
-		        container.appendChild(card);
-		    }
-		}
+            const container = document.getElementById('favSidebarContainer');
+            if (!container) return;
+            container.innerHTML = "";
+
+            // --- 1. RIADOK: OBĽÚBENÉ (3 PEVNÉ POZÍCIE) ---
+            const staticRow = document.createElement('div');
+            staticRow.className = 'fav-static-row';
+
+            for (let i = 0; i < 3; i++) {
+                const id = slotFavorites[i];
+                const item = DATABASE.find(d => d.id === id);
+                const card = document.createElement('div');
+                
+                if (item && id !== null) {
+                    card.className = "fav-card";
+                    if (currentPlayingType === item.id && !audio.paused) card.classList.add("playing");
+                    card.onclick = () => handleFavCardClick(item);
+                    if (item.img) card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
+                    else if (item.icon) card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
+                } else {
+                    card.className = "fav-card empty";
+                    card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
+                    card.onclick = () => otvorNastaveniaPreSlot();
+                }
+                staticRow.appendChild(card);
+            }
+            container.appendChild(staticRow);
+
+            // --- 2., 3. A 4. RIADOK: ROTUJÚCE KATEGÓRIE ---
+            const rotujuceKategorie = ["Slovensko a FUN", "Alternatívne", "Komerčné"];
+
+            rotujuceKategorie.forEach(catName => {
+                const items = DATABASE.filter(d => d.category === catName);
+                if (items.length === 0) return;
+
+                const row = document.createElement('div');
+                row.className = 'category-row';
+
+                const title = document.createElement('div');
+                title.className = 'category-title';
+                title.textContent = catName;
+                row.appendChild(title);
+
+                const carousel = document.createElement('div');
+                carousel.className = 'carousel-container';
+
+                const activeIdx = categoryIndices[catName] || 0;
+                const total = items.length;
+
+                items.forEach((item, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'carousel-card';
+
+                    let posClass = 'hidden';
+                    if (index === activeIdx) posClass = 'center';
+                    else if (index === (activeIdx - 1 + total) % total) posClass = 'left';
+                    else if (index === (activeIdx + 1) % total) posClass = 'right';
+
+                    card.classList.add(posClass);
+                    if (currentPlayingType === item.id && !audio.paused) card.classList.add("playing");
+
+                    card.onclick = (e) => {
+                        e.stopPropagation();
+                        if (index === categoryIndices[catName]) {
+                            handleFavCardClick(item);
+                        } else {
+                            categoryIndices[catName] = index;
+                            renderSidebarFavorites();
+                        }
+                    };
+
+                    if (item.img) card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
+                    else if (item.icon) card.innerHTML = `<i class="${item.icon}" style="color:${item.color}"></i><span>${item.name}</span>`;
+
+                    carousel.appendChild(card);
+                });
+
+                row.appendChild(carousel);
+                container.appendChild(row);
+            });
+        }
 		function otvorNastaveniaPreSlot() {
 		    if (!isSettingsModeActive) {
 		        toggleSettingsMode();
@@ -2420,38 +2556,33 @@
         }
 
         function handleChannelSelectionToggle(id) {
-		    const existingIndex = slotFavorites.indexOf(id);
-		    
-		    // 1. Ak už rádio v obľúbených je, kliknutím ho odstránime (nahradíme null)
-		    if (existingIndex !== -1) {
-		        slotFavorites[existingIndex] = null;
-		    } else {
-		        // 2. Hľadáme index prvého voľného miesta (kde je null, undefined alebo "")
-		        let freeSlotIndex = slotFavorites.findIndex(slot => !slot);
-		        
-		        // Ak je pole kratšie ako 8, môžeme pridať nový slot
-		        if (freeSlotIndex === -1 && slotFavorites.length < 8) {
-		            freeSlotIndex = slotFavorites.length;
-		        }
-		
-		        if (freeSlotIndex !== -1 && freeSlotIndex < 8) {
-		            slotFavorites[freeSlotIndex] = id;
-		        } else {
-		            alert("Všetkých 8 pozícií je plných. Najprv kliknutím uvoľnite niektoré miesto.");
-		            return;
-		        }
-		    }
-		    
-		    // Garantujeme, že pole má vždy presne 8 položiek
-		    while (slotFavorites.length < 8) {
-		        slotFavorites.push(null);
-		    }
-		
-		    localStorage.setItem('kiosk_slots_v4', JSON.stringify(slotFavorites));
-		    renderSidebarFavorites();
-		    renderSettingsGrid();
-		    resetSettingsTimer();
-		}
+            const existingIndex = slotFavorites.indexOf(id);
+            
+            if (existingIndex !== -1) {
+                slotFavorites[existingIndex] = null;
+            } else {
+                let freeSlotIndex = slotFavorites.findIndex(slot => !slot);
+                if (freeSlotIndex === -1 && slotFavorites.length < 3) {
+                    freeSlotIndex = slotFavorites.length;
+                }
+
+                if (freeSlotIndex !== -1 && freeSlotIndex < 3) {
+                    slotFavorites[freeSlotIndex] = id;
+                } else {
+                    alert("Všetky 3 obľúbené pozície sú plné. Najprv kliknutím uvoľnite niektoré miesto.");
+                    return;
+                }
+            }
+            
+            while (slotFavorites.length < 3) {
+                slotFavorites.push(null);
+            }
+
+            localStorage.setItem('kiosk_slots_v4', JSON.stringify(slotFavorites));
+            renderSidebarFavorites();
+            renderSettingsGrid();
+            resetSettingsTimer();
+        }
 		document.addEventListener('DOMContentLoaded', function() {
 		    localStorage.setItem('dashboard_version', 'v4');
 		});
