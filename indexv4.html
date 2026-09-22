@@ -1597,6 +1597,11 @@
                         <i class="fa-solid fa-circle-arrow-left label-icon" title="Verzia 2"></i>
                         <button onclick="prejdiNaVerziu2(); event.stopPropagation();" style="width: 100%;">Verzia 2</button>
                     </div>
+					<!-- Tlačidlo Návrat na Verziu 3 -->
+                    <div class="settings-night-row">
+                        <i class="fa-solid fa-circle-arrow-left label-icon" title="Verzia 3"></i>
+                        <button onclick="prejdiNaVerziu3(); event.stopPropagation();" style="width: 100%;">Verzia 3</button>
+                    </div>
                 </div>
             </div>
          </main>
@@ -1668,7 +1673,7 @@
 		</div>
     <script>
         // Zväčšenie štartovacieho poľa z 6 na 8 položiek (+ pridané rádio jazz a topolcany)
-		let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v3')) || ["slovensko", "funchill", "rock", "blanik", "fun", "jazz", null, null];
+		let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v4')) || [null, null, null];
         
         const audio = document.getElementById('audioPlayer');
         let currentPlayingType = "";
@@ -1721,6 +1726,11 @@
 		function prejdiNaVerziu2() {
 		    localStorage.setItem('dashboard_version', 'v2');
 		    window.location.replace('indexv2.html');
+		}
+
+		function prejdiNaVerziu3() {
+		    localStorage.setItem('dashboard_version', 'v3');
+		    window.location.replace('indexv3.html');
 		}
 
         function getWeatherText(wCode) { return WEATHER_TEXTS_SK[wCode] || 'Premenlivé'; }
@@ -2450,13 +2460,13 @@
 		        slotFavorites.push(null);
 		    }
 		
-		    localStorage.setItem('kiosk_slots_v3', JSON.stringify(slotFavorites));
+		    localStorage.setItem('kiosk_slots_v4', JSON.stringify(slotFavorites));
 		    renderSidebarFavorites();
 		    renderSettingsGrid();
 		    resetSettingsTimer();
 		}
 		document.addEventListener('DOMContentLoaded', function() {
-		    localStorage.setItem('dashboard_version', 'v3');
+		    localStorage.setItem('dashboard_version', 'v4');
 		});
         function toggleMainRadioBtn() {
             const body = document.getElementById('mainBody');
