@@ -1796,7 +1796,7 @@
 		</div>
     <script>
         // Zväčšenie štartovacieho poľa z 6 na 8 položiek (+ pridané rádio jazz a topolcany)
-		let slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v4')) || [null, null, null];
+		slotFavorites = JSON.parse(localStorage.getItem('kiosk_slots_v4')) || [null, null, null];
         
         const audio = document.getElementById('audioPlayer');
         let currentPlayingType = "";
@@ -3407,18 +3407,7 @@
 			    }
 			}
 			
-			function skontrolujObnovuNocnehoRezimu() {
-			    const chcelNocnyRezim = localStorage.getItem('kiosk_autorestart_nightmode');
-			    localStorage.removeItem('kiosk_autorestart_nightmode');
 			
-			    if (chcelNocnyRezim === 'true') {
-			        if (typeof zapniNocnyRezim === 'function') {
-			            zapniNocnyRezim();
-			        } else {
-			            document.body.classList.add('night-mode');
-			        }
-			    }
-			}
 			
 			// Spustenie pri načítaní stránky
 			zapniWakeLock();
