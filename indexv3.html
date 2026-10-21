@@ -2589,39 +2589,51 @@
 		}, { once: true });
         
         function toggleSettingsMode() {
-            isSettingsModeActive = !isSettingsModeActive;
-            const btn = document.getElementById('settingsToggleBtn');
-            const placeholder = document.getElementById('rightPlaceholder');
-            const gridView = document.getElementById('settingsGridView');
-            const weatherView = document.getElementById('weatherDetailView');
-			// Odkazy na tlačidlá, ktoré chcemo schovať pri otvorených nastaveniach
-            const fsBtn = document.getElementById('fullscreenToggleBtn');
-            const radioBtn = document.getElementById('radioToggleBtn');
-			const volPanel = document.getElementById('volumePanel');
-
-            if (isSettingsModeActive) {
-                btn.classList.add('active');
-                placeholder.style.display = 'none';
-                weatherView.style.display = 'none';
-                gridView.style.display = 'grid';
-				// Skryjeme zbytočné tlačidlá vpravo hore
-                if (fsBtn) fsBtn.style.display = 'none';
-                if (radioBtn) radioBtn.style.display = 'none';
-				if (volPanel) volPanel.style.display = 'none';
-                renderSettingsGrid();
-                resetSettingsTimer(); 
-            } else {
-                clearTimeout(settingsTimeout);
-                btn.classList.remove('active');
-                placeholder.style.display = 'flex';
-                gridView.style.display = 'none';
-                weatherView.style.display = 'none';
-				// Vrátime tlačidlá vpravo hore
-                if (fsBtn) fsBtn.style.display = 'flex';
-                if (radioBtn) radioBtn.style.display = 'flex';
-				if (volPanel) volPanel.style.display = 'flex';
-            }
-        }
+		    isSettingsModeActive = !isSettingsModeActive;
+		    const body = document.getElementById('mainBody');
+		    const btn = document.getElementById('settingsToggleBtn');
+		    const placeholder = document.getElementById('rightPlaceholder');
+		    const gridView = document.getElementById('settingsGridView');
+		    const weatherView = document.getElementById('weatherDetailView');
+		    const fsBtn = document.getElementById('fullscreenToggleBtn');
+		    const radioBtn = document.getElementById('radioToggleBtn');
+		    const volPanel = document.getElementById('volumePanel');
+		
+		    if (isSettingsModeActive) {
+		        btn.classList.add('active');
+		        
+		        // Ak bol sidebar skrytý, pri otvorení nastavení ho na chvíľu odkryjeme,
+		        // aby sa mriežka nastavení korektne zobrazila na celú šírku
+		        body.classList.remove('sidebar-hidden');
+		
+		        placeholder.style.display = 'none';
+		        weatherView.style.display = 'none';
+		        gridView.style.display = 'grid';
+		
+		        if (fsBtn) fsBtn.style.display = 'none';
+		        if (radioBtn) radioBtn.style.display = 'none';
+		        if (volPanel) volPanel.style.display = 'none';
+		
+		        renderSettingsGrid();
+		        resetSettingsTimer(); 
+		    } else {
+		        clearTimeout(settingsTimeout);
+		        btn.classList.remove('active');
+		        placeholder.style.display = 'flex';
+		        gridView.style.display = 'none';
+		        weatherView.style.display = 'none';
+		
+		        // Pri zavretí nastavení obnovíme uložený stav sidebaru z localStorage
+		        const isSidebarHidden = localStorage.getItem('kiosk_sidebar_hidden') === 'true';
+		        if (isSidebarHidden) {
+		            body.classList.add('sidebar-hidden');
+		        }
+		
+		        if (fsBtn) fsBtn.style.display = 'flex';
+		        if (radioBtn) radioBtn.style.display = 'flex';
+		        if (volPanel) volPanel.style.display = (audio && !audio.paused) ? 'flex' : 'none';
+		    }
+		}
 
         function handleFavCardClick(item) {
 		    if (isSettingsModeActive) return;
