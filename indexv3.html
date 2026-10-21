@@ -2554,42 +2554,36 @@
 		    localStorage.setItem('dashboard_version', 'v3');
 		});
         function toggleMainRadioBtn() {
-            const body = document.getElementById('mainBody');
-            const radioBtn = document.getElementById('radioToggleBtn');
-            
-            body.classList.toggle('sidebar-hidden');
-            
-            if (radioBtn) {
-                radioBtn.classList.toggle('active');
-            }
-        }
-        function toggleFullscreenMode() {
-            const doc = window.document;
-            const docEl = doc.documentElement;
-            const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-            const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
-            const fsBtn = document.getElementById('fullscreenToggleBtn');
-            const fsIcon = document.getElementById('fullscreenIcon');
-
-            if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
-                if (requestFullScreen) {
-                    requestFullScreen.call(docEl);
-                    if (fsBtn) fsBtn.classList.add('active');
-                    if (fsIcon) { fsIcon.classList.remove('fa-expand'); fsIcon.classList.add('fa-compress'); }
-                }
-            } else {
-                if (cancelFullScreen) {
-                    cancelFullScreen.call(doc);
-                    if (fsBtn) fsBtn.classList.remove('active');
-                    if (fsIcon) { fsIcon.classList.remove('fa-compress'); fsIcon.classList.add('fa-expand'); }
-                }
-            }
-        }
-		// Spustí tvoju funkciu toggleFullscreenMode pri prvom dotyku IBA na mobilných zariadeniach
-		document.addEventListener('click', function() {
-		    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
+		    const body = document.getElementById('mainBody');
+		    const radioBtn = document.getElementById('radioToggleBtn');
 		    
-		    if (isMobile && !document.fullscreenElement && !document.webkitFullscreenElement) {
+		    body.classList.toggle('sidebar-hidden');
+		    
+		    const isHidden = body.classList.contains('sidebar-hidden');
+		    localStorage.setItem('kiosk_sidebar_hidden', isHidden);
+		    
+		    if (radioBtn) {
+		        radioBtn.classList.toggle('active', isHidden);
+		    }
+		}
+        function skontrolujObnovuStavuDisplaya() {
+		    // 1. Okamžitá obnova skrytého sidebaru pri načítaní
+		    const isSidebarHidden = localStorage.getItem('kiosk_sidebar_hidden') === 'true';
+		    const body = document.getElementById('mainBody');
+		    const radioBtn = document.getElementById('radioToggleBtn');
+		
+		    if (isSidebarHidden && body) {
+		        body.classList.add('sidebar-hidden');
+		        if (radioBtn) radioBtn.classList.add('active');
+		    }
+		}
+		
+		// 2. Obnova Fullscreenu pri prvom dotyku/kliknutí (IBA pre mobily a IBA ak bol zapnutý)
+		document.addEventListener('click', function prvotnaInterakcia() {
+		    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
+		    const wantedFullscreen = localStorage.getItem('kiosk_fullscreen_wanted') !== 'false'; // Výchozo true pre mobily
+		
+		    if (isMobile && wantedFullscreen && !document.fullscreenElement && !document.webkitFullscreenElement) {
 		        toggleFullscreenMode();
 		    }
 		}, { once: true });
@@ -3107,6 +3101,7 @@
             fetchNamedayData();
             renderSidebarFavorites();
             inicializujPlochuNastaveni();
+			skontrolujObnovuStavuDisplaya();
             aktualizujTlacidloMesta();
         });
 
