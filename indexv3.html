@@ -3003,30 +3003,45 @@
             // Globálna premenná na odlíšenie ručnej pauzy (pridaj k ostatným let premenným)
 			manualnePozastavene = false;
 			
-			// Nahradiť pôvodný blok audio.addEventListener('pause', ...) týmto úsekom:
+	
 			audio.addEventListener('pause', () => {
-				document.getElementById("player-now-playing").innerText = "";
-				if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
-				renderSidebarFavorites();
-				aktualizujNochnyPrehravacVizual();
-
-				const volPanel = document.getElementById('volumePanel');
-    			if (volPanel) volPanel.style.display = 'none';
+			    document.getElementById("player-now-playing").innerText = "";
+			    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
+			    renderSidebarFavorites();
+			    aktualizujNochnyPrehravacVizual();
 			
-				// Časovač pre uvoľnenie streamu sa spustí LEN vtedy, ak si klikol na PAUSE ručne
-				clearTimeout(globalPauseToStopTimeout);
-				if (manualnePozastavene) {
-					globalPauseToStopTimeout = setTimeout(() => {
-						audio.src = "";
-						audio.load();
-						currentPlayingType = "";
-						if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
-						renderSidebarFavorites();
-						runClockEngine();
-						aktualizujNochnyPrehravacVizual();
-						manualnePozastavene = false;
-					}, CAS_PRE_HARD_STOP);
-				}
+			    const volPanel = document.getElementById('volumePanel');
+			    if (volPanel) volPanel.style.display = 'none';
+			
+			    // 1. Ak si tlačidlo pauzy nestlačil ručne, ide o výpadok siete/prehliadača -> pokúsime sa rádio obnoviť
+			    if (!manualnePozastavene && currentPlayingType) {
+			        console.log("Neplánovaná pauza (výpadok siete/bufferu). Pokus o opätovný štart o 2 sekundy...");
+			        setTimeout(() => {
+			            if (!manualnePozastavene && audio.paused && currentPlayingType) {
+			                audio.play().catch(err => {
+			                    console.log("Automatické obnovenie zlyhalo, načítavam stream znova...", err);
+			                    const lastUrl = localStorage.getItem('kiosk_last_radio_url');
+			                    if (lastUrl) playRadio(lastUrl, currentPlayingType);
+			                });
+			            }
+			        }, 2000);
+			        return;
+			    }
+			
+			    // 2. Ručná pauza -> spustí 5-minútový časovač pre hard stop
+			    clearTimeout(globalPauseToStopTimeout);
+			    if (manualnePozastavene) {
+			        globalPauseToStopTimeout = setTimeout(() => {
+			            audio.src = "";
+			            audio.load();
+			            currentPlayingType = "";
+			            if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
+			            renderSidebarFavorites();
+			            runClockEngine();
+			            aktualizujNochnyPrehravacVizual();
+			            manualnePozastavene = false;
+			        }, CAS_PRE_HARD_STOP);
+			    }
 			});
 			
 			// PRIDAŤ: Automatické opätovné načítanie pri výpadku pripojenia
