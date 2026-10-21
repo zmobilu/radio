@@ -1537,6 +1537,15 @@
             
             <div class="settings-grid-view" id="settingsGridView" onclick="resetSettingsTimer()">                
                 <div class="settings-night-panel" style="grid-column: 1 / -1;" onclick="resetSettingsTimer()">
+					<!-- Tlačidlo pre Automatické Vypnutie Rádia -->
+					<div class="settings-night-row">
+					    <i class="fa-solid fa-power-off label-icon" title="Automatické vypnutie rádia"></i>
+					    <div style="display: flex; align-items: center; gap: 5px;">
+					        <button onclick="zmenCasVypnutiaRadia(); event.stopPropagation();" id="set-radio-off-time">17:00</button>
+					        <button onclick="toggleAutoOffRadia(); event.stopPropagation();" id="set-radio-off-toggle" style="background: #222; color: #888;">OFF</button>
+					    </div>
+					    <span style="font-size: 0.8em; color: #888; font-weight: bold;">Auto-Vypnutie</span>
+					</div>
                     <div class="settings-night-row">
                         <i class="fa-solid fa-clock label-icon" title="Trvanie noci"></i>
                         <div>
@@ -1690,6 +1699,9 @@
         let nocnyRezimSnoozeDo = 0;
         let manualnaNocAktivna = false;
         const noSleep = new NoSleep();
+		let cfgRadioOffTime = localStorage.getItem('cfg_radio_off_time') || "16:30";
+		let cfgRadioOffEnabled = localStorage.getItem('cfg_radio_off_enabled') === 'true';
+		let radioAlreadyAutoStopped = false; // Zabráni opakovanému vypínaniu v tej istej minúte
 
         let cfgLat = localStorage.getItem('cfg_weather_lat') || "48.1486"; 
         let cfgLon = localStorage.getItem('cfg_weather_lon') || "17.1077";
@@ -1791,6 +1803,45 @@
 
         const VOLUME_MAP = { 'slovensko': 0.5, 'fm': 0.5, 'devin': 0.5, 'litera': 0.7, 'junior': 0.5, 'regina': 0.5, 'rock': 0.7, 'rockzone': 1.0,'impuls': 1.0, 'fun': 1.0, 'funchill': 0.5, 'funczsk': 0.5, 'fun8090': 0.5, 'milenialky': 0.5, 'expres': 1.0, 'europa2': 1.0, 'melody': 1.0, 'vlna': 0.5, 'blanik': 1.0, 'jazz': 1.0, 'h-techno': 1.0 };
 		
+		function toggleAutoOffRadia() {
+		    cfgRadioOffEnabled = !cfgRadioOffEnabled;
+		    localStorage.setItem('cfg_radio_off_enabled', cfgRadioOffEnabled);
+		    radioAlreadyAutoStopped = false;
+		    aktualizujTlacidlaAutoVypnutia();
+		    resetSettingsTimer();
+		}
+		
+		function zmenCasVypnutiaRadia() {
+		    let novy = prompt("Zadaj čas pre automatické vypnutie rádia (HH:MM):", cfgRadioOffTime);
+		    if (novy && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(novy)) {
+		        if (novy.length === 4 && novy.indexOf(':') === 1) novy = "0" + novy;
+		        cfgRadioOffTime = novy;
+		        localStorage.setItem('cfg_radio_off_time', novy);
+		        radioAlreadyAutoStopped = false;
+		        aktualizujTlacidlaAutoVypnutia();
+		    }
+		    resetSettingsTimer();
+		}
+		
+		function aktualizujTlacidlaAutoVypnutia() {
+		    const btnTime = document.getElementById('set-radio-off-time');
+		    const btnToggle = document.getElementById('set-radio-off-toggle');
+		
+		    if (btnTime) btnTime.textContent = cfgRadioOffTime;
+		    if (btnToggle) {
+		        if (cfgRadioOffEnabled) {
+		            btnToggle.textContent = "ON";
+		            btnToggle.style.color = "#ff9f0a";
+		            btnToggle.style.borderColor = "#ff9f0a";
+		            btnToggle.style.background = "#1a1a1a";
+		        } else {
+		            btnToggle.textContent = "OFF";
+		            btnToggle.style.color = "#888";
+		            btnToggle.style.borderColor = "#444";
+		            btnToggle.style.background = "#222";
+		        }
+		    }
+		}
 		// Aplikuje a uloží hlasitosť pre aktuálne vybrané rádio
 		function applyAndSaveVolume(newVol) {
 		    const clampedVol = Math.min(1, Math.max(0, newVol));
@@ -2180,6 +2231,7 @@
                 if (currentDotHex === cfgFarbaNoci.toLowerCase()) {
                     dot.classList.add('active-color');
                 }
+				aktualizujTlacidlaAutoVypnutia()
             });
         }
 
@@ -2806,6 +2858,21 @@
             }
             
             document.title = `${aktualnaTeplotaText} | ${stavRadia}`;
+			// Kontrola automatického vypnutia rádia
+			if (cfgRadioOffEnabled) {
+			    if (aktCasString === cfgRadioOffTime) {
+			        if (!radioAlreadyAutoStopped) {
+			            if (audio && !audio.paused) {
+			                manualnePozastavene = true;
+			                audio.pause();
+			                console.log("Rádio bolo automaticky vypnuté plánovaným časovačom.");
+			            }
+			            radioAlreadyAutoStopped = true;
+			        }
+			    } else {
+			        radioAlreadyAutoStopped = false; // Resetne sa hneď po prechode na ďalšiu minútu
+			    }
+			}
         }
 
         // Globálne premenné pre meniny
