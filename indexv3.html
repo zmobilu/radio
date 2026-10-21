@@ -2292,20 +2292,53 @@
             resetSettingsTimer();
         }
 
-        // Kliknutie na hlavné tlačidlo mesta zmení/prepíše LEN označené mesto
-        function zmenNastavenieMesta() {
-            if (!cfgHistoriaMest || cfgHistoriaMest.length === 0) {
-                pridajNoveMesto();
-                return;
-            }
-            let vybraneMesto = cfgHistoriaMest[aktivneMestoIndex] || cfgMestoNazov;
-            let navrhMesta = prompt("Upraviť názov označeného mesta:", vybraneMesto);
-            
-            if (navrhMesta && navrhMesta.trim() !== "") {
-                vyhladajMestoPodlaTextu(navrhMesta.trim(), "prepisat");
-            }
-            resetSettingsTimer();
-        }
+        // Kliknutie na hlavné tlačidlo mesta zmení, prepíše alebo zmaže označené mesto
+		function zmenNastavenieMesta() {
+		    if (!cfgHistoriaMest || cfgHistoriaMest.length === 0) {
+		        pridajNoveMesto();
+		        return;
+		    }
+		    
+		    let vybraneMesto = cfgHistoriaMest[aktivneMestoIndex] || cfgMestoNazov;
+		    let navrhMesta = prompt(`Upraviť označené mesto (${vybraneMesto}). Zadaj "0" pre zmazanie:`, vybraneMesto);
+		    
+		    if (navrhMesta !== null) {
+		        let cistyVstup = navrhMesta.trim();
+		        
+		        // Ak používateľ zadal "0", mesto vymažeme
+		        if (cistyVstup === "0") {
+		            odstranMestoZHistorie(aktivneMestoIndex);
+		        } else if (cistyVstup !== "") {
+		            vyhladajMestoPodlaTextu(cistyVstup, "prepisat");
+		        }
+		    }
+		    resetSettingsTimer();
+		}
+		
+		function odstranMestoZHistorie(indexNaZmazanie) {
+		    if (cfgHistoriaMest.length === 0) return;
+		
+		    // Odstránime mesto z poľa
+		    cfgHistoriaMest.splice(indexNaZmazanie, 1);
+		
+		    // Ak sme vymazali všetky mestá, vrátime výchoziu Bratislavu
+		    if (cfgHistoriaMest.length === 0) {
+		        cfgHistoriaMest = ["Bratislava"];
+		        aktivneMestoIndex = 0;
+		        vyhladajMestoPodlaTextu("Bratislava", "nacitat");
+		    } else {
+		        // Ak sme zmazali posledný prvok poľa, posunieme index na nový koniec
+		        if (aktivneMestoIndex >= cfgHistoriaMest.length) {
+		            aktivneMestoIndex = cfgHistoriaMest.length - 1;
+		        }
+		        // Načítame dáta pre nové aktívne mesto
+		        vyhladajMestoPodlaTextu(cfgHistoriaMest[aktivneMestoIndex], "nacitat");
+		    }
+		
+		    // Uložíme nový zoznam do pamäte prehliadača
+		    localStorage.setItem('cfg_weather_history', JSON.stringify(cfgHistoriaMest));
+		    aktualizujTlacidloMesta();
+		}
 
         function vyhladajMestoPodlaTextu(cisteMesto, rezim = "nacitat") {
             fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cisteMesto)}&count=1&language=sk&format=json`)
