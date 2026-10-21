@@ -1539,12 +1539,12 @@
                 <div class="settings-night-panel" style="grid-column: 1 / -1;" onclick="resetSettingsTimer()">
 					<!-- Tlačidlo pre Automatické Vypnutie Rádia -->
 					<div class="settings-night-row">
-					    <i class="fa-solid fa-power-off label-icon" title="Automatické vypnutie rádia"></i>
+					    <i class="fa-solid fa-volume-xmark label-icon" title="Automatické vypnutie rádia"></i>
 					    <div style="display: flex; align-items: center; gap: 5px;">
 					        <button onclick="zmenCasVypnutiaRadia(); event.stopPropagation();" id="set-radio-off-time">17:00</button>
 					        <button onclick="toggleAutoOffRadia(); event.stopPropagation();" id="set-radio-off-toggle" style="background: #222; color: #888;">OFF</button>
 					    </div>
-					    <span style="font-size: 0.8em; color: #888; font-weight: bold;">Auto-Vypnutie</span>
+					    <span style="font-size: 0.8em; color: #888; font-weight: bold;">AutoOFF rádia</span>
 					</div>
                     <div class="settings-night-row">
                         <i class="fa-solid fa-clock label-icon" title="Trvanie noci"></i>
@@ -1558,6 +1558,7 @@
                     <div class="settings-night-row">
                         <i class="fa-solid fa-bed label-icon" title="Prerušenie noci (Snooze)"></i>
                         <button onclick="zmenDobuOdkladu(); event.stopPropagation();" id="set-snooze-time">1 min</button>
+						<span style="font-size: 0.8em; color: #888; font-weight: bold;">Návrat noč.režimu</span>
                     </div>
                     <div class="settings-night-row">
                         <i class="fa-solid fa-palette label-icon" title="Farba nočného zobrazenia"></i>
