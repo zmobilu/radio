@@ -1446,7 +1446,7 @@
 </head>
 <body id="mainBody">
 
-    <audio id="audioPlayer" preload="none" playsinline fetchpriority="high"></audio>
+    <audio id="audioPlayer" preload="auto" playsinline fetchpriority="high"></audio>
 
     <div class="workspace-container">
         <aside class="favorites-sidebar" id="favSidebarContainer"></aside>
@@ -2732,36 +2732,40 @@
         }
         
         function playRadio(url, id) {
-            audio.src = url;
-            audio.load();
-            // Zoberieme priamu URL adresu rádia a spustíme analýzu streamu
-            sledujStreamMetadat(url);
-            currentPlayingType = id;
-            localStorage.setItem('kiosk_last_radio_url', url);
-            localStorage.setItem('kiosk_last_radio_type', id);
-            // Načítanie individuálnej uloženej hlasitosti pre stanicu
-			const savedRadioVol = localStorage.getItem(`vol_radio_${id}`);
-			let initialVol;
-			
-			if (savedRadioVol !== null) {
-			    initialVol = parseFloat(savedRadioVol);
-			} else {
-			    initialVol = VOLUME_MAP[id] !== undefined ? VOLUME_MAP[id] : 0.8;
-			}
-			
-			applyAndSaveVolume(initialVol);
-            audio.play()
-            .then(() => {
-                if (typeof noSleep !== 'undefined') {
-                    noSleep.enable().catch(e => console.log("WakeLock chyba:", e));
-                }
-                renderSidebarFavorites();
-                runClockEngine(); 
-                aktualizujZamknutuObrazovku(id);
-                aktualizujNochnyPrehravacVizual();
-            })
-            .catch((e) => console.log("Stream offline", e));
-        }
+		    audio.src = url;
+		    audio.load();
+		    // Zoberieme priamu URL adresu rádia a spustíme analýzu streamu
+		    sledujStreamMetadat(url);
+		    currentPlayingType = id;
+		    localStorage.setItem('kiosk_last_radio_url', url);
+		    localStorage.setItem('kiosk_last_radio_type', id);
+		    // Načítanie individuálnej uloženej hlasitosti pre stanicu
+		    const savedRadioVol = localStorage.getItem(`vol_radio_${id}`);
+		    let initialVol;
+		    
+		    if (savedRadioVol !== null) {
+		        initialVol = parseFloat(savedRadioVol);
+		    } else {
+		        initialVol = VOLUME_MAP[id] !== undefined ? VOLUME_MAP[id] : 0.8;
+		    }
+		    
+		    applyAndSaveVolume(initialVol);
+		
+		    // Pridaný pauza 800 ms pre načítanie bufferu zo siete
+		    setTimeout(() => {
+		        audio.play()
+		        .then(() => {
+		            if (typeof noSleep !== 'undefined') {
+		                noSleep.enable().catch(e => console.log("WakeLock chyba:", e));
+		            }
+		            renderSidebarFavorites();
+		            runClockEngine(); 
+		            aktualizujZamknutuObrazovku(id);
+		            aktualizujNochnyPrehravacVizual();
+		        })
+		        .catch((e) => console.log("Stream offline", e));
+		    }, 800);
+		}
 
         function triggerExternalApp(url, id) {
 			// Zastavenie interného audio prehrávača kiosku
