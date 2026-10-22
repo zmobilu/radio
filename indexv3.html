@@ -1804,6 +1804,8 @@
 
         const VOLUME_MAP = { 'slovensko': 0.5, 'fm': 0.5, 'devin': 0.5, 'litera': 0.7, 'junior': 0.5, 'regina': 0.5, 'rock': 0.7, 'rockzone': 1.0,'impuls': 1.0, 'fun': 1.0, 'funchill': 0.5, 'funczsk': 0.5, 'fun8090': 0.5, 'milenialky': 0.5, 'expres': 1.0, 'europa2': 1.0, 'melody': 1.0, 'vlna': 0.5, 'blanik': 1.0, 'jazz': 1.0, 'h-techno': 1.0 };
 		
+		
+		
 		function toggleAutoOffRadia() {
 		    cfgRadioOffEnabled = !cfgRadioOffEnabled;
 		    localStorage.setItem('cfg_radio_off_enabled', cfgRadioOffEnabled);
@@ -2580,11 +2582,34 @@
 		}
 		
 		// 2. Obnova Fullscreenu pri prvom dotyku/kliknutí (IBA pre mobily a IBA ak bol zapnutý)
-		document.addEventListener('click', function prvotnaInterakcia() {
-		    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
-		    const wantedFullscreen = localStorage.getItem('kiosk_fullscreen_wanted') !== 'false'; // Výchozo true pre mobily
+		function toggleFullscreenMode() {
+		    const doc = window.document;
+		    const docEl = doc.documentElement;
+		    const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+		    const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+		    const fsBtn = document.getElementById('fullscreenToggleBtn');
+		    const fsIcon = document.getElementById('fullscreenIcon');
 		
-		    if (isMobile && wantedFullscreen && !document.fullscreenElement && !document.webkitFullscreenElement) {
+		    if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+		        if (requestFullScreen) {
+		            requestFullScreen.call(docEl);
+		            if (fsBtn) fsBtn.classList.add('active');
+		            if (fsIcon) { fsIcon.classList.remove('fa-expand'); fsIcon.classList.add('fa-compress'); }
+		        }
+		    } else {
+		        if (cancelFullScreen) {
+		            cancelFullScreen.call(doc);
+		            if (fsBtn) fsBtn.classList.remove('active');
+		            if (fsIcon) { fsIcon.classList.remove('fa-compress'); fsIcon.classList.add('fa-expand'); }
+		        }
+		    }
+		}
+		
+		// Spustí tvoju funkciu toggleFullscreenMode pri prvom dotyku IBA na mobilných zariadeniach
+		document.addEventListener('click', function() {
+		    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
+		    
+		    if (isMobile && !document.fullscreenElement && !document.webkitFullscreenElement) {
 		        toggleFullscreenMode();
 		    }
 		}, { once: true });
