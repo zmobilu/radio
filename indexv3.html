@@ -2841,19 +2841,39 @@
 		}
 
         function triggerExternalApp(url, id) {
-			// Zastavenie interného audio prehrávača kiosku
-			if (typeof audio !== 'undefined') {
-				audio.pause(); 
-				audio.src = ""; 
-			}
-			
-			currentPlayingType = id;
-			if (typeof renderSidebarFavorites === 'function') {
-				renderSidebarFavorites();
-			}
+		    // 1. Natvrdo povieme systému, že rádio bolo zastavené zámerne
+		    manualnePozastavene = true;
+		    clearTimeout(globalPauseToStopTimeout);
 		
-			// Otvorenie akejkoľvek externej aplikácie/streamu v samostatnom popup okne
-			window.open(url, '_blank', 'popup=yes,width=1200,height=800,scrollbars=yes,resizable=yes');
+		    // 2. Zastavíme audio prehrávač a úplne mu vyčistíme zdroj
+		    if (typeof audio !== 'undefined' && audio) {
+		        audio.pause(); 
+		        audio.src = "";
+		        audio.load();
+		    }
+		
+		    // 3. Zrušíme aj čítanie metadát / playlistov rádia, ak nejaké bežalo
+		    if (typeof metadataController !== 'undefined' && metadataController) {
+		        metadataController.abort();
+		        metadataController = null;
+		    }
+		    if (typeof bauerIntervalId !== 'undefined' && bauerIntervalId) {
+		        clearInterval(bauerIntervalId);
+		        bauerIntervalId = null;
+		    }
+		    
+		    // 4. Vyčistíme text práve hrajúcej pesničky na displeji
+		    const textElement = document.getElementById("player-now-playing");
+		    if (textElement) textElement.innerText = "";
+		
+		    // 5. Označíme aktuálnu aplikáciu a aktualizujeme obľúbené
+		    currentPlayingType = id;
+		    if (typeof renderSidebarFavorites === 'function') {
+		        renderSidebarFavorites();
+		    }
+		
+		    // 6. Otvoríme okno Spotify / externej aplikácie
+		    window.open(url, '_blank', 'popup=yes,width=1200,height=800,scrollbars=yes,resizable=yes');
 		}
         function handleBigClockClick() {
             if (typeof noSleep !== 'undefined') {
