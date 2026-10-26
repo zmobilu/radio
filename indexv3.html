@@ -1720,8 +1720,8 @@
         let weatherDataBackup = null;
 
         // GLOBÁLNY SLEDNÝ ČASOVAČ PRE PAUSE -> HARD STOP (5 minút)
-        let globalPauseToStopTimeout = null;
-        const CAS_PRE_HARD_STOP = 5 * 60 * 1000; 
+        // let globalPauseToStopTimeout = null;
+        // const CAS_PRE_HARD_STOP = 5 * 60 * 1000; 
 
         const WEATHER_CODES = { 0: 'fa-sun', 1: 'fa-cloud-sun', 2: 'fa-cloud-sun', 3: 'fa-cloud', 45: 'fa-smog', 48: 'fa-smog', 51: 'fa-cloud-rain', 61: 'fa-cloud-showers-heavy', 71: 'fa-snowflake', 95: 'fa-bolt' };
         const WEATHER_COLORS = { 0: '#ffcc00', 1: '#ffdb58', 2: '#aaa', 3: '#888', 45: '#777', 51: '#4dabff', 61: '#007bff', 71: '#fff', 95: '#ffeb3b' };
@@ -2680,23 +2680,20 @@
 		    const spotifyIframe = document.getElementById('spotifyIframe');
 		    const weatherBlock = document.querySelector('.main-weather-container');
 		
-		    // Kontrola, či ide o externú streamovaciu platformu (Spotify, Apple Music, YouTube a pod.)
+		    // Kontrola, či ide o externú streamovaciu platformu (Spotify, Apple Music...)
 		    const isExternalApp = item.isExternal || 
 		                          (item.id && (item.id.startsWith('sp') || item.id.startsWith('ext_'))) || 
 		                          item.embedUrl;
 		
 		    if (isExternalApp) {
-		        clearTimeout(globalPauseToStopTimeout);
-		        manualnePozastavene = false;
+		        manualnePozastavene = true;
 		
-		        // Ak uz nejaky iframe bezi v kiosku, zatvorime ho a vratime pocacie
 		        if (spotifyContainer && spotifyContainer.style.display === 'block') {
 		            spotifyContainer.style.display = 'none';
 		            if (spotifyIframe) spotifyIframe.src = "about:blank";
 		            if (weatherBlock) weatherBlock.style.display = 'flex';
 		        }
 		
-		        // Otvorenie externeho streamu v samostatnom popup okne
 		        triggerExternalApp(item.url || item.embedUrl, item.id);
 		        return;
 		    }
@@ -2709,11 +2706,10 @@
 		    }
 		
 		    if (item.url) {
+		        // Ak rádio hrá, opätovným stlačením ho OKAMŽITE zastavíme
 		        if (currentPlayingType === item.id && !audio.paused) {
 		            manualnePozastavene = true;
 		            audio.pause(); 
-		            document.getElementById("player-now-playing").innerText = "";
-		            renderSidebarFavorites(); 
 		        } else {
 		            manualnePozastavene = false;
 		            playRadio(item.url, item.id);
@@ -3087,58 +3083,39 @@
 		        skontrolujAObnovMeniny();
 		    });
             
-            // --- CENTRÁLNY AUDIO EVENT MANAŽMENT PRE STOP/PAUSE S ČASOVAČOM ---
-            audio.addEventListener('play', () => {
-                clearTimeout(globalPauseToStopTimeout); 
-                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
-                renderSidebarFavorites();
-                aktualizujNochnyPrehravacVizual();
-				const volPanel = document.getElementById('volumePanel');
-    			if (volPanel) volPanel.style.display = 'flex';
-            });
-
-            // Globálna premenná na odlíšenie ručnej pauzy (pridaj k ostatným let premenným)
-			manualnePozastavene = false;
-			
-	
-			audio.addEventListener('pause', () => {
-			    document.getElementById("player-now-playing").innerText = "";
-			    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
+            // --- CENTRÁLNY AUDIO EVENT MANAŽMENT PRE OKAMŽITÉ ZASTAVENIE (HARD STOP) ---
+			audio.addEventListener('play', () => {
+			    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
 			    renderSidebarFavorites();
 			    aktualizujNochnyPrehravacVizual();
+			    const volPanel = document.getElementById('volumePanel');
+			    if (volPanel) volPanel.style.display = 'flex';
+			});
 			
+			audio.addEventListener('pause', () => {
+			    // 1. Okamžité vyčistenie displeja a prvkov
+			    document.getElementById("player-now-playing").innerText = "";
+			    if ('mediaSession' in navigator) {
+			        navigator.mediaSession.playbackState = "paused";
+			        navigator.mediaSession.metadata = null;
+			    }
+			    
+			    // 2. Skrytie ovládača hlasitosti a úprava tlačidiel rádia
 			    const volPanel = document.getElementById('volumePanel');
 			    if (volPanel) volPanel.style.display = 'none';
 			
-			    // 1. Ak si tlačidlo pauzy nestlačil ručne, ide o výpadok siete/prehliadača -> pokúsime sa rádio obnoviť
-			    if (!manualnePozastavene && currentPlayingType) {
-			        console.log("Neplánovaná pauza (výpadok siete/bufferu). Pokus o opätovný štart o 2 sekundy...");
-			        setTimeout(() => {
-			            if (!manualnePozastavene && audio.paused && currentPlayingType) {
-			                audio.play().catch(err => {
-			                    console.log("Automatické obnovenie zlyhalo, načítavam stream znova...", err);
-			                    const lastUrl = localStorage.getItem('kiosk_last_radio_url');
-			                    if (lastUrl) playRadio(lastUrl, currentPlayingType);
-			                });
-			            }
-			        }, 2000);
-			        return;
+			    // 3. OKAMŽITÝ HARD STOP (vyčistenie zdroja streamu)
+			    if (audio.src) {
+			        audio.src = "";
+			        audio.load();
 			    }
 			
-			    // 2. Ručná pauza -> spustí 5-minútový časovač pre hard stop
-			    clearTimeout(globalPauseToStopTimeout);
-			    if (manualnePozastavene) {
-			        globalPauseToStopTimeout = setTimeout(() => {
-			            audio.src = "";
-			            audio.load();
-			            currentPlayingType = "";
-			            if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
-			            renderSidebarFavorites();
-			            runClockEngine();
-			            aktualizujNochnyPrehravacVizual();
-			            manualnePozastavene = false;
-			        }, CAS_PRE_HARD_STOP);
-			    }
+			    currentPlayingType = "";
+			    manualnePozastavene = false;
+			
+			    renderSidebarFavorites();
+			    runClockEngine();
+			    aktualizujNochnyPrehravacVizual();
 			});
 			
 			// PRIDAŤ: Automatické opätovné načítanie pri výpadku pripojenia
