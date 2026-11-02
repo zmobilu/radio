@@ -1928,7 +1928,7 @@
 					
 					// Skontrolujeme okamžité zrážky z current + najbližších 15 minút
 					const currentRain = (data.current.precipitation || 0) + (data.current.rain || 0) + (data.current.showers || 0);
-					const minutelyRain = data.minutely_15 && data.minutely_15.precipitation ? (data.minutely_15.precipitation[0] || 0) : 0;
+					const minutelyRain = data?.minutely_15?.precipitation?.[0] || 0;
 					
 					let code = data.current.weather_code;
 					
