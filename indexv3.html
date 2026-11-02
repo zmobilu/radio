@@ -2472,9 +2472,10 @@
 		        if (item && id !== null) {
 		            card.className = "fav-card";
 		            
-		            if (currentPlayingType === item.id && !audio.paused) {
-		                card.classList.add("playing");
-		            }
+		            // Oranžový svietiaci rámik sa pridá IBA ak stanica reálne hrá a nie je pozastavená
+					if (currentPlayingType === item.id && audio && !audio.paused) {
+						card.classList.add("playing");
+					}
 		            
 		            card.onclick = () => handleFavCardClick(item);
 		
@@ -2809,10 +2810,19 @@
 		    if (currentPlayingType === item.id && audio && !audio.paused) {
 		        // Zastavenie rádia (STOP) -> Okamžité vyčistenie streamu a prechod do sivého stavu
 		        manualnePozastavene = true;
-		        audio.pause();
+		        currentPlayingType = ""; // Zabezpečí odstránenie oranžového rámika
+				
+				audio.pause();
 		        audio.src = "";
 		        audio.load();
-		        document.getElementById("player-now-playing").innerText = "";
+		        
+				document.getElementById("player-now-playing").innerText = "";
+
+				// Skrytie bežca hlasitosti
+		        const volPanel = document.getElementById('volumePanel');
+		        if (volPanel) volPanel.style.display = 'none';
+		
+		        renderSidebarFavorites();
 		        aktualizujNochnyPrehravacVizual();
 		    } else {
 		        // Opätovné spustenie
