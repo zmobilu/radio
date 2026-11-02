@@ -605,7 +605,7 @@
 
             /* 1. Definícia prechodov (transition) pre plynulý fade-in / fade-out */
             body .placeholder-view,
-            body #,
+            body #player-now-playing,
             body #nightBottomInfo,
             body .night-player-container {
                 transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out !important;
@@ -649,12 +649,12 @@
             body.full-night-mode .big-clock-hours, 
             body.full-night-mode .big-clock-minutes, 
             body.full-night-mode #nightBottomInfo, 
-            body.full-night-mode # { 
+            body.full-night-mode #player-now-playing { 
                 color: var(--night-color) !important; 
             }
             
             /* Práve hrá (Song info) */
-            body.full-night-mode # {
+            body.full-night-mode #player-now-playing {
                 display: block !important;
                 position: absolute !important;
                 bottom: 13vh !important; /* Presne medzi rádio (18vh) a dátum (5vh) */
@@ -719,7 +719,7 @@
 			        margin-bottom: 0.5vh !important;
 			    }
 			
-			    body.full-night-mode # {
+			    body.full-night-mode #player-now-playing {
 			        bottom: 11vh !important;
 			        font-size: 2.2vw !important;
 			    }
@@ -1196,7 +1196,7 @@
             border-color: var(--night-color) !important;
             color: var(--night-color) !important;
         }
-        # {
+        #player-now-playing {
             font-size: clamp(12px, 2.2vh, 18px) !important;
             margin-top: 0.5vh !important; 
             margin-bottom: 0 !important;
@@ -1423,7 +1423,7 @@
             .big-clock-date-wrapper, 
             .main-weather-container, 
             #nightBottomInfo, 
-            #,
+            #player-now-playing,
             #settingsToggleBtn {
                 transition: opacity 1.5s ease-in-out, background-color 1.5s ease-in-out, color 1.5s ease-in-out, transform 1.5s ease-in-out !important;
             }
@@ -1462,7 +1462,7 @@
         		margin-bottom: 0.5vh !important;
 			}
 			
-			body:not(.full-night-mode).sidebar-hidden # { order: 4 !important; }
+			body:not(.full-night-mode).sidebar-hidden #player-now-playing { order: 4 !important; }
 			body:not(.full-night-mode).sidebar-hidden .main-weather-container { order: 5 !important; }
 			        
     </style>
@@ -1490,7 +1490,7 @@
                     <span class="big-clock-nameday" id="bigNameday">---</span>
                 </div>
 
-               <!-- <div id="player-now-playing" style="color: #fff; text-align: center;"></div> -->
+                <!-- <div id="player-now-playing" style="color: #fff; text-align: center;"></div> -->
                 
 				<!-- Skrytý Spotify prehrávač, ktorý pri aktivácii prekryje počasie -->
 				<div id="spotifyPlayerContainer" style="display: none; width: 100%; height: 352px; margin-top: 1vh; border-radius: 12px; overflow: hidden; position: relative; z-index: 50;">
@@ -2766,11 +2766,11 @@
 		    const item = DATABASE.find(d => d.id === lastId);
 		
 		    if (item && item.url) {
-		        // Hrá iba vtedy, ak je nastavený typ A ZROVEŇ audio nezamrzlo/nie je pozastavené
-		        const isPlaying = currentPlayingType !== "" && audio && !audio.paused && audio.src !== "";
+		        const isPlaying = audio && !audio.paused && audio.src !== "";
 		
 		        let imgHtml = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}"></i>`;
 		        
+		        // Kliknutie na ikonu/názov rádia stanicu zastaví (STOP) alebo zapne
 		        if (pInfo) {
 		            pInfo.innerHTML = `${imgHtml} <span>${item.name}</span>`;
 		            pInfo.style.cursor = "pointer";
@@ -2781,7 +2781,7 @@
 		        }
 		
 		        if (isPlaying) {
-		            // HRAJÚCI STAV
+		            // HRAJÚCI STAV (Biely)
 		            pBox.classList.add('active-playing');
 		            pBox.classList.remove('stopped-state');
 		
@@ -2793,9 +2793,8 @@
 		                }
 		            }
 		        } else {
-		            // ZASTAVENÝ STAV (STOP) - KRITICKÝ KROK: musíme odobrať 'active-playing'
-		            pBox.classList.remove('active-playing');
-		            pBox.classList.add('stopped-state');
+		            // ZASTAVENÝ STAV (Sivý - STOP)
+		            pBox.classList.add('active-playing', 'stopped-state');
 		
 		            if (pBtn) {
 		                pBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
