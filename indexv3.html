@@ -2733,32 +2733,43 @@
 		    }
 		}
 
-       function toggleNightPlayPause() {
+       // --- PREPÍNANIE STAVU: HRÁ -> MUTE/UNMUTE | NEHRÁ -> ŠTART ---
+		function toggleNightPlayPause() {
 		    if (!audio) return;
-		    
-		    // Prepínanie stíšenia zvuku (MUTE)
+		
+		    // Ak rádio nehrá alebo nemá načítaný stream, tlačidlo PLAY ho spustí
+		    if (audio.paused || !audio.src) {
+		        const lastId = currentPlayingType || localStorage.getItem('kiosk_last_radio_type');
+		        const item = DATABASE.find(d => d.id === lastId);
+		        if (item && item.url) {
+		            manualnePozastavene = false;
+		            playRadio(item.url, item.id);
+		        }
+		        return;
+		    }
+		
+		    // Ak rádio hrá, stredové tlačidlo stíši / odstíši zvuk (MUTE / UNMUTE)
 		    audio.muted = !audio.muted;
-		    
 		    aktualizujNochnyPrehravacVizual();
 		}
-        function aktualizujNochnyPrehravacVizual() {
+		
+		// --- VIZUÁL PREHRÁVAČA (SVIETI BIELO PRI PLAY, SIVO PRI STOP) ---
+		function aktualizujNochnyPrehravacVizual() {
 		    const pBox = document.getElementById('nightPlayer');
 		    const pInfo = document.getElementById('nightStationInfo');
 		    const pBtn = document.getElementById('nightPlayPauseBtn');
 		    
 		    if (!pBox) return;
 		
-		    // Načítame uložené posledné rádio, aj keď zatiaľ nič nehrá
 		    const lastId = currentPlayingType || localStorage.getItem('kiosk_last_radio_type');
 		    const item = DATABASE.find(d => d.id === lastId);
 		
 		    if (item && item.url) {
-		        // Skontrolujeme, či rádio reálne hrá
 		        const isPlaying = audio && !audio.paused && audio.src !== "";
 		
 		        let imgHtml = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}"></i>`;
 		        
-		        // Kliknutím na ikonu/názov rádia stanicu zapneš (ak stojí) alebo zastavíš (STOP)
+		        // Kliknutie na ikonu/názov rádia stanicu zastaví (STOP) alebo zapne
 		        if (pInfo) {
 		            pInfo.innerHTML = `${imgHtml} <span>${item.name}</span>`;
 		            pInfo.style.cursor = "pointer";
@@ -2781,7 +2792,7 @@
 		                }
 		            }
 		        } else {
-		            // SIVÝ STAV (STOP / Vypnuté)
+		            // ZASTAVENÝ STAV (Sivý - STOP)
 		            pBox.classList.add('active-playing', 'stopped-state');
 		
 		            if (pBtn) {
@@ -2790,19 +2801,21 @@
 		        }
 		    }
 		}
-
+		
+		// --- STOP / ŠTART PRI KLIKNUTÍ NA NÁZOV / IKONU RÁDIA ---
 		function toggleStopPlayLastRadio(item) {
 		    if (!item) return;
 		
-		    // Ak rádio hrá -> ÚPLNÝ STOP (vyčistenie a zosivenie)
 		    if (currentPlayingType === item.id && audio && !audio.paused) {
+		        // Zastavenie rádia (STOP) -> Okamžité vyčistenie streamu a prechod do sivého stavu
 		        manualnePozastavene = true;
 		        audio.pause();
 		        audio.src = "";
 		        audio.load();
 		        document.getElementById("player-now-playing").innerText = "";
+		        aktualizujNochnyPrehravacVizual();
 		    } else {
-		        // Ak rádio nehrá -> ŠTART (zapnutie a prefarbenie na bielo)
+		        // Opätovné spustenie
 		        manualnePozastavene = false;
 		        playRadio(item.url, item.id);
 		    }
@@ -3147,23 +3160,19 @@
 			});
 			
 			audio.addEventListener('pause', () => {
-			    // 1. Vyčistenie textu práve hrajúcej skladby
 			    document.getElementById("player-now-playing").innerText = "";
 			    if ('mediaSession' in navigator) {
 			        navigator.mediaSession.playbackState = "paused";
 			    }
 			    
-			    // 2. Skrytie vertikálneho ovládača hlasitosti
 			    const volPanel = document.getElementById('volumePanel');
 			    if (volPanel) volPanel.style.display = 'none';
 			
-			    // 3. Ak bolo rádio zastavené manuálne (tlačidlom STOP), vyčistíme zdroj streamu
 			    if (manualnePozastavene && audio.src) {
 			        audio.src = "";
 			        audio.load();
 			    }
 			
-			    // 4. Obnovenie vizuálu sidebaru, hodín a prepnutie panela do sivého stavu
 			    renderSidebarFavorites();
 			    runClockEngine();
 			    aktualizujNochnyPrehravacVizual();
