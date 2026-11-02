@@ -1490,7 +1490,7 @@
                     <span class="big-clock-nameday" id="bigNameday">---</span>
                 </div>
 
-                <!-- <div id="player-now-playing" style="color: #fff; text-align: center;"></div> -->
+                <div id="player-now-playing" style="color: #fff; text-align: center;"></div>
                 
 				<!-- Skrytý Spotify prehrávač, ktorý pri aktivácii prekryje počasie -->
 				<div id="spotifyPlayerContainer" style="display: none; width: 100%; height: 352px; margin-top: 1vh; border-radius: 12px; overflow: hidden; position: relative; z-index: 50;">
@@ -1928,7 +1928,7 @@
 					
 					// Skontrolujeme okamžité zrážky z current + najbližších 15 minút
 					const currentRain = (data.current.precipitation || 0) + (data.current.rain || 0) + (data.current.showers || 0);
-					const minutelyRain = data?.minutely_15?.precipitation?.[0] || 0;
+					const minutelyRain = data.minutely_15 && data.minutely_15.precipitation ? (data.minutely_15.precipitation[0] || 0) : 0;
 					
 					let code = data.current.weather_code;
 					
