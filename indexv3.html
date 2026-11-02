@@ -456,6 +456,22 @@
 		    accent-color: #ff9f0a;
 		    cursor: pointer;
 		}
+
+		/* Sivý vzhľad panela pri zastavenom rádiu (STOP) */
+		.night-player-container.stopped-state {
+		    display: flex !important;
+		    color: #555555 !important;
+		    opacity: 0.65;
+		}
+		
+		.night-player-container.stopped-state .night-btn,
+		.night-player-container.stopped-state .night-player-station {
+		    color: #555555 !important;
+		}
+		
+		.night-player-container.stopped-state .night-player-station img {
+		    filter: grayscale(1) opacity(0.4) !important;
+		}
 		
 		/* Skrytie pri nočnom režime */
 		body.full-night-mode .volume-panel-container {
@@ -2732,26 +2748,64 @@
 		    
 		    if (!pBox) return;
 		
-		    if (currentPlayingType && currentPlayingType !== "") {
-		        const item = DATABASE.find(d => d.id === currentPlayingType);
-		        if (item && item.url && !item.url.includes('googleusercontent.com') && !item.url.includes('music.apple.com') && !item.url.includes('music.youtube.com') && !item.url.includes('tidal.com') && !item.url.includes('soundcloud.com')) {
+		    // Načítame uložené posledné rádio, aj keď zatiaľ nič nehrá
+		    const lastId = currentPlayingType || localStorage.getItem('kiosk_last_radio_type');
+		    const item = DATABASE.find(d => d.id === lastId);
+		
+		    if (item && item.url) {
+		        // Skontrolujeme, či rádio reálne hrá
+		        const isPlaying = audio && !audio.paused && audio.src !== "";
+		
+		        let imgHtml = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}"></i>`;
+		        
+		        // Kliknutím na ikonu/názov rádia stanicu zapneš (ak stojí) alebo zastavíš (STOP)
+		        if (pInfo) {
+		            pInfo.innerHTML = `${imgHtml} <span>${item.name}</span>`;
+		            pInfo.style.cursor = "pointer";
+		            pInfo.onclick = (e) => {
+		                e.stopPropagation();
+		                toggleStopPlayLastRadio(item);
+		            };
+		        }
+		
+		        if (isPlaying) {
+		            // HRAJÚCI STAV (Biely)
 		            pBox.classList.add('active-playing');
-		            
-		            let imgHtml = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}"></i>`;
-		            if(pInfo) pInfo.innerHTML = `${imgHtml} <span>${item.name}</span>`;
-		            
-		            if(pBtn) {
-		                // Ak je zvuk stíšený (MUTE), zobrazíme preškrtnutý reproduktor
+		            pBox.classList.remove('stopped-state');
+		
+		            if (pBtn) {
 		                if (audio.muted) {
 		                    pBtn.innerHTML = `<i class="fa-solid fa-volume-xmark" style="color: #ff3b30;"></i>`;
 		                } else {
 		                    pBtn.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
 		                }
 		            }
-		            return;
+		        } else {
+		            // SIVÝ STAV (STOP / Vypnuté)
+		            pBox.classList.add('active-playing', 'stopped-state');
+		
+		            if (pBtn) {
+		                pBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
+		            }
 		        }
 		    }
-		    pBox.classList.remove('active-playing');
+		}
+
+		function toggleStopPlayLastRadio(item) {
+		    if (!item) return;
+		
+		    // Ak rádio hrá -> ÚPLNÝ STOP (vyčistenie a zosivenie)
+		    if (currentPlayingType === item.id && audio && !audio.paused) {
+		        manualnePozastavene = true;
+		        audio.pause();
+		        audio.src = "";
+		        audio.load();
+		        document.getElementById("player-now-playing").innerText = "";
+		    } else {
+		        // Ak rádio nehrá -> ŠTART (zapnutie a prefarbenie na bielo)
+		        manualnePozastavene = false;
+		        playRadio(item.url, item.id);
+		    }
 		}
 
         function aktualizujZamknutuObrazovku(idRadia) {
@@ -3093,26 +3147,23 @@
 			});
 			
 			audio.addEventListener('pause', () => {
-			    // 1. Okamžité vyčistenie displeja a prvkov
+			    // 1. Vyčistenie textu práve hrajúcej skladby
 			    document.getElementById("player-now-playing").innerText = "";
 			    if ('mediaSession' in navigator) {
 			        navigator.mediaSession.playbackState = "paused";
-			        navigator.mediaSession.metadata = null;
 			    }
 			    
-			    // 2. Skrytie ovládača hlasitosti a úprava tlačidiel rádia
+			    // 2. Skrytie vertikálneho ovládača hlasitosti
 			    const volPanel = document.getElementById('volumePanel');
 			    if (volPanel) volPanel.style.display = 'none';
 			
-			    // 3. OKAMŽITÝ HARD STOP (vyčistenie zdroja streamu)
-			    if (audio.src) {
+			    // 3. Ak bolo rádio zastavené manuálne (tlačidlom STOP), vyčistíme zdroj streamu
+			    if (manualnePozastavene && audio.src) {
 			        audio.src = "";
 			        audio.load();
 			    }
 			
-			    currentPlayingType = "";
-			    manualnePozastavene = false;
-			
+			    // 4. Obnovenie vizuálu sidebaru, hodín a prepnutie panela do sivého stavu
 			    renderSidebarFavorites();
 			    runClockEngine();
 			    aktualizujNochnyPrehravacVizual();
