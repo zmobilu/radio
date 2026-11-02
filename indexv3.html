@@ -2766,11 +2766,11 @@
 		    const item = DATABASE.find(d => d.id === lastId);
 		
 		    if (item && item.url) {
-		        const isPlaying = audio && !audio.paused && audio.src !== "";
+		        // Hrá iba vtedy, ak je nastavený typ A ZROVEŇ audio nezamrzlo/nie je pozastavené
+		        const isPlaying = currentPlayingType !== "" && audio && !audio.paused && audio.src !== "";
 		
 		        let imgHtml = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}"></i>`;
 		        
-		        // Kliknutie na ikonu/názov rádia stanicu zastaví (STOP) alebo zapne
 		        if (pInfo) {
 		            pInfo.innerHTML = `${imgHtml} <span>${item.name}</span>`;
 		            pInfo.style.cursor = "pointer";
@@ -2781,7 +2781,7 @@
 		        }
 		
 		        if (isPlaying) {
-		            // HRAJÚCI STAV (Biely)
+		            // HRAJÚCI STAV
 		            pBox.classList.add('active-playing');
 		            pBox.classList.remove('stopped-state');
 		
@@ -2793,8 +2793,9 @@
 		                }
 		            }
 		        } else {
-		            // ZASTAVENÝ STAV (Sivý - STOP)
-		            pBox.classList.add('active-playing', 'stopped-state');
+		            // ZASTAVENÝ STAV (STOP) - KRITICKÝ KROK: musíme odobrať 'active-playing'
+		            pBox.classList.remove('active-playing');
+		            pBox.classList.add('stopped-state');
 		
 		            if (pBtn) {
 		                pBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
