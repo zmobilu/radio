@@ -2717,43 +2717,42 @@
 		    }
 		}
 
-        function toggleNightPlayPause() {
-		    if (!currentPlayingType || currentPlayingType === "") return;
-		    if (audio.paused) {
-		        manualnePozastavene = false; // <--- Pridané
-		        audio.play().catch(e => console.log("Chyba nočného prebudenia prúdu:", e));
-		    } else {
-		        manualnePozastavene = true;  // <--- Pridané
-		        audio.pause();
-		    }
+       function toggleNightPlayPause() {
+		    if (!audio) return;
+		    
+		    // Prepínanie stíšenia zvuku (MUTE)
+		    audio.muted = !audio.muted;
+		    
+		    aktualizujNochnyPrehravacVizual();
 		}
         function aktualizujNochnyPrehravacVizual() {
-            const pBox = document.getElementById('nightPlayer');
-            const pInfo = document.getElementById('nightStationInfo');
-            const pBtn = document.getElementById('nightPlayPauseBtn');
-            
-            if (!pBox) return;
-
-            if (currentPlayingType && currentPlayingType !== "") {
-                const item = DATABASE.find(d => d.id === currentPlayingType);
-                if (item && item.url && !item.url.includes('googleusercontent.com') && !item.url.includes('music.apple.com') && !item.url.includes('music.youtube.com') && !item.url.includes('tidal.com') && !item.url.includes('soundcloud.com')) {
-                    pBox.classList.add('active-playing');
-                    
-                    let imgHtml = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}"></i>`;
-                    if(pInfo) pInfo.innerHTML = `${imgHtml} <span>${item.name}</span>`;
-                    
-                    if(pBtn) {
-                        if (audio.paused) {
-                            pBtn.innerHTML = `<i class="fa-solid fa-circle-play"></i>`;
-                        } else {
-                            pBtn.innerHTML = `<i class="fa-solid fa-circle-pause"></i>`;
-                        }
-                    }
-                    return;
-                }
-            }
-            pBox.classList.remove('active-playing');
-        }
+		    const pBox = document.getElementById('nightPlayer');
+		    const pInfo = document.getElementById('nightStationInfo');
+		    const pBtn = document.getElementById('nightPlayPauseBtn');
+		    
+		    if (!pBox) return;
+		
+		    if (currentPlayingType && currentPlayingType !== "") {
+		        const item = DATABASE.find(d => d.id === currentPlayingType);
+		        if (item && item.url && !item.url.includes('googleusercontent.com') && !item.url.includes('music.apple.com') && !item.url.includes('music.youtube.com') && !item.url.includes('tidal.com') && !item.url.includes('soundcloud.com')) {
+		            pBox.classList.add('active-playing');
+		            
+		            let imgHtml = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}"></i>`;
+		            if(pInfo) pInfo.innerHTML = `${imgHtml} <span>${item.name}</span>`;
+		            
+		            if(pBtn) {
+		                // Ak je zvuk stíšený (MUTE), zobrazíme preškrtnutý reproduktor
+		                if (audio.muted) {
+		                    pBtn.innerHTML = `<i class="fa-solid fa-volume-xmark" style="color: #ff3b30;"></i>`;
+		                } else {
+		                    pBtn.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
+		                }
+		            }
+		            return;
+		        }
+		    }
+		    pBox.classList.remove('active-playing');
+		}
 
         function aktualizujZamknutuObrazovku(idRadia) {
             if ('mediaSession' in navigator) {
@@ -2802,6 +2801,7 @@
         
         function playRadio(url, id) {
 		    audio.src = url;
+			audio.muted = false; // Automaticky odstíši zvuk pri zapnutí novej stanice
 		    audio.load();
 		    // Zoberieme priamu URL adresu rádia a spustíme analýzu streamu
 		    sledujStreamMetadat(url);
