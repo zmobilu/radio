@@ -456,22 +456,6 @@
 		    accent-color: #ff9f0a;
 		    cursor: pointer;
 		}
-
-		/* Sivý vzhľad panela pri zastavenom rádiu (STOP) */
-		.night-player-container.stopped-state {
-		 /* display: flex !important;*/
-		    color: #555555 !important;
-		    opacity: 0.65;
-		}
-		
-		.night-player-container.stopped-state .night-btn,
-		.night-player-container.stopped-state .night-player-station {
-		    color: #555555 !important;
-		}
-		
-		.night-player-container.stopped-state .night-player-station img {
-		    filter: grayscale(1) opacity(0.4) !important;
-		}
 		
 		/* Skrytie pri nočnom režime */
 		body.full-night-mode .volume-panel-container {
@@ -1489,8 +1473,8 @@
                     <span style="color: #444;" id="dateSeparator">•</span>
                     <span class="big-clock-nameday" id="bigNameday">---</span>
                 </div>
-				<!-- Skrytý riadok pre hrajúcu skladbu -->
-               <!-- <div id="player-now-playing" style="color: #fff; text-align: center;"></div> -->
+
+                <div id="player-now-playing" style="color: #fff; text-align: center;"></div>
                 
 				<!-- Skrytý Spotify prehrávač, ktorý pri aktivácii prekryje počasie -->
 				<div id="spotifyPlayerContainer" style="display: none; width: 100%; height: 352px; margin-top: 1vh; border-radius: 12px; overflow: hidden; position: relative; z-index: 50;">
@@ -1916,102 +1900,109 @@
         }
 
         async function fetchWeatherData() {
-		    try {
-		        /* Pridané &minutely_15=precipitation do URL požiadavky */
-		        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${cfgLat}&longitude=${cfgLon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m&minutely_15=precipitation&hourly=temperature_2m,precipitation,cloud_cover,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FBratislava&wind_speed_unit=kmh&forecast_days=6`);
-		        const data = await response.json();
-		        weatherDataBackup = data;
-		        
-		        if (data && data.current) {
-		            const rawTemp = data.current.temperature_2m;
-		            const rawApparent = data.current.apparent_temperature;
-		            const temp = Math.round(rawTemp);
-		            
-		            // Bezpečné ošetrenie zrážok
-		            const currentRain = (data.current.precipitation || 0) + (data.current.rain || 0) + (data.current.showers || 0);
-		            const minutelyRain = data?.minutely_15?.precipitation?.[0] || 0;
-		            
-		            let code = data.current.weather_code;
-		            
-		            if ((currentRain > 0 || minutelyRain > 0) && code < 51) {
-		                code = 61;
-		            }
-		            const humidity = Math.round(data.current.relative_humidity_2m);
-		            const appTemp = Math.round(rawApparent);
-		            const tColor = getTempColor(rawTemp);
-		            const appColor = getTempColor(rawApparent);
-		          
-		            const icon = getWeatherIcon(code);
-		            aktualnaTeplotaText = `${icon} ${temp}°C`;
-		
-		            const locMainText = document.getElementById('weather-location-text');
-		            if (locMainText) locMainText.textContent = cfgMestoNazov.toUpperCase();
-		
-		            const bigCityEl = document.getElementById('bigClockCity');
-		            if (bigCityEl) bigCityEl.textContent = cfgMestoNazov.toUpperCase();
-		            
-		            const mainBigIconEl = document.getElementById('mainBigIcon');
-		            if (mainBigIconEl) {
-		                mainBigIconEl.textContent = icon;
-		                mainBigIconEl.style.animation = 'none';
-		                
-		                setTimeout(() => {
-		                    if (code === 0) {
-		                        mainBigIconEl.style.animation = 'sunRotatePulse 20s infinite linear';
-		                    } else if (code >= 1 && code <= 3) {
-		                        mainBigIconEl.style.animation = 'cloudFloat 4s infinite ease-in-out';
-		                    } else if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
-		                        mainBigIconEl.style.animation = 'rainDrop 1.8s infinite ease-in-out';
-		                    } else if (code >= 95) {
-		                        mainBigIconEl.style.animation = 'lightningFlash 4s infinite ease-in-out';
-		                    } else {
-		                        mainBigIconEl.style.animation = 'cloudFloat 5s infinite ease-in-out';
-		                    }
-		                }, 50);
-		            }
-		            
-		            const mainBigTempEl = document.getElementById('mainBigTemp');
-		            if (mainBigTempEl) {
-		                mainBigTempEl.textContent = `${temp}°C`;
-		                mainBigTempEl.style.color = tColor;
-		            }
-		
-		            const mainDescEl = document.getElementById('mainWeatherDesc');
-		            if (mainDescEl) mainDescEl.textContent = getWeatherText(code);
-		            
-		            const mainApparentEl = document.getElementById('mainApparent');
-		            if (mainApparentEl) {
-		                mainApparentEl.textContent = `${appTemp}°`;
-		                mainApparentEl.style.color = appColor;
-		            }
-		            
-		            const mainHumidityEl = document.getElementById('mainHumidity');
-		            if (mainHumidityEl) mainHumidityEl.textContent = `${humidity}%`;
-		
-		            for (let i = 0; i <= 1; i++) {
-		                const dCode = data.daily.weather_code[i];
-		                const max = Math.round(data.daily.temperature_2m_max[i]);
-		                const min = Math.round(data.daily.temperature_2m_min[i]);
-		                
-		                const mIcon = document.getElementById(`mainFc${i}Icon`);
-		                if (mIcon) {
-		                    mIcon.textContent = getWeatherIcon(dCode);
-		                    priradAnimaciuIkone(mIcon, dCode);
-		                }
-		                
-		                const mTemp = document.getElementById(`mainFc${i}Temp`);
-		                if (mTemp) mTemp.innerHTML = `<span style="color:${getTempColor(max)}">${max}°</span> / <span style="color:#aaa">${min}°</span>`;
-		            }
-		
-		            const weatherView = document.getElementById('weatherDetailView');
-		            if (weatherView && weatherView.style.display === 'flex') {
-		                vykresliGraf(aktualnyGrafMod);
-		            }
-		        }
-		    } catch (e) {
-		        console.log("Chyba pri načítaní počasia:", e);
-		    }
-		}
+            try {
+                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${cfgLat}&longitude=${cfgLon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,precipitation,cloud_cover,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FBratislava&wind_speed_unit=kmh&forecast_days=6`);
+                const data = await response.json();
+                weatherDataBackup = data;
+                
+                if (data && data.current) {
+	                const rawTemp = data.current.temperature_2m;
+					const rawApparent = data.current.apparent_temperature;
+					const temp = Math.round(rawTemp);
+					
+					// Skontrolujeme okamžité zrážky z current + najbližších 15 minút
+					const currentRain = (data.current.precipitation || 0) + (data.current.rain || 0) + (data.current.showers || 0);
+					const minutelyRain = data.minutely_15 && data.minutely_15.precipitation ? (data.minutely_15.precipitation[0] || 0) : 0;
+					
+					let code = data.current.weather_code;
+					
+					// Ak aktuálne alebo v najbližších 15 minútach prší (> 0.0 mm), vynútime kód pre dážď
+					if ((currentRain > 0 || minutelyRain > 0) && code < 51) {
+					    code = 61; // Kód pre dážď
+					}
+                    const humidity = Math.round(data.current.relative_humidity_2m);
+                    const appTemp = Math.round(rawApparent);
+                    const tColor = getTempColor(rawTemp);
+                    const appColor = getTempColor(rawApparent);
+                  
+                    const icon = getWeatherIcon(code);
+                    aktualnaTeplotaText = `${icon} ${temp}°C`;
+
+                    const locMainText = document.getElementById('weather-location-text');
+                    if (locMainText) locMainText.textContent = cfgMestoNazov.toUpperCase();
+
+                    const bigCityEl = document.getElementById('bigClockCity');
+                    if (bigCityEl) bigCityEl.textContent = cfgMestoNazov.toUpperCase();
+                    
+                   const mainBigIconEl = document.getElementById('mainBigIcon');
+                    if (mainBigIconEl) {
+                        mainBigIconEl.textContent = icon;
+                        
+                        // Odstránime staré animácie
+                        mainBigIconEl.style.animation = 'none';
+                        
+                        // Aplikujeme presnú animáciu podľa kódu počasia (Open-Meteo code)
+                        setTimeout(() => {
+                            if (code === 0) {
+                                // Jasno - slnko rotuje a dýcha
+                                mainBigIconEl.style.animation = 'sunRotatePulse 20s infinite linear';
+                            } else if (code >= 1 && code <= 3) {
+                                // Polojasno / Zamračené - oblak sa jemne kolíše
+                                mainBigIconEl.style.animation = 'cloudFloat 4s infinite ease-in-out';
+                            } else if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
+                                // Dážď - jemné kvapkanie
+                                mainBigIconEl.style.animation = 'rainDrop 1.8s infinite ease-in-out';
+                            } else if (code >= 95) {
+                                // Búrka - bleskové blikanie
+                                mainBigIconEl.style.animation = 'lightningFlash 4s infinite ease-in-out';
+                            } else {
+                                mainBigIconEl.style.animation = 'cloudFloat 5s infinite ease-in-out';
+                            }
+                        }, 50);
+                    }
+                    
+                    const mainBigTempEl = document.getElementById('mainBigTemp');
+                    if (mainBigTempEl) {
+                        mainBigTempEl.textContent = `${temp}°C`;
+                        mainBigTempEl.style.color = tColor;
+                    }
+
+                    const mainDescEl = document.getElementById('mainWeatherDesc');
+                    if (mainDescEl) mainDescEl.textContent = getWeatherText(code);
+                    
+                    const mainApparentEl = document.getElementById('mainApparent');
+                    if (mainApparentEl) {
+                        mainApparentEl.textContent = `${appTemp}°`;
+                        mainApparentEl.style.color = appColor;
+                    }
+                    
+                    const mainHumidityEl = document.getElementById('mainHumidity');
+                    if (mainHumidityEl) mainHumidityEl.textContent = `${humidity}%`;
+
+                    for (let i = 0; i <= 1; i++) {
+                        const dCode = data.daily.weather_code[i];
+                        const max = Math.round(data.daily.temperature_2m_max[i]);
+                        const min = Math.round(data.daily.temperature_2m_min[i]);
+                        
+                        const mIcon = document.getElementById(`mainFc${i}Icon`);
+                        if (mIcon) {
+                            mIcon.textContent = getWeatherIcon(dCode);
+                            priradAnimaciuIkone(mIcon, dCode);
+                        }
+                        
+                        const mTemp = document.getElementById(`mainFc${i}Temp`);
+                        if (mTemp) mTemp.innerHTML = `<span style="color:${getTempColor(max)}">${max}°</span> / <span style="color:#aaa">${min}°</span>`;
+                    }
+
+                    const weatherView = document.getElementById('weatherDetailView');
+                    if (weatherView && weatherView.style.display === 'flex') {
+                        vykresliGraf(aktualnyGrafMod);
+                    }
+                }
+            } catch (e) {
+                console.log("Chyba pri načítaní počasia:", e);
+            }
+        }
          
         function vykresliGraf(mod) {
             const chartContainer = document.getElementById('hourly-chart-container');
@@ -2465,10 +2456,9 @@
 		        if (item && id !== null) {
 		            card.className = "fav-card";
 		            
-		            // Oranžový svietiaci rámik sa pridá IBA ak stanica reálne hrá a nie je pozastavená
-					if (currentPlayingType === item.id && audio && !audio.paused) {
-						card.classList.add("playing");
-					}
+		            if (currentPlayingType === item.id && !audio.paused) {
+		                card.classList.add("playing");
+		            }
 		            
 		            card.onclick = () => handleFavCardClick(item);
 		
@@ -2727,102 +2717,41 @@
 		    }
 		}
 
-       // --- PREPÍNANIE STAVU: HRÁ -> MUTE/UNMUTE | NEHRÁ -> ŠTART ---
-		function toggleNightPlayPause() {
+       function toggleNightPlayPause() {
 		    if (!audio) return;
-		
-		    // Ak rádio nehrá alebo nemá načítaný stream, tlačidlo PLAY ho spustí
-		    if (audio.paused || !audio.src) {
-		        const lastId = currentPlayingType || localStorage.getItem('kiosk_last_radio_type');
-		        const item = DATABASE.find(d => d.id === lastId);
-		        if (item && item.url) {
-		            manualnePozastavene = false;
-		            playRadio(item.url, item.id);
-		        }
-		        return;
-		    }
-		
-		    // Ak rádio hrá, stredové tlačidlo stíši / odstíši zvuk (MUTE / UNMUTE)
+		    
+		    // Prepínanie stíšenia zvuku (MUTE)
 		    audio.muted = !audio.muted;
+		    
 		    aktualizujNochnyPrehravacVizual();
 		}
-		
-		// --- VIZUÁL PREHRÁVAČA (SVIETI BIELO PRI PLAY, SIVO PRI STOP) ---
-		function aktualizujNochnyPrehravacVizual() {
+        function aktualizujNochnyPrehravacVizual() {
 		    const pBox = document.getElementById('nightPlayer');
 		    const pInfo = document.getElementById('nightStationInfo');
 		    const pBtn = document.getElementById('nightPlayPauseBtn');
 		    
 		    if (!pBox) return;
 		
-		    const lastId = currentPlayingType || localStorage.getItem('kiosk_last_radio_type');
-		    const item = DATABASE.find(d => d.id === lastId);
-		
-		    if (item && item.url) {
-		        // Rádio hrá IBA vtedy, ak je nastavený typ A ZROVEŇ audio nie je pozastavené
-		        const isPlaying = currentPlayingType !== "" && audio && !audio.paused && audio.src !== "";
-		
-		        let imgHtml = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}"></i>`;
-		        
-		        if (pInfo) {
-		            pInfo.innerHTML = `${imgHtml} <span>${item.name}</span>`;
-		            pInfo.style.cursor = "pointer";
-		            pInfo.onclick = (e) => {
-		                e.stopPropagation();
-		                toggleStopPlayLastRadio(item);
-		            };
-		        }
-		
-		        if (isPlaying) {
-		            // HRAJÚCI STAV (Biely)
+		    if (currentPlayingType && currentPlayingType !== "") {
+		        const item = DATABASE.find(d => d.id === currentPlayingType);
+		        if (item && item.url && !item.url.includes('googleusercontent.com') && !item.url.includes('music.apple.com') && !item.url.includes('music.youtube.com') && !item.url.includes('tidal.com') && !item.url.includes('soundcloud.com')) {
 		            pBox.classList.add('active-playing');
-		            pBox.classList.remove('stopped-state');
-		
-		            if (pBtn) {
+		            
+		            let imgHtml = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}"></i>`;
+		            if(pInfo) pInfo.innerHTML = `${imgHtml} <span>${item.name}</span>`;
+		            
+		            if(pBtn) {
+		                // Ak je zvuk stíšený (MUTE), zobrazíme preškrtnutý reproduktor
 		                if (audio.muted) {
 		                    pBtn.innerHTML = `<i class="fa-solid fa-volume-xmark" style="color: #ff3b30;"></i>`;
 		                } else {
 		                    pBtn.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
 		                }
 		            }
-		        } else {
-		            // ZASTAVENÝ STAV (Sivý - STOP) -> Odstránime active-playing
-		            pBox.classList.remove('active-playing');
-		            pBox.classList.add('stopped-state');
-		
-		            if (pBtn) {
-		                pBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
-		            }
+		            return;
 		        }
 		    }
-		}
-		
-		// --- STOP / ŠTART PRI KLIKNUTÍ NA NÁZOV / IKONU RÁDIA ---
-		function toggleStopPlayLastRadio(item) {
-		    if (!item) return;
-		
-		    if (currentPlayingType === item.id && audio && !audio.paused) {
-		        // Zastavenie rádia (STOP) -> Okamžité vyčistenie streamu a prechod do sivého stavu
-		        manualnePozastavene = true;
-		        currentPlayingType = ""; // Zabezpečí odstránenie oranžového rámika
-				
-				audio.pause();
-		        audio.src = "";
-		        audio.load();
-		        
-				document.getElementById("player-now-playing").innerText = "";
-
-				// Skrytie bežca hlasitosti
-		        const volPanel = document.getElementById('volumePanel');
-		        if (volPanel) volPanel.style.display = 'none';
-		
-		        renderSidebarFavorites();
-		        aktualizujNochnyPrehravacVizual();
-		    } else {
-		        // Opätovné spustenie
-		        manualnePozastavene = false;
-		        playRadio(item.url, item.id);
-		    }
+		    pBox.classList.remove('active-playing');
 		}
 
         function aktualizujZamknutuObrazovku(idRadia) {
@@ -3164,18 +3093,25 @@
 			});
 			
 			audio.addEventListener('pause', () => {
+			    // 1. Okamžité vyčistenie displeja a prvkov
 			    document.getElementById("player-now-playing").innerText = "";
 			    if ('mediaSession' in navigator) {
 			        navigator.mediaSession.playbackState = "paused";
+			        navigator.mediaSession.metadata = null;
 			    }
 			    
+			    // 2. Skrytie ovládača hlasitosti a úprava tlačidiel rádia
 			    const volPanel = document.getElementById('volumePanel');
 			    if (volPanel) volPanel.style.display = 'none';
 			
-			    if (manualnePozastavene && audio.src) {
+			    // 3. OKAMŽITÝ HARD STOP (vyčistenie zdroja streamu)
+			    if (audio.src) {
 			        audio.src = "";
 			        audio.load();
 			    }
+			
+			    currentPlayingType = "";
+			    manualnePozastavene = false;
 			
 			    renderSidebarFavorites();
 			    runClockEngine();
