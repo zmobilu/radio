@@ -609,6 +609,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 15px; border-radius: 12px; border: 1px solid #222;">
             <span style="font-size: 2.5vw; color: #fff;"><i class="fa-solid fa-code-branch" style="color: #4dabff; margin-right: 10px;"></i> Verzia Kiosku</span>
             <div style="display: flex; gap: 10px; align-items: center;">
+				<button onclick="localStorage.setItem('dashboard_version', 'v1'); window.location.replace('indexv1.html');" style="background: #222; color: #fff; border: 1px solid #444; padding: 8px 15px; border-radius: 8px; font-size: 2vw; cursor: pointer;">Verzia 1</button>
                 <button onclick="localStorage.setItem('dashboard_version', 'v2'); window.location.replace('indexv2.html');" style="background: #222; color: #fff; border: 1px solid #444; padding: 8px 15px; border-radius: 8px; font-size: 2vw; cursor: pointer;">Verzia 2</button>
                 <button onclick="localStorage.setItem('dashboard_version', 'v3'); window.location.replace('indexv3.html');" style="background: #222; color: #fff; border: 1px solid #444; padding: 8px 15px; border-radius: 8px; font-size: 2vw; cursor: pointer;">Verzia 3</button>
             </div>
@@ -699,8 +700,8 @@
 		const DATABASE = [
 			{ id: "slovensko", name: "Slovensko", url: "https://icecast.stv.livebox.sk/slovensko_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png", style: "background:#00547E;", category: "Verejnoprávne" },
 			{ id: "fun", name: "Fun Radio", url: "https://funradio-proxy.zmobilu.workers.dev/fun192.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png", style: "background:#fff;", category: "Komerčné" },
-			{ id: "blanik", name: "Blaník", url: "https://ice.abradio.cz/blanikcz128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png", style: "background:#005ea6;", category: "Komerčné" },
-			{ id: "rock", name: "Radio rock", url: "https://stream.bauermedia.sk/rock-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png", style: "background:#000;", category: "Rockové" },
+			{ id: "blanik", name: "Blaník", url: "https://ice.abradio.cz/blanikcz128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png", style: "background:#005ea6;", category: "Rockové" },
+			{ id: "rock", name: "Radio rock", url: "https://stream.bauermedia.sk/rock-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png", style: "background:#000;", category: "Komerčné" },
 			{ id: "S-techno", name: "Techno", url: "https://stream.sunshine-live.de/techno/mp3-192/", icon: "fa-solid fa-bolt", color: "#307CEB", style: "background:#000; color:#307CEB;", category: "Elektronická scéna" },
 			{ id: "spotify", name: "Spotify", url: "https://open.spotify.com", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSpotifySET.png", style: "background:#21D844;", category: "Externé Aplikácie" },
 			// ... (Tu môžeš pridať ďalšie z V3 databázy, ak chceš širší výber)
