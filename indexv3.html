@@ -3102,26 +3102,27 @@
 			});
 			
 			audio.addEventListener('pause', () => {
-			    // 1. Okamžité vyčistenie displeja a prvkov
+			    // 1. Vyčistenie textu a mediaSession
 			    document.getElementById("player-now-playing").innerText = "";
 			    if ('mediaSession' in navigator) {
 			        navigator.mediaSession.playbackState = "paused";
 			        navigator.mediaSession.metadata = null;
 			    }
 			    
-			    // 2. Skrytie ovládača hlasitosti a úprava tlačidiel rádia
 			    const volPanel = document.getElementById('volumePanel');
 			    if (volPanel) volPanel.style.display = 'none';
 			
-			    // 3. OKAMŽITÝ HARD STOP (vyčistenie zdroja streamu)
+			    // 2. Vyčistenie zdroja
 			    if (audio.src) {
 			        audio.src = "";
 			        audio.load();
 			    }
 			
+			    // 3. VYRULOVANIE AKTÍVNEJ STANICE
 			    currentPlayingType = "";
 			    manualnePozastavene = false;
 			
+			    // 4. PREKRESLENIE (zruší oranžový okraj aj prepne tlačidlo na PLAY)
 			    renderSidebarFavorites();
 			    runClockEngine();
 			    aktualizujNochnyPrehravacVizual();
