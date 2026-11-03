@@ -515,32 +515,32 @@
             margin-top: 1.5vh;
         }
 
-        /* V dennom režime: biela farba a zmenšenie písma pre denné rozloženie */
-        body:not(.full-night-mode).sidebar-hidden .night-player-container {
-            color: #ffffff !important;
-            margin-top: 0.5vh !important;
-            margin-bottom: 1vh !important;
-        }
-
-        body:not(.full-night-mode).sidebar-hidden .night-btn {
-            color: #ffffff !important;
-            font-size: clamp(24px, 4vw, 36px) !important;
-            padding: 2px 10px !important;
-        }
-
-        body:not(.full-night-mode).sidebar-hidden .night-btn.btn-playpause {
-            font-size: clamp(30px, 5vw, 44px) !important;
-        }
-
-        body:not(.full-night-mode).sidebar-hidden .night-player-station {
-            font-size: clamp(14px, 2.5vw, 22px) !important;
-            margin-bottom: 0.5vh !important;
-        }
-
-        body:not(.full-night-mode).sidebar-hidden .night-player-controls {
-            gap: 4vw !important;
-        }
-
+       /* V dennom režime: biela farba pre denné rozloženie (so sidebarom aj bez) */
+		body:not(.full-night-mode) .night-player-container {
+		    color: #ffffff !important;
+		    margin-top: 0.5vh !important;
+		    margin-bottom: 1vh !important;
+		}
+		
+		body:not(.full-night-mode) .night-btn {
+		    color: #ffffff !important;
+		    font-size: clamp(24px, 4vw, 36px) !important;
+		    padding: 2px 10px !important;
+		}
+		
+		body:not(.full-night-mode) .night-btn.btn-playpause {
+		    font-size: clamp(30px, 5vw, 44px) !important;
+		}
+		
+		body:not(.full-night-mode) .night-player-station {
+		    color: #ffffff !important;
+		    font-size: clamp(14px, 2.5vw, 22px) !important;
+		    margin-bottom: 0.5vh !important;
+		}
+		
+		body:not(.full-night-mode) .night-player-controls {
+		    gap: 4vw !important;
+		}
         .night-player-station {
             font-size: 5.5vw;
             font-weight: 700;
