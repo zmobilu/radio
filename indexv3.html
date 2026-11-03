@@ -2450,7 +2450,9 @@
 		        if (item && id !== null) {
 		            card.className = "fav-card";
 		            
-		            if (currentPlayingType === item.id && !audio.paused) {
+		            // STRIKTNÁ KONTROLA: Oranžový okraj sa pridá LEN vtedy, ak rádio REÁLNE hrá
+		            const jeHrajuceAudio = audio && !audio.paused && audio.src && audio.src !== "";
+		            if (currentPlayingType === item.id && jeHrajuceAudio) {
 		                card.classList.add("playing");
 		            }
 		            
