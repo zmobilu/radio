@@ -916,8 +916,9 @@
 	        if (hodinyEl) hodinyEl.style.display = 'flex';
 	        if (infoRiadokEl) infoRiadokEl.style.display = 'flex';
 			if (namedayLineEl) namedayLineEl.style.display = 'block'; 
-	        if (spotifyContainer) spotifyContainer.style.display = 'flex'; 
-	        currentPlayingType = "spotify";
+			// Skryje nepotrebné sub-panely po zatvorení nastavení
+            currentPlayingType = "";
+            aktualizujSubPanely("none");
 	    } else {
 	        document.body.classList.remove('weather-details-mode');
 	        settingsBox.style.display = 'block';
@@ -927,7 +928,8 @@
 	        if (hodinyEl) hodinyEl.style.display = 'none';
 	        if (infoRiadokEl) infoRiadokEl.style.display = 'none';
 			if (namedayLineEl) namedayLineEl.style.display = 'none'; 
-	        if (spotifyContainer) spotifyContainer.style.display = 'none'; 
+	        
+            aktualizujSubPanely("none");
 	        currentPlayingType = "settings";
 	    }
 	    aktualizujTitulokStranky();
