@@ -506,19 +506,13 @@
 
        /* --- INTEGROVANÝ NOČNÝ PREHRÁVAČ --- */
         .night-player-container {
-            display: none;
+            display: flex !important; /* Trvalo zobrazený stále a všade */
             flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100%;
             color: var(--night-color);
             margin-top: 1.5vh;
-        }
-
-        /* Zobrazenie v noci ALEBO cez deň pri schovanom paneli */
-        body.full-night-mode .night-player-container.active-playing,
-        body.sidebar-hidden .night-player-container.active-playing {
-            display: flex !important;
         }
 
         /* V dennom režime: biela farba a zmenšenie písma pre denné rozloženie */
@@ -1531,15 +1525,15 @@
                 <div id="nightBottomInfo"></div>
 
                 <div class="night-player-container" id="nightPlayer">
-                    <div class="night-player-station" id="nightStationInfo">
-                        <i class="fa-solid fa-radio"></i> <span id="nightStationName">OFFLINE</span>
-                    </div>
-                    <div class="night-player-controls">
-                        <button class="night-btn" onclick="spustiDalsieRadio('vzad'); event.stopPropagation();"><i class="fa-solid fa-backward-step"></i></button>
-                        <button class="night-btn btn-playpause" onclick="toggleNightPlayPause(); event.stopPropagation();" id="nightPlayPauseBtn"><i class="fa-solid fa-circle-pause"></i></button>
-                        <button class="night-btn" onclick="spustiDalsieRadio('vpred'); event.stopPropagation();"><i class="fa-solid fa-forward-step"></i></button>
-                    </div>
-                </div>
+				    <div class="night-player-station" id="nightStationInfo">
+				        <i class="fa-solid fa-radio"></i> <span id="nightStationName">OFFLINE</span>
+				    </div>
+				    <div class="night-player-controls">
+				        <button class="night-btn" onclick="spustiDalsieRadio('vzad'); event.stopPropagation();"><i class="fa-solid fa-backward-step"></i></button>
+				        <button class="night-btn btn-playpause" onclick="toggleNightPlayPause(); event.stopPropagation();" id="nightPlayPauseBtn"><i class="fa-solid fa-circle-play"></i></button>
+				        <button class="night-btn" onclick="spustiDalsieRadio('vpred'); event.stopPropagation();"><i class="fa-solid fa-forward-step"></i></button>
+				    </div>
+				</div>
 
             </div>
             
@@ -2718,42 +2712,54 @@
 		}
 
         function toggleNightPlayPause() {
-		    if (!currentPlayingType || currentPlayingType === "") return;
-		    if (audio.paused) {
-		        manualnePozastavene = false; // <--- Pridané
-		        audio.play().catch(e => console.log("Chyba nočného prebudenia prúdu:", e));
-		    } else {
-		        manualnePozastavene = true;  // <--- Pridané
-		        audio.pause();
+		    // Ak rádio hrá -> spravíme čistý STOP
+		    if (audio && !audio.paused) {
+		        manualnePozastavene = true;
+		        audio.pause(); // Event listener v audio.addEventListener('pause') spraví HARD STOP a vyčistí stream
+		        return;
+		    }
+		
+		    // Ak rádio nehrá -> spustíme poslednú zapamätanú stanicu alebo aktívnu
+		    let targetId = currentPlayingType || localStorage.getItem('kiosk_last_radio_type') || slotFavorites.find(id => id !== null);
+		    if (!targetId) return;
+		
+		    const item = DATABASE.find(d => d.id === targetId);
+		    if (item && item.url) {
+		        manualnePozastavene = false;
+		        playRadio(item.url, item.id);
 		    }
 		}
         function aktualizujNochnyPrehravacVizual() {
-            const pBox = document.getElementById('nightPlayer');
-            const pInfo = document.getElementById('nightStationInfo');
-            const pBtn = document.getElementById('nightPlayPauseBtn');
-            
-            if (!pBox) return;
-
-            if (currentPlayingType && currentPlayingType !== "") {
-                const item = DATABASE.find(d => d.id === currentPlayingType);
-                if (item && item.url && !item.url.includes('googleusercontent.com') && !item.url.includes('music.apple.com') && !item.url.includes('music.youtube.com') && !item.url.includes('tidal.com') && !item.url.includes('soundcloud.com')) {
-                    pBox.classList.add('active-playing');
-                    
-                    let imgHtml = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}"></i>`;
-                    if(pInfo) pInfo.innerHTML = `${imgHtml} <span>${item.name}</span>`;
-                    
-                    if(pBtn) {
-                        if (audio.paused) {
-                            pBtn.innerHTML = `<i class="fa-solid fa-circle-play"></i>`;
-                        } else {
-                            pBtn.innerHTML = `<i class="fa-solid fa-circle-pause"></i>`;
-                        }
-                    }
-                    return;
-                }
-            }
-            pBox.classList.remove('active-playing');
-        }
+		    const pInfo = document.getElementById('nightStationInfo');
+		    const pBtn = document.getElementById('nightPlayPauseBtn');
+		
+		    // 1. Zistíme ID stanice: aktívne hrajúca ALEBO naposledy uložená v localStorage
+		    let activeId = currentPlayingType || localStorage.getItem('kiosk_last_radio_type');
+		    
+		    // Ak ešte nebola uložená žiadna stanica, zoberieme prvú z obľúbených
+		    if (!activeId) {
+		        activeId = slotFavorites.find(id => id !== null);
+		    }
+		
+		    if (activeId) {
+		        const item = DATABASE.find(d => d.id === activeId);
+		        if (item) {
+		            let imgHtml = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}"></i>`;
+		            if (pInfo) pInfo.innerHTML = `${imgHtml} <span>${item.name}</span>`;
+		        }
+		    } else {
+		        if (pInfo) pInfo.innerHTML = `<i class="fa-solid fa-radio"></i> <span>OFFLINE</span>`;
+		    }
+		
+		    // 2. Nastavenie ikony tlačidla: STOP keď hrá, PLAY keď nehrá
+		    if (pBtn) {
+		        if (audio && !audio.paused) {
+		            pBtn.innerHTML = `<i class="fa-solid fa-circle-stop"></i>`; // Tlačidlo STOP pri prehrávaní
+		        } else {
+		            pBtn.innerHTML = `<i class="fa-solid fa-circle-play"></i>`; // Tlačidlo PLAY pri vypnutom rádiu
+		        }
+		    }
+		}
 
         function aktualizujZamknutuObrazovku(idRadia) {
             if ('mediaSession' in navigator) {
@@ -3146,6 +3152,7 @@
             inicializujPlochuNastaveni();
 			skontrolujObnovuStavuDisplaya();
             aktualizujTlacidloMesta();
+			aktualizujNochnyPrehravacVizual();
         });
 
         document.addEventListener('touchstart', function (event) {
