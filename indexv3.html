@@ -2732,11 +2732,13 @@
 		    const pInfo = document.getElementById('nightStationInfo');
 		    const pBtn = document.getElementById('nightPlayPauseBtn');
 		
+		    // 1. Zistíme aktívnu stanicu z pamäte
 		    let activeId = currentPlayingType || localStorage.getItem('kiosk_last_radio_type');
-		    if (!activeId) {
+		    if (!activeId && typeof slotFavorites !== 'undefined') {
 		        activeId = slotFavorites.find(id => id !== null);
 		    }
 		
+		    // Zobrazenie názvu a loga stanice
 		    if (activeId) {
 		        const item = DATABASE.find(d => d.id === activeId);
 		        if (item) {
@@ -2747,11 +2749,15 @@
 		        if (pInfo) pInfo.innerHTML = `<i class="fa-solid fa-radio"></i> <span>OFFLINE</span>`;
 		    }
 		
+		    // 2. STRIKTNÁ KONTROLA PREHRÁVANIA (PLAY vs STOP ikona)
 		    if (pBtn) {
-		        if (audio && !audio.paused) {
-		            pBtn.innerHTML = `<i class="fa-solid fa-circle-stop"></i>`;
+		        // Kontrolujeme, či audio reálne beží a má platný čas
+		        const jeBeziaceAudio = audio && !audio.paused && audio.currentTime > 0 && audio.readyState > 2;
+		
+		        if (jeBeziaceAudio) {
+		            pBtn.innerHTML = `<i class="fa-solid fa-circle-stop"></i>`; // Zobrazí STOP pri prehrávaní
 		        } else {
-		            pBtn.innerHTML = `<i class="fa-solid fa-circle-play"></i>`;
+		            pBtn.innerHTML = `<i class="fa-solid fa-circle-play"></i>`; // Zobrazí PLAY pri zastavení
 		        }
 		    }
 		}
