@@ -1468,7 +1468,16 @@
                     <span class="big-clock-nameday" id="bigNameday">---</span>
                 </div>
 
-               <!-- <div id="player-now-playing" style="color: #fff; text-align: center;"></div> -->
+         		<div class="night-player-container" id="nightPlayer">
+				    <div class="night-player-station" id="nightStationInfo">
+				        <i class="fa-solid fa-radio"></i> <span id="nightStationName">OFFLINE</span>
+				    </div>
+				    <div class="night-player-controls">
+				        <button class="night-btn" onclick="spustiDalsieRadio('vzad'); event.stopPropagation();"><i class="fa-solid fa-backward-step"></i></button>
+				        <button class="night-btn btn-playpause" onclick="toggleNightPlayPause(); event.stopPropagation();" id="nightPlayPauseBtn"><i class="fa-solid fa-circle-play"></i></button>
+				        <button class="night-btn" onclick="spustiDalsieRadio('vpred'); event.stopPropagation();"><i class="fa-solid fa-forward-step"></i></button>
+				    </div>
+				</div>
                 
 				<!-- Skrytý Spotify prehrávač, ktorý pri aktivácii prekryje počasie -->
 				<div id="spotifyPlayerContainer" style="display: none; width: 100%; height: 352px; margin-top: 1vh; border-radius: 12px; overflow: hidden; position: relative; z-index: 50;">
@@ -1524,16 +1533,7 @@
                 </div>
                 <div id="nightBottomInfo"></div>
 
-                <div class="night-player-container" id="nightPlayer">
-				    <div class="night-player-station" id="nightStationInfo">
-				        <i class="fa-solid fa-radio"></i> <span id="nightStationName">OFFLINE</span>
-				    </div>
-				    <div class="night-player-controls">
-				        <button class="night-btn" onclick="spustiDalsieRadio('vzad'); event.stopPropagation();"><i class="fa-solid fa-backward-step"></i></button>
-				        <button class="night-btn btn-playpause" onclick="toggleNightPlayPause(); event.stopPropagation();" id="nightPlayPauseBtn"><i class="fa-solid fa-circle-play"></i></button>
-				        <button class="night-btn" onclick="spustiDalsieRadio('vpred'); event.stopPropagation();"><i class="fa-solid fa-forward-step"></i></button>
-				    </div>
-				</div>
+                
 
             </div>
             
@@ -2712,14 +2712,12 @@
 		}
 
         function toggleNightPlayPause() {
-		    // Ak rádio hrá -> spravíme čistý STOP
 		    if (audio && !audio.paused) {
 		        manualnePozastavene = true;
-		        audio.pause(); // Event listener v audio.addEventListener('pause') spraví HARD STOP a vyčistí stream
+		        audio.pause(); // Vyčistí prúd a spraví hard stop
 		        return;
 		    }
 		
-		    // Ak rádio nehrá -> spustíme poslednú zapamätanú stanicu alebo aktívnu
 		    let targetId = currentPlayingType || localStorage.getItem('kiosk_last_radio_type') || slotFavorites.find(id => id !== null);
 		    if (!targetId) return;
 		
@@ -2729,14 +2727,12 @@
 		        playRadio(item.url, item.id);
 		    }
 		}
-        function aktualizujNochnyPrehravacVizual() {
+		
+		function aktualizujNochnyPrehravacVizual() {
 		    const pInfo = document.getElementById('nightStationInfo');
 		    const pBtn = document.getElementById('nightPlayPauseBtn');
 		
-		    // 1. Zistíme ID stanice: aktívne hrajúca ALEBO naposledy uložená v localStorage
 		    let activeId = currentPlayingType || localStorage.getItem('kiosk_last_radio_type');
-		    
-		    // Ak ešte nebola uložená žiadna stanica, zoberieme prvú z obľúbených
 		    if (!activeId) {
 		        activeId = slotFavorites.find(id => id !== null);
 		    }
@@ -2751,12 +2747,11 @@
 		        if (pInfo) pInfo.innerHTML = `<i class="fa-solid fa-radio"></i> <span>OFFLINE</span>`;
 		    }
 		
-		    // 2. Nastavenie ikony tlačidla: STOP keď hrá, PLAY keď nehrá
 		    if (pBtn) {
 		        if (audio && !audio.paused) {
-		            pBtn.innerHTML = `<i class="fa-solid fa-circle-stop"></i>`; // Tlačidlo STOP pri prehrávaní
+		            pBtn.innerHTML = `<i class="fa-solid fa-circle-stop"></i>`;
 		        } else {
-		            pBtn.innerHTML = `<i class="fa-solid fa-circle-play"></i>`; // Tlačidlo PLAY pri vypnutom rádiu
+		            pBtn.innerHTML = `<i class="fa-solid fa-circle-play"></i>`;
 		        }
 		    }
 		}
