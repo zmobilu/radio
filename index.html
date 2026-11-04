@@ -448,19 +448,18 @@
 <body id="mainBody">
 
     <audio id="audioPlayer" preload="none" playsinline></audio>
-	    <!-- Ľavý panel, ktorý sa bude plniť dynamicky cez JS -->
+	    <!-- Ľavý panel (mriežka 6 rádií a tlačidlo STOP) -->
 	    <div class="buttons-section" id="leftButtonsContainer">
-	        <!-- Zostáva tu len statické tlačidlo STOP, zvyšok pridá JS -->
 	        <button onpointerdown="stopRadio()" class="btn vypni" style="padding: 20px 0; min-height: 90px; width: 100%;"><i class="fa-solid fa-power-off"></i></button>
 	    </div>
 	    
 	    <div class="clock-section">
-	        <!-- Nové tlačidlo nastavení (Nahradilo raketu V2) -->
+	        <!-- Tlačidlo nastavení vpravo hore -->
 	        <button id="settingsToggleBtn" class="btn-settings ss-hide" onclick="prepniNastavenia()">
 	            <i class="fa-solid fa-gear"></i>
 	        </button>
         
-		<!-- Ovládač hlasitosti z V3 -->
+		<!-- Ovládač hlasitosti -->
         <div class="volume-panel-container" id="volumePanel">
             <button class="vol-btn" onpointerdown="event.stopPropagation(); changeVolumeStep(0.05);" title="Zvýšiť hlasitosť">+</button>
             <div class="volume-slider-wrapper">
@@ -478,6 +477,8 @@
             </div>
             <button class="vol-btn" onpointerdown="event.stopPropagation(); changeVolumeStep(-0.05);" title="Znížiť hlasitosť">-</button>
         </div>
+
+        <!-- Ľavý stĺpec šetriča (počasie) -->
         <div class="ss-left-col ss-only">
             <div id="ss-weather-trigger" style="cursor: pointer; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
                 <div class="current-weather-group">
@@ -506,6 +507,7 @@
             </div>
         </div>
         
+        <!-- Pravý stĺpec (hodiny, zapnutie rádia a dole dátum s meninami) -->
         <div class="ss-right-col">
             <div id="ss-radio-info" class="weather-details-hide" onpointerdown="event.stopPropagation(); event.preventDefault(); stopRadio();" style="pointer-events: auto !important; cursor: pointer; z-index: 9999 !important;"></div>
             
@@ -513,28 +515,21 @@
                 <span id="h-part" class="hours-part">00</span>
                 <span id="m-part" class="minutes-part">00</span> 
             </div>
-            <!-- PRIDANÉ: Spodný riadok pre nočný režim -->
+            
             <div id="night-bottom-info" style="display: none;"></div>
             
             <div id="weather-details-top-inline" class="weather-details-only" style="display: none; flex-direction: column; width: 100%; height: 68vh; padding: 10px 10px 0 10px; box-sizing: border-box; justify-content: space-between;">
                 <div id="weather-search-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%; height: 5vh; gap: 10px;">
- 
                     <span id="weather-location-topbar" style="display: none;"></span>
- 
                     <div style="position: relative; width: 50%; display: flex; gap: 6px;" onpointerdown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
- 
                         <input type="text" id="city-search-input" placeholder="Mesto..." 
                                onfocus="zobrazHistoriu()"
                                onblur="setTimeout(skryHistoriu, 200)"
                                onkeydown="if(event.key === 'Enter') hladajMesto()"
                                style="width: 100%; background: #111; color: #fff; border: 1px solid #444; border-radius: 8px; padding: 4px 10px; font-size: 2.2vw; font-family: inherit; outline: none;">
- 
                         <button onclick="hladajMesto()" style="background: #222; color: #ff9f0a; border: 1px solid #ff9f0a; padding: 2px 10px; border-radius: 8px; font-size: 2.2vw; font-weight: bold; cursor: pointer; white-space: nowrap;">🔍</button>
-
-                        <div id="search-history-box" style="display: none; position: absolute; top: 110%; left: 0; width: 100%; background: #111; border: 1px solid #ff9f0a; border-radius: 8px; padding: 5px; box-sizing: border-box; z-index: 999; flex-direction: column; gap: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.8);">
-                        </div>
+                        <div id="search-history-box" style="display: none; position: absolute; top: 110%; left: 0; width: 100%; background: #111; border: 1px solid #ff9f0a; border-radius: 8px; padding: 5px; box-sizing: border-box; z-index: 999; flex-direction: column; gap: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.8);"></div>
                     </div>
-                
                     <button onclick="zatvorPocasie(event)" style="background: #222; color: #ff9f0a; border: 2px solid #ff9f0a; padding: 2px 15px; border-radius: 8px; font-size: 2.5vw; font-weight: bold; cursor: pointer; white-space: nowrap;">Zatvor</button>
                 </div>
              
@@ -554,7 +549,7 @@
                 </div>
             </div>
          
-                <!-- Riadok 1: Mesto | Teplota | Dátum (vyčistené od pomlčiek a starého názvu rádia) -->
+            <!-- Info riadok v rádio režime -->
             <div class="radio-info-wrapper ss-hide">
                 <span id="weather-city-mini" style="font-weight: 500; text-transform: uppercase;">---</span>
                 <span class="separator">|</span>
@@ -563,18 +558,19 @@
                 <span id="radio-date">--.--.</span>
             </div>
 
-            <!-- Riadok 2: Samostatné meniny pod hodinami (rovnaká veľkosť 3.5vw a font ako riadok vyššie) -->
+            <!-- Samostatný riadok menín -->
             <div id="radio-nameday-line" class="ss-hide" style="margin-top: 2px; font-size: 3.5vw; font-weight: 400; text-transform: uppercase; text-align: center; letter-spacing: 1px;"></div>
 
+            <!-- Spotify kontajner -->
             <div id="integrated-spotify-container" class="ss-hide" style="display: none; width: 100%; margin-top: 15px; padding: 0 10px; box-sizing: border-box;">
                 <iframe id="spotify-player-frame" src="" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" style="border-radius: 12px; border: none;"></iframe>
             </div>
 
-           <div id="settings-container" style="display: none; width: 95%; max-height: 80vh; margin: 0 auto; padding: 12px 15px; box-sizing: border-box; background: #080808; border-radius: 14px; border: 1px solid #222; overflow-y: auto;">
+            <!-- Nastavenia -->
+            <div id="settings-container" style="display: none; width: 95%; max-height: 80vh; margin: 0 auto; padding: 12px 15px; box-sizing: border-box; background: #080808; border-radius: 14px; border: 1px solid #222; overflow-y: auto;">
 			    <h2 style="color: #ff9f0a; margin-top: 0; font-weight: 400; font-size: 1.8vw; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 12px;">Nastavenia nočný režim</h2>
-			
+			    
 			    <div style="display: flex; flex-direction: column; gap: 8px;">
-			        <!-- Noc od-do -->
 			        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
 			            <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-moon" style="color: #307CEB; margin-right: 8px;"></i> Noc</span>
 			            <div style="display: flex; gap: 6px; align-items: center;">
@@ -584,13 +580,11 @@
 			            </div>
 			        </div>
 			
-			        <!-- Snooze -->
 			        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
 			            <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-hourglass-half" style="color: #ff9f0a; margin-right: 8px;"></i> Odklad</span>
 			            <button onclick="zmenDobuOdkladu()" id="set-snooze-time" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 10px; border-radius: 6px; font-size: 1.3vw; cursor: pointer;">1 min</button>
 			        </div>
 			
-			        <!-- Farba -->
 			        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
 			            <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-palette" style="color: #eb0028; margin-right: 8px;"></i> Farba hodín</span>
 			            <div style="display: flex; gap: 6px;">
@@ -602,7 +596,6 @@
 			            </div>
 			        </div>
 			
-			        <!-- AutoOFF rádia -->
 			        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
 			            <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-volume-xmark" style="color: #888; margin-right: 8px;"></i> AutoOFF rádia</span>
 			            <div style="display: flex; gap: 6px; align-items: center;">
@@ -611,7 +604,6 @@
 			            </div>
 			        </div>
 			
-			        <!-- Verzia Kiosku -->
 			        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
 			            <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-code-branch" style="color: #4dabff; margin-right: 8px;"></i> Verzia Kiosku</span>
 			            <div style="display: flex; gap: 6px; align-items: center;">
@@ -621,15 +613,11 @@
 			        </div>
 			    </div>
 			
-			    <!-- Mriežka rádia -->
 			    <h2 style="color: #ff9f0a; margin-top: 15px; font-weight: 400; font-size: 1.8vw; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 8px;">Výber 6 rádií do panelu</h2>
 			    <div id="settingsGridView" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; padding: 5px 0;"></div>
 			</div>
-		</div>
-	</div>
 
-           
-
+            <!-- SPODNÝ BLOK ŠETRIČA (Dátum, meniny, vietor) - Umiestnený na samom dne -->
             <div id="date-block" class="ss-only">
                 <div class="ss-date-wrapper weather-details-hide">
                     <span id="date-display" class="ss-date">--.--.</span>
@@ -648,6 +636,7 @@
         </div>
 
     </div>
+
             
     <script>
 		
