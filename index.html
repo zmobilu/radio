@@ -598,12 +598,13 @@
 			        </div>
 			
 			        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
-			            <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-volume-xmark" style="color: #888; margin-right: 8px;"></i> AutoOFF rádia</span>
-			            <div style="display: flex; gap: 6px; align-items: center;">
-			                <button onclick="zmenCasVypnutiaRadia()" id="set-radio-off-time" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 10px; border-radius: 6px; font-size: 1.3vw; cursor: pointer;">17:00</button>
-			                <button onclick="toggleAutoOffRadia()" id="set-radio-off-toggle" style="background: #222; color: #888; border: 1px solid #444; padding: 4px 10px; border-radius: 6px; font-size: 1.3vw; cursor: pointer;">OFF</button>
-			            </div>
-			        </div>
+					    <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-volume-xmark" style="color: #888; margin-right: 8px;"></i> AutoOFF rádia</span>
+					    <div style="display: flex; gap: 6px; align-items: center;">
+					        <button onclick="zmenCasVypnutiaRadia(1)" id="set-radio-off-time-1" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 10px; border-radius: 6px; font-size: 1.3vw; cursor: pointer;">09:00</button>
+					        <button onclick="zmenCasVypnutiaRadia(2)" id="set-radio-off-time-2" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 10px; border-radius: 6px; font-size: 1.3vw; cursor: pointer;">17:00</button>
+					        <button onclick="toggleAutoOffRadia()" id="set-radio-off-toggle" style="background: #222; color: #888; border: 1px solid #444; padding: 4px 10px; border-radius: 6px; font-size: 1.3vw; cursor: pointer;">OFF</button>
+					    </div>
+					</div>
 			
 			        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
 			            <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-code-branch" style="color: #4dabff; margin-right: 8px;"></i> Verzia Kiosku</span>
@@ -686,9 +687,58 @@
 		];
 	
 		let slotFavoritesMain = JSON.parse(localStorage.getItem('kiosk_slots_main')) || ["slovensko", "fun", "rock", "blanik", "S-techno", "spotify"];
-		let cfgRadioOffTime = localStorage.getItem('cfg_radio_off_time') || "16:30";
+		// Staré: let cfgRadioOffTime = localStorage.getItem('cfg_radio_off_time') || "16:30";
+		let cfgRadioOffTime1 = localStorage.getItem('cfg_radio_off_time_1') || "09:00";
+		let cfgRadioOffTime2 = localStorage.getItem('cfg_radio_off_time_2') || "17:00";
 		let cfgRadioOffEnabled = localStorage.getItem('cfg_radio_off_enabled') === 'true';
 		let radioAlreadyAutoStopped = false;
+		
+		function toggleAutoOffRadia() {
+			cfgRadioOffEnabled = !cfgRadioOffEnabled;
+			localStorage.setItem('cfg_radio_off_enabled', cfgRadioOffEnabled);
+			radioAlreadyAutoStopped = false;
+			aktualizujTlacidlaAutoVypnutia();
+		}
+		
+		// Funkcia pre zmenu 1. (ranného) alebo 2. (večerného) času
+		function zmenCasVypnutiaRadia(index) {
+			let povodny = (index === 1) ? cfgRadioOffTime1 : cfgRadioOffTime2;
+			let novy = prompt(`Zadaj ${index}. čas pre automatické vypnutie rádia (HH:MM):`, povodny);
+			if (novy && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(novy)) {
+				if (novy.length === 4 && novy.indexOf(':') === 1) novy = "0" + novy;
+				if (index === 1) {
+					cfgRadioOffTime1 = novy;
+					localStorage.setItem('cfg_radio_off_time_1', novy);
+				} else {
+					cfgRadioOffTime2 = novy;
+					localStorage.setItem('cfg_radio_off_time_2', novy);
+				}
+				radioAlreadyAutoStopped = false;
+				aktualizujTlacidlaAutoVypnutia();
+			}
+		}
+		
+		function aktualizujTlacidlaAutoVypnutia() {
+			const btnTime1 = document.getElementById('set-radio-off-time-1');
+			const btnTime2 = document.getElementById('set-radio-off-time-2');
+			const btnToggle = document.getElementById('set-radio-off-toggle');
+		
+			if (btnTime1) btnTime1.textContent = cfgRadioOffTime1;
+			if (btnTime2) btnTime2.textContent = cfgRadioOffTime2;
+			if (btnToggle) {
+				if (cfgRadioOffEnabled) {
+					btnToggle.textContent = "ON";
+					btnToggle.style.color = "#ff9f0a";
+					btnToggle.style.borderColor = "#ff9f0a";
+					btnToggle.style.background = "#1a1a1a";
+				} else {
+					btnToggle.textContent = "OFF";
+					btnToggle.style.color = "#888";
+					btnToggle.style.borderColor = "#444";
+					btnToggle.style.background = "#222";
+				}
+			}
+		}
 	
 		function renderLeftButtons() {
 			const container = document.getElementById('leftButtonsContainer');
@@ -761,44 +811,7 @@
 			});
 		}
 	
-		function toggleAutoOffRadia() {
-			cfgRadioOffEnabled = !cfgRadioOffEnabled;
-			localStorage.setItem('cfg_radio_off_enabled', cfgRadioOffEnabled);
-			radioAlreadyAutoStopped = false;
-			aktualizujTlacidlaAutoVypnutia();
-		}
-		
-		function zmenCasVypnutiaRadia() {
-			let novy = prompt("Zadaj čas pre automatické vypnutie rádia (HH:MM):", cfgRadioOffTime);
-			if (novy && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(novy)) {
-				if (novy.length === 4 && novy.indexOf(':') === 1) novy = "0" + novy;
-				cfgRadioOffTime = novy;
-				localStorage.setItem('cfg_radio_off_time', novy);
-				radioAlreadyAutoStopped = false;
-				aktualizujTlacidlaAutoVypnutia();
-			}
-		}
-		
-		function aktualizujTlacidlaAutoVypnutia() {
-			const btnTime = document.getElementById('set-radio-off-time');
-			const btnToggle = document.getElementById('set-radio-off-toggle');
-		
-			if (btnTime) btnTime.textContent = cfgRadioOffTime;
-			if (btnToggle) {
-				if (cfgRadioOffEnabled) {
-					btnToggle.textContent = "ON";
-					btnToggle.style.color = "#ff9f0a";
-					btnToggle.style.borderColor = "#ff9f0a";
-					btnToggle.style.background = "#1a1a1a";
-				} else {
-					btnToggle.textContent = "OFF";
-					btnToggle.style.color = "#888";
-					btnToggle.style.borderColor = "#444";
-					btnToggle.style.background = "#222";
-				}
-			}
-		}
-            // --- LOGIKA PRE PLOCHU NASTAVENÍ ---
+		 // --- LOGIKA PRE PLOCHU NASTAVENÍ ---
         let cfgNocOd = localStorage.getItem('cfg_night_from') || "20:00";
         let cfgNocDo = localStorage.getItem('cfg_night_to') || "05:20";
         let cfgSnoozeMin = parseInt(localStorage.getItem('cfg_snooze_min') || "2");
@@ -1157,9 +1170,10 @@ function updateClock() {
             .map(m => `<span class="${dajFarbuMena(m)}">${m.toUpperCase()}</span>`)
             .join('<span style="color:#555; margin: 0 4px;">,</span> ');
     }
-	// Kontrola automatického vypnutia rádia
+	// Kontrola automatického vypnutia rádia (dva časy)
     if (cfgRadioOffEnabled) {
-        if (`${h}:${m}` === cfgRadioOffTime) {
+        const aktualnyCas = `${h}:${m}`;
+        if (aktualnyCas === cfgRadioOffTime1 || aktualnyCas === cfgRadioOffTime2) {
             if (!radioAlreadyAutoStopped) {
                 if (audio && !audio.paused) {
                     stopRadio();
