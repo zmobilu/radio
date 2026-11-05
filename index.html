@@ -1191,10 +1191,8 @@ function updateClock() {
             .map(m => `<span class="${dajFarbuMena(m)}">${m.toUpperCase()}</span>`)
             .join('<span style="color:#555; margin: 0 4px;">,</span> ');
     }
-	// Kontrola automatického vypnutia rádia (dva časy)
-    if (cfgRadioOffEnabled) {
-        // Kontrola automatického vypnutia rádia (dva samostatné časy)
-    const aktualnyCas = `${h}:${m}`;
+	// Kontrola automatického vypnutia rádia (dva samostatné časy)
+	    const aktualnyCas = `${h}:${m}`;
 	    const vypnut1 = cfgRadioOffEnabled1 && (aktualnyCas === cfgRadioOffTime1);
 	    const vypnut2 = cfgRadioOffEnabled2 && (aktualnyCas === cfgRadioOffTime2);
 	
