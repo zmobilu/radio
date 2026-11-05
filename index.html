@@ -567,7 +567,8 @@
             </div>
 
             <!-- Nastavenia -->
-            <div id="settings-container" style="display: none; width: 95%; max-height: 80vh; margin: 0 auto; padding: 12px 15px; box-sizing: border-box; background: #080808; border-radius: 14px; border: 1px solid #222; overflow-y: auto;">
+           <!-- Nastavenia -->
+			<div id="settings-container" style="display: none; width: 95%; max-height: 80vh; margin: 55px auto 0 auto; padding: 12px 15px; box-sizing: border-box; background: #080808; border-radius: 14px; border: 1px solid #222; overflow-y: auto; position: relative; z-index: 99999;">
 			    <h2 style="color: #ff9f0a; margin-top: 0; font-weight: 400; font-size: 1.8vw; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 12px;">Nastavenia nočný režim</h2>
 			    
 			    <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -1652,11 +1653,14 @@ function resetIdleTimer(wakingUp = true) {
     const settingsBox = document.getElementById('settings-container');
     const nastaveniaSuOtvorene = settingsBox && settingsBox.style.display === 'block';
 
-    if (!nastaveniaSuOtvorene) {
-        idleTimer = setTimeout(() => {
-            document.body.classList.add('screensaver-mode');
-        }, cfgSnoozeMin * 60 * 1000); // Prepočet zadaných minút na milisekundách (napr. 2 min = 120000 ms)
-    }
+    // Ak sú otvorené nastavenia, pri nečinnosti ich najprv zavrieme
+        if (nastaveniaSuOtvorene) {
+            prepniNastavenia();
+        }
+
+        // Automaticky preklopíme do šetriča obrazovky
+        document.body.classList.add('screensaver-mode');
+    }, cfgSnoozeMin * 60 * 1000);
 }
 
 function klikNaHodiny(e) {
