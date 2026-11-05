@@ -430,17 +430,19 @@
             transition: transform 0.1s ease, opacity 0.1s ease;
         }
 
-        /* Zvýraznenie klikateľného mesta v šetriči obrazovky */
-        #weather-location-main span {
-            background: rgba(255, 159, 10, 0.15) !important;
-            border: 1px dashed #ff9f0a !important;
-            padding: 4px 12px !important;
-            border-radius: 8px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 8px !important;
-            transition: background 0.2s, transform 0.1s;
-        }
+        /* Zmenšené mesto v šetriči obrazovky (štýl ako Dnes/Zajtra) */
+		#weather-location-main span {
+		    background: transparent !important;
+		    border: none !important;
+		    padding: 0 !important;
+		    display: inline-flex !important;
+		    align-items: center !important;
+		    gap: 6px !important;
+		    font-size: 1.8vw !important;
+		    color: #aaa !important;
+		    letter-spacing: 1px !important;
+		    font-weight: 500 !important;
+		}
          
     </style>
 </head>
@@ -1242,12 +1244,12 @@ async function updateWeather(lat = 48.1421, lon = 17.1964) {
             const windyUrl = `https://www.windy.com/?temp,${lat.toFixed(4)},${lon.toFixed(4)},10`;
             
             locationMainEl.innerHTML = `
-                <span onpointerdown="event.stopPropagation(); event.preventDefault(); window.open('${windyUrl}', '_blank');" 
-                      title="Otvoriť mapu Windy" 
-                      style="color: #ff9f0a; text-decoration: none; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; z-index: 9999;">
-                    <i class="fa-solid fa-map-location-dot" style="font-size: 0.85em; color: #ff9f0a;"></i>
-                    <span>${zobrazovanyNazov}</span>
-                </span>`;
+			    <span onpointerdown="event.stopPropagation(); event.preventDefault(); window.open('${windyUrl}', '_blank');" 
+			          title="Otvoriť mapu Windy" 
+			          style="cursor: pointer; position: relative; z-index: 9999;">
+			        <i class="fa-solid fa-map-location-dot" style="font-size: 0.9em; color: #ff9f0a;"></i>
+			        <span>${zobrazovanyNazov}</span>
+			    </span>`;
         }
 
         const topLocationEl = document.getElementById('weather-location-topbar');
