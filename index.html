@@ -1649,11 +1649,11 @@ function resetIdleTimer(wakingUp = true) {
     if (wakingUp) document.body.classList.remove('screensaver-mode');
     clearTimeout(idleTimer);
 
-    // Ak nie sú otvorené nastavenia, po zadaných minútach nečinnosti preklopí displej na šetrič
-    const settingsBox = document.getElementById('settings-container');
-    const nastaveniaSuOtvorene = settingsBox && settingsBox.style.display === 'block';
+    idleTimer = setTimeout(() => {
+        const settingsBox = document.getElementById('settings-container');
+        const nastaveniaSuOtvorene = settingsBox && settingsBox.style.display === 'block';
 
-    // Ak sú otvorené nastavenia, pri nečinnosti ich najprv zavrieme
+        // Ak sú otvorené nastavenia, pri nečinnosti ich najprv zavrieme
         if (nastaveniaSuOtvorene) {
             prepniNastavenia();
         }
