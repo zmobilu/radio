@@ -796,20 +796,33 @@
 			if(!grid) return;
 			grid.innerHTML = "";
 			
+			// Vypneme pôvodnú mriežku zo samotného rodiča
+			grid.style.display = "block";
+			
 			let currentCategory = "";
+			let currentGroupContainer = null;
+
 			DATABASE.forEach(item => {
 				if (item.category !== currentCategory) {
 					currentCategory = item.category;
+					
+					// Vytvorenie nadpisu
 					const separator = document.createElement('div');
 					separator.className = "settings-label-separator";
 					separator.textContent = currentCategory;
 					grid.appendChild(separator);
+
+					// Vytvorenie riadkového kontajnera pre danú kategóriu
+					currentGroupContainer = document.createElement('div');
+					currentGroupContainer.style.cssText = "display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;";
+					grid.appendChild(currentGroupContainer);
 				}
 				
 				const card = document.createElement('div');
 				card.className = "cfg-mini-card";
+				card.style.cssText = "width: 85px; aspect-ratio: 1/1;";
 				if (slotFavoritesMain.includes(item.id)) card.classList.add("selected");
-	
+
 				card.onclick = (e) => { 
 					const existingIndex = slotFavoritesMain.indexOf(item.id);
 					if (existingIndex !== -1) {
@@ -827,10 +840,13 @@
 					renderSettingsGrid();
 					renderLeftButtons();
 				};
-	
+
 				let cardContent = item.img ? `<img src="${item.img}">` : `<i class="${item.icon || 'fa-solid fa-radio'}" style="color:${item.color || '#fff'}"></i>`;
 				card.innerHTML = `${cardContent}<span>${item.name}</span>`;
-				grid.appendChild(card);
+				
+				if (currentGroupContainer) {
+					currentGroupContainer.appendChild(card);
+				}
 			});
 		}
 	
