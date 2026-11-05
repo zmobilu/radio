@@ -581,9 +581,9 @@
 			        </div>
 			
 			        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
-			            <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-hourglass-half" style="color: #ff9f0a; margin-right: 8px;"></i> Odklad</span>
-			            <button onclick="zmenDobuOdkladu()" id="set-snooze-time" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 10px; border-radius: 6px; font-size: 1.3vw; cursor: pointer;">1 min</button>
-			        </div>
+					    <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-hourglass-half" style="color: #ff9f0a; margin-right: 8px;"></i> Odklad a šetrič</span>
+					    <button onclick="zmenDobuOdkladu()" id="set-snooze-time" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 10px; border-radius: 6px; font-size: 1.3vw; cursor: pointer;">2 min</button>
+					</div>
 			
 			        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
 			            <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-palette" style="color: #eb0028; margin-right: 8px;"></i> Farba hodín</span>
@@ -800,7 +800,7 @@
             // --- LOGIKA PRE PLOCHU NASTAVENÍ ---
         let cfgNocOd = localStorage.getItem('cfg_night_from') || "20:00";
         let cfgNocDo = localStorage.getItem('cfg_night_to') || "05:20";
-        let cfgSnoozeMin = parseInt(localStorage.getItem('cfg_snooze_min') || "1");
+        let cfgSnoozeMin = parseInt(localStorage.getItem('cfg_snooze_min') || "2");
         let cfgFarbaNoci = localStorage.getItem('cfg_night_color') || "#ffff00";
 
         // Verzia buildu V2 (pri vydaní veľkých zmien zmeňte napr. na '2.1' a banner sa znova zvýrazní)
@@ -1643,20 +1643,19 @@ function playIntegratedSpotify(target, element) {
     }
 }
 
-// --- ŠETRIČ A DOTYKY (UPRAVENÉ PRE MANUÁLNE OVLÁDANIE) ---
 let idleTimer;
 function resetIdleTimer(wakingUp = true) {
     if (wakingUp) document.body.classList.remove('screensaver-mode');
     clearTimeout(idleTimer);
 
-    // Ak nie sú otvorené nastavenia, po 60 sekundách nečinnosti preklopí displej na šetrič
+    // Ak nie sú otvorené nastavenia, po zadaných minútach nečinnosti preklopí displej na šetrič
     const settingsBox = document.getElementById('settings-container');
     const nastaveniaSuOtvorene = settingsBox && settingsBox.style.display === 'block';
 
     if (!nastaveniaSuOtvorene) {
         idleTimer = setTimeout(() => {
             document.body.classList.add('screensaver-mode');
-        }, 60000); // 60000 ms = 60 sekúnd
+        }, cfgSnoozeMin * 60 * 1000); // Prepočet zadaných minút na milisekundách (napr. 2 min = 120000 ms)
     }
 }
 
@@ -1746,7 +1745,9 @@ function zatvorPocasie(e) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Vykreslenie dynamických panelov ---
+    // Spustíme odpočet pre šetrič ihneď pri otvorení KIOSKU (bez potreby kliknutia)
+    resetIdleTimer(false);
+	// --- Vykreslenie dynamických panelov ---
     renderLeftButtons();
     renderSettingsGrid();
 
