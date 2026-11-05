@@ -660,40 +660,42 @@
             'S-techno': 1.0, 'schranz': 1.0, 'melodic': 1.0, 'h-techno': 1.0, 'Drumcode': 1.0,
             'topolcany': 0.5 // PRIDANÉ SEM
         };
-		// --- DATABÁZA A LOGIKA PRE 6 SLOTOV (STARÝ VZHĽAD) ---
+		// --- DATABÁZA ZOSKUPENÁ PODĽA KATEGÓRIÍ ---
 		const DATABASE = [
+			// Verejnoprávne (STVR)
 			{ id: "slovensko", name: "Slovensko", url: "https://icecast.stv.livebox.sk/slovensko_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png", style: "background:#00547E;", category: "Verejnoprávne" },
-			{ id: "fun", name: "Fun Radio", url: "https://funradio-proxy.zmobilu.workers.dev/fun192.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png", style: "background:#fff;", category: "Komerčné" },
-			{ id: "blanik", name: "Blaník", url: "https://ice.abradio.cz/blanikcz128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png", style: "background:#005ea6;", category: "Rockové" },
-			{ id: "rock", name: "Radio rock", url: "https://stream.bauermedia.sk/rock-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png", style: "background:#000;", category: "Komerčné" },
-			{ id: "S-techno", name: "Techno", url: "https://stream.sunshine-live.de/techno/mp3-192/", icon: "fa-solid fa-bolt", color: "#307CEB", style: "background:#000; color:#307CEB;", category: "Elektronická scéna" },
-			{ id: "spotify", name: "Spotify", url: "https://open.spotify.com", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSpotifySET.png", style: "background:#21D844;", category: "Externé Aplikácie" },
-			// ... (Tu môžeš pridať ďalšie z V3 databázy, ak chceš širší výber)
 			{ id: "fm", name: "Rádio_FM", url: "https://icecast.stv.livebox.sk/fm_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioFM.png", style: "background:#111;", category: "Verejnoprávne" },
-            { id: "regina", name: "Regina", url: "https://icecast.stv.livebox.sk/regina-ba_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioReginaZ.png", style: "background:#111;", category: "Verejnoprávne" },
-            { id: "devin", name: "Devín", url: "https://icecast.stv.livebox.sk/devin_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioDevin.png", style: "background:#111;", category: "Verejnoprávne" },
-            { id: "junior", name: "Junior", url: "https://icecast.stv.livebox.sk/junior_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioJunior.png", style: "background:#111;", category: "Verejnoprávne" },
-            { id: "litera", name: "Litera", url: "https://icecast.stv.livebox.sk/litera_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioLitera.png", style: "background:#111;", category: "Verejnoprávne" },
+			{ id: "regina", name: "Regina", url: "https://icecast.stv.livebox.sk/regina-ba_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioReginaZ.png", style: "background:#111;", category: "Verejnoprávne" },
+			{ id: "devin", name: "Devín", url: "https://icecast.stv.livebox.sk/devin_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioDevin.png", style: "background:#111;", category: "Verejnoprávne" },
+			{ id: "junior", name: "Junior", url: "https://icecast.stv.livebox.sk/junior_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioJunior.png", style: "background:#111;", category: "Verejnoprávne" },
+			{ id: "litera", name: "Litera", url: "https://icecast.stv.livebox.sk/litera_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioLitera.png", style: "background:#111;", category: "Verejnoprávne" },
 
+			// Fun Kontajner
+			{ id: "fun", name: "Fun Radio", url: "https://funradio-proxy.zmobilu.workers.dev/fun192.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png", style: "background:#fff;", category: "Fun Kontajner" },
 			{ id: "funchill", name: "Fun Chill", url: "https://funradio-proxy.zmobilu.workers.dev/chill128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunChill.png", style: "background:#111;", category: "Fun Kontajner" },
-            { id: "fun8090", name: "Fun 80-90", url: "https://funradio-proxy.zmobilu.workers.dev/80-90-128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun8090.png", style: "background:#111;", category: "Fun Kontajner" },
-            { id: "funczsk", name: "Fun CZ-SK", url: "https://funradio-proxy.zmobilu.workers.dev/cs128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunCZSK.png", style: "background:#111;", category: "Fun Kontajner" },
-            { id: "milenialky", name: "Milenialky", url: "https://funradio-proxy.zmobilu.workers.dev/milenialky128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun2000.png", style: "background:#111;", category: "Fun Kontajner" },
+			{ id: "fun8090", name: "Fun 80-90", url: "https://funradio-proxy.zmobilu.workers.dev/80-90-128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun8090.png", style: "background:#111;", category: "Fun Kontajner" },
+			{ id: "funczsk", name: "Fun CZ-SK", url: "https://funradio-proxy.zmobilu.workers.dev/cs128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunCZSK.png", style: "background:#111;", category: "Fun Kontajner" },
+			{ id: "milenialky", name: "Milenialky", url: "https://funradio-proxy.zmobilu.workers.dev/milenialky128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun2000.png", style: "background:#111;", category: "Fun Kontajner" },
 
+			// Komerčné
+			{ id: "jazz", name: "Rádio Jazz", url: "https://radio-jazz-proxy.zmobilu.workers.dev", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioJazz.png", style: "background:#111;", category: "Komerčné" },
+			{ id: "impuls", name: "Rádio Impuls", url: "https://proxy-impuls.zmobilu.workers.dev", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoImpuls.png", style: "background:#111;", category: "Komerčné" },
 			{ id: "expres", name: "Expres", url: "https://stream.bauermedia.sk/expres-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoExpress.png", style: "background:#111;", category: "Komerčné" },
-            { id: "europa2", name: "Europa 2", url: "https://stream.bauermedia.sk/europa2-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoEuropa2.png", style: "background:#111;", category: "Komerčné" },
-            { id: "melody", name: "Melody", url: "https://stream.bauermedia.sk/melody-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoMelody.png", style: "background:#111;", category: "Komerčné" },
-            { id: "vlna", name: "Rádio Vlna", url: "https://stream.radiovlna.sk/vlna-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoVlna.png", style: "background:#111;", category: "Komerčné" },
+			{ id: "europa2", name: "Europa 2", url: "https://stream.bauermedia.sk/europa2-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoEuropa2.png", style: "background:#111;", category: "Komerčné" },
+			{ id: "melody", name: "Melody", url: "https://stream.bauermedia.sk/melody-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoMelody.png", style: "background:#111;", category: "Komerčné" },
+			{ id: "vlna", name: "Rádio Vlna", url: "https://stream.radiovlna.sk/vlna-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoVlna.png", style: "background:#111;", category: "Komerčné" },
+			{ id: "rock", name: "Radio rock", url: "https://stream.bauermedia.sk/rock-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png", style: "background:#000;", category: "Komerčné" },
+			{ id: "blanik", name: "Blaník", url: "https://ice.abradio.cz/blanikcz128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png", style: "background:#005ea6;", category: "Komerčné" },
 			
-            { id: "jazz", name: "Rádio Jazz", url: "https://radio-jazz-proxy.zmobilu.workers.dev", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioJazz.png", style: "background:#111;", category: "Ostatné" },
-			{ id: "impuls", name: "Rádio Impuls", url: "https://proxy-impuls.zmobilu.workers.dev", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoImpuls.png", style: "background:#111;", category: "Ostatné" },
+			// Elektronická / Techno scéna
+			{ id: "S-techno", name: "Techno", url: "https://stream.sunshine-live.de/techno/mp3-192/", icon: "fa-solid fa-bolt", color: "#307CEB", style: "background:#000; color:#307CEB;", category: "Elektronická scéna" },
+			{ id: "schranz", name: "Schranz", url: "https://stream.sunshine-live.de/schranz/mp3-192/", icon: "fa-solid fa-triangle-exclamation", color: "#fff", style: "background:#111;", category: "Elektronická scéna" },
+			{ id: "melodic", name: "Melodic Beats", url: "https://stream.sunshine-live.de/melodic_beats/mp3-192/", icon: "fa-solid fa-wave-square", color: "#fff", style: "background:#111;", category: "Elektronická scéna" },
+			{ id: "h-techno", name: "Hard Techno", url: "https://stream.sunshine-live.de/hardtechno/mp3-192", icon: "fa-solid fa-circle-radiation", color: "#fff", style: "background:#111;", category: "Elektronická scéna" },
+			{ id: "Drumcode", name: "Drumcode", url: "https://stream.sunshine-live.de/drumbass/mp3-192", icon: "fa-solid fa-volume-high", color: "#fff", style: "background:#111;", category: "Elektronická scéna" },
 
-			{ id: "S-techno", name: "Techno", url: "https://stream.sunshine-live.de/techno/mp3-192/", icon: "fa-solid fa-bolt", color: "#307CEB", style: "background:#111;", category: "Techno scéna" },
-            { id: "schranz", name: "Schranz", url: "https://stream.sunshine-live.de/schranz/mp3-192/", icon: "fa-solid fa-triangle-exclamation", color: "#fff", style: "background:#111;", category: "Techno scéna" },
-            { id: "melodic", name: "Melodic Beats", url: "https://stream.sunshine-live.de/melodic_beats/mp3-192/", icon: "fa-solid fa-wave-square", color: "#fff", style: "background:#111;", category: "Techno scéna" },
-            { id: "h-techno", name: "Hard Techno", url: "https://stream.sunshine-live.de/hardtechno/mp3-192", icon: "fa-solid fa-circle-radiation", color: "#fff", style: "background:#111;", category: "Techno scéna" },
-            { id: "Drumcode", name: "Drumcode", url: "https://stream.sunshine-live.de/drumbass/mp3-192", icon: "fa-solid fa-volume-high", color: "#fff", style: "background:#111;", category: "Techno scéna" },
-
+			// Ostatné
+			{ id: "spotify", name: "Spotify", url: "https://open.spotify.com", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSpotifySET.png", style: "background:#21D844;", category: "Ostatné" }
 		];
 	
 		let slotFavoritesMain = JSON.parse(localStorage.getItem('kiosk_slots_main')) || ["slovensko", "fun", "rock", "blanik", "S-techno", "spotify"];
