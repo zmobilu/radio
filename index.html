@@ -890,6 +890,11 @@
 				const activeBtn = container.querySelector(`[data-type="${currentPlayingType}"]`);
 				if(activeBtn) activeBtn.classList.add('playing');
 			}
+			/ --- PRIDANÁ KONTROLA PRE BEŽEC HLASITOSTI ---
+			const volPanel = document.getElementById('volumePanel');
+			if (volPanel) {
+				volPanel.style.display = (typeof audio !== 'undefined' && audio && !audio.paused && currentPlayingType !== "" && currentPlayingType !== "settings") ? 'flex' : 'none';
+			}
 		}
 	
 		function renderSettingsGrid() {
@@ -1043,7 +1048,10 @@
 	        settingsBox.style.display = 'none';
 	        if (btnSettings) btnSettings.classList.remove('active');
 	
-	        if (volPanel) volPanel.style.display = 'flex';
+	        // Zobrazí bežec iba vtedy, ak zvuk naozaj hrá
+	        if (volPanel) {
+	            volPanel.style.display = (typeof audio !== 'undefined' && audio && !audio.paused && currentPlayingType !== "" && currentPlayingType !== "settings") ? 'flex' : 'none';
+	        }
 	        if (hodinyEl) hodinyEl.style.display = 'flex';
 	        if (infoRiadokEl) infoRiadokEl.style.display = 'flex';
 	        if (namedayLineEl) namedayLineEl.style.display = 'block'; 
