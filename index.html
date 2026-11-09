@@ -443,104 +443,7 @@
 		    letter-spacing: 1px !important;
 		    font-weight: 500 !important;
 		}
-
-		/* --- SVETLÝ REŽIM (LIGHT MODE) --- */
-		body.light-mode {
-		    background-color: #f4f4f6 !important;
-		    color: #111111 !important;
-		}
-		
-		body.light-mode .clock-section,
-		body.light-mode .ss-right-col {
-		    background-color: #f4f4f6 !important;
-		    border-left-color: #ddd !important;
-		}
-		
-		body.light-mode .hours-part,
-		body.light-mode .minutes-part,
-		body.light-mode .ss-date,
-		body.light-mode .temp-val,
-		body.light-mode #wind-speed,
-		body.light-mode .mini-temp,
-		body.light-mode .forecast-day-label,
-		body.light-mode #date-display {
-		    color: #111111 !important;
-		}
-		
-		body.light-mode .buttons-section {
-		    background-color: #e5e5ea !important;
-		}
-		
-		body.light-mode .btn {
-		    background-color: #ffffff !important;
-		    color: #111111 !important;
-		    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-		}
-		
-		body.light-mode .btn.vypni {
-		    background-color: #d1d1d6 !important;
-		}
-		
-		body.light-mode .radio-info-wrapper {
-		    color: #444444 !important;
-		}
-		
-		body.light-mode .radio-info-wrapper .separator,
-		body.light-mode .ss-separator {
-		    color: #cccccc !important;
-		}
-		
-		body.light-mode .btn-settings,
-		body.light-mode .vol-btn {
-		    background-color: #ffffff !important;
-		    border-color: #cccccc !important;
-		    color: #333333 !important;
-		}
-		
-		body.light-mode #settings-container {
-		    background-color: #ffffff !important;
-		    border-color: #dddddd !important;
-		    color: #111111 !important;
-		    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-		}
-		
-		body.light-mode #settings-container div[style*="background: #111"],
-		body.light-mode #settings-container div[style*="background:#111"] {
-		    background: #f0f0f3 !important;
-		    border-color: #ddd !important;
-		}
-		
-		body.light-mode #settings-container span[style*="color: #fff"] {
-		    color: #111111 !important;
-		}
-		
-		body.light-mode .cfg-mini-card {
-		    background: #ffffff !important;
-		    border-color: #dddddd !important;
-		}
-		
-		body.light-mode .cfg-mini-card span {
-		    color: #444444 !important;
-		}
-		
-		body.light-mode .cfg-mini-card.selected {
-		    background: #fff4e5 !important;
-		    border-color: #ff9f0a !important;
-		}
-		
-		body.light-mode #mini-forecast-strip {
-		    border-top-color: #dddddd !important;
-		}
-		
-		body.light-mode .forecast-day-box {
-		    background: #ffffff !important;
-		    border-color: #dddddd !important;
-		}
-		
-		body.light-mode .day-box-active {
-		    background: #fff4e5 !important;
-		    border-color: #ff9f0a !important;
-		}
+         
     </style>
 </head>
 
@@ -670,10 +573,6 @@
 			<div id="settings-container" style="display: none; width: 95%; max-height: 80vh; margin: 55px auto 0 auto; padding: 12px 15px; box-sizing: border-box; background: #080808; border-radius: 14px; border: 1px solid #222; overflow-y: auto; position: relative; z-index: 99999;">
 			    <h2 style="color: #ff9f0a; margin-top: 0; font-weight: 400; font-size: 1.8vw; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 12px;">Nastavenia nočný režim</h2>
 			    
-				<div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
-				    <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-sun-moon" style="color: #ff9f0a; margin-right: 8px;"></i> Režim zobrazenia</span>
-				    <button onclick="prepniTemuZobrazenia()" id="set-theme-toggle" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 10px; border-radius: 6px; font-size: 1.3vw; cursor: pointer;">Tmavý 🌙</button>
-				</div>
 			    <div style="display: flex; flex-direction: column; gap: 8px;">
 			        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
 			            <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-moon" style="color: #307CEB; margin-right: 8px;"></i> Noc</span>
@@ -890,11 +789,6 @@
 				const activeBtn = container.querySelector(`[data-type="${currentPlayingType}"]`);
 				if(activeBtn) activeBtn.classList.add('playing');
 			}
-			/ --- PRIDANÁ KONTROLA PRE BEŽEC HLASITOSTI ---
-			const volPanel = document.getElementById('volumePanel');
-			if (volPanel) {
-				volPanel.style.display = (typeof audio !== 'undefined' && audio && !audio.paused && currentPlayingType !== "" && currentPlayingType !== "settings") ? 'flex' : 'none';
-			}
 		}
 	
 		function renderSettingsGrid() {
@@ -984,50 +878,19 @@
 		    }
 		}
 
-        // --- LOGIKA PRE PREPÍNANIE TEMY (SVETLÝ / TMAVÝ REŽIM) ---
-		let cfgTema = localStorage.getItem('kiosk_theme') || 'dark';
-
-		function aplikujTemu() {
-			const bodyEl = document.getElementById('mainBody');
-			const btnToggle = document.getElementById('set-theme-toggle');
-			
-			if (cfgTema === 'light') {
-				bodyEl.classList.add('light-mode');
-				if (btnToggle) {
-					btnToggle.textContent = 'Svetlý ☀️';
-					btnToggle.style.color = '#ff9f0a';
-					btnToggle.style.borderColor = '#ff9f0a';
-				}
-			} else {
-				bodyEl.classList.remove('light-mode');
-				if (btnToggle) {
-					btnToggle.textContent = 'Tmavý 🌙';
-					btnToggle.style.color = '#ffffff';
-					btnToggle.style.borderColor = '#444444';
-				}
-			}
-		}
-
-		function prepniTemuZobrazenia() {
-			cfgTema = (cfgTema === 'dark') ? 'light' : 'dark';
-			localStorage.setItem('kiosk_theme', cfgTema);
-			aplikujTemu();
-		}
-
-		function inicializujPlochuNastaveni() {
-			if(document.getElementById('set-night-from')) document.getElementById('set-night-from').textContent = cfgNocOd;
-			if(document.getElementById('set-night-to')) document.getElementById('set-night-to').textContent = cfgNocDo;
-			if(document.getElementById('set-snooze-time')) document.getElementById('set-snooze-time').textContent = cfgSnoozeMin + " min";
-			document.documentElement.style.setProperty('--night-color', cfgFarbaNoci);
-			
-			document.querySelectorAll('.color-picker-dot').forEach(dot => {
-				if (dot.style.backgroundColor === cfgFarbaNoci || (cfgFarbaNoci === '#ffff00' && dot.style.backgroundColor === 'yellow')) {
-					dot.classList.add('active-color');
-				}
-			});
+        function inicializujPlochuNastaveni() {
+            if(document.getElementById('set-night-from')) document.getElementById('set-night-from').textContent = cfgNocOd;
+            if(document.getElementById('set-night-to')) document.getElementById('set-night-to').textContent = cfgNocDo;
+            if(document.getElementById('set-snooze-time')) document.getElementById('set-snooze-time').textContent = cfgSnoozeMin + " min";
+            document.documentElement.style.setProperty('--night-color', cfgFarbaNoci);
+            
+            document.querySelectorAll('.color-picker-dot').forEach(dot => {
+                if (dot.style.backgroundColor === cfgFarbaNoci || (cfgFarbaNoci === '#ffff00' && dot.style.backgroundColor === 'yellow')) {
+                    dot.classList.add('active-color');
+                }
+            });
 			aktualizujTlacidlaAutoVypnutia();
-			aplikujTemu(); // <-- Pridané zavolanie pri inicializácii nastavení
-		}
+        }
 		function prepniNastavenia() {
 	    audio.pause(); 
 	    audio.src = "";
@@ -1048,10 +911,7 @@
 	        settingsBox.style.display = 'none';
 	        if (btnSettings) btnSettings.classList.remove('active');
 	
-	        // Zobrazí bežec iba vtedy, ak zvuk naozaj hrá
-	        if (volPanel) {
-	            volPanel.style.display = (typeof audio !== 'undefined' && audio && !audio.paused && currentPlayingType !== "" && currentPlayingType !== "settings") ? 'flex' : 'none';
-	        }
+	        if (volPanel) volPanel.style.display = 'flex';
 	        if (hodinyEl) hodinyEl.style.display = 'flex';
 	        if (infoRiadokEl) infoRiadokEl.style.display = 'flex';
 	        if (namedayLineEl) namedayLineEl.style.display = 'block'; 
@@ -1944,7 +1804,6 @@ function zatvorPocasie(e) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-	aplikujTemu(); // <-- Pridané zavolanie hneď po načítaní DOM
     // Spustíme odpočet pre šetrič ihneď pri otvorení KIOSKU (bez potreby kliknutia)
     resetIdleTimer(false);
 	// --- Vykreslenie dynamických panelov ---
