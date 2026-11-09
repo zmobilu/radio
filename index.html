@@ -392,8 +392,8 @@
 		body.full-night-mode #night-bottom-info {
 		    display: block !important;
 		    position: absolute !important;
-		    bottom: 4vh !important; /* Posunuté o niečo nižšie kvôli väčším hodinám */
-		    font-size: 4.8vw !important; /* Pôvodne 3.2vw - výrazne zväčšené písmo */
+		    bottom: 3.5vh !important; /* Mierne posunuté nižšie, aby bol vyšší text pekne vycentrovaný */
+		    font-size: 5.6vw !important; /* Výrazne väčší celý riadok (deň, dátum aj teplota) */
 		    font-weight: 400 !important; /* Mierne hrubšie písmo pre lepšiu čitateľnosť */
 		    letter-spacing: 1px !important;
 		    color: var(--night-color) !important; /* Rovnaká farba ako čas */
@@ -568,7 +568,6 @@
                 <iframe id="spotify-player-frame" src="" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" style="border-radius: 12px; border: none;"></iframe>
             </div>
 
-            <!-- Nastavenia -->
            <!-- Nastavenia -->
 			<div id="settings-container" style="display: none; width: 95%; max-height: 80vh; margin: 55px auto 0 auto; padding: 12px 15px; box-sizing: border-box; background: #080808; border-radius: 14px; border: 1px solid #222; overflow-y: auto; position: relative; z-index: 99999;">
 			    <h2 style="color: #ff9f0a; margin-top: 0; font-weight: 400; font-size: 1.8vw; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 12px;">Nastavenia nočný režim</h2>
@@ -582,7 +581,10 @@
 			                <button onclick="zmenNastavenieCasu('do')" id="set-night-to" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 10px; border-radius: 6px; font-size: 1.3vw; cursor: pointer;">05:20</button>
 			            </div>
 			        </div>
-			
+					<div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
+			            <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-rotate" style="color: #32CD32; margin-right: 8px;"></i> Aktualizácia kódu</span>
+			            <button onclick="spravAktualizaciu()" style="background: #222; color: #32CD32; border: 1px solid #32CD32; padding: 4px 10px; border-radius: 6px; font-size: 1.3vw; cursor: pointer; font-weight: bold;">Stiahnuť z GitHub 🚀</button>
+			        </div>
 			        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 10px; border: 1px solid #222;">
 					    <span style="font-size: 1.5vw; color: #fff;"><i class="fa-solid fa-hourglass-half" style="color: #ff9f0a; margin-right: 8px;"></i> Odklad a šetrič</span>
 					    <button onclick="zmenDobuOdkladu()" id="set-snooze-time" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 10px; border-radius: 6px; font-size: 1.3vw; cursor: pointer;">2 min</button>
