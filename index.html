@@ -308,22 +308,24 @@
         .name-classmates { color: #32CD32 !important; }  
         
         #ss-radio-info {
-            position: absolute;
-            bottom: 26vh; /* Posunuté vyššie nad dátum (pôvodne 25vh) */
-            left: 35vw; 
-            width: 48vw; /* Širšia dotyková zóna */
-            padding: 15px 0; /* Väčšia výška klikateľnej plochy pre prst */
-            font-size: 5.5vw; /* Väčšie písmo (pôvodne 4.0vw) */
-            font-weight: 500;
-            color: #ff9f0a;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            display: none;
-            justify-content: space-between;
-            align-items: center;
-           /* pointer-events: none;*/
-            z-index: 9999 !important;
-        }
+		    display: none;
+		}
+		
+		body.screensaver-mode #ss-radio-info {
+		    position: relative;
+		    width: 92%;
+		    margin: 0 auto;
+		    padding: 10px 0;
+		    font-size: 5.2vw;
+		    font-weight: 500;
+		    color: #ff9f0a;
+		    text-transform: uppercase;
+		    letter-spacing: 2px;
+		    display: flex !important;
+		    justify-content: space-between;
+		    align-items: center;
+		    z-index: 9999 !important;
+		}
 		 .ss-nav-arrow {
 		    padding: 10px 24px;
 		    cursor: pointer;
@@ -573,14 +575,14 @@
         
         <!-- Pravý stĺpec (hodiny, zapnutie rádia a dole dátum s meninami) -->
         <div class="ss-right-col">
-            <div id="ss-radio-info" class="weather-details-hide" style="pointer-events: auto !important; z-index: 9999 !important;"></div>
-            
             <div id="time" class="weather-details-hide">
                 <span id="h-part" class="hours-part">00</span>
 				<span class="time-colon" aria-hidden="true"><i></i><i></i></span>
                 <span id="m-part" class="minutes-part">00</span> 
             </div>
             
+			<div id="ss-radio-info" class="weather-details-hide" style="pointer-events: auto !important; z-index: 9999 !important;"></div>
+			
             <div id="night-bottom-info" style="display: none;"></div>
             
             <div id="weather-details-top-inline" class="weather-details-only" style="display: none; flex-direction: column; width: 100%; height: 68vh; padding: 10px 10px 0 10px; box-sizing: border-box; justify-content: space-between;">
