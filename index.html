@@ -157,7 +157,7 @@
 		    line-height: 0.8; 
 		    letter-spacing: -4px; 
 		    display: flex; 
-		    align-items: center;
+		    align-items: baseline; /* Spodok dvojbodky sa automaticky zarovná na spodnú hranu číslic */
 		    transform: scaleY(1.05); 
 		    transform-origin: center; 
 		    cursor: pointer; 
@@ -173,7 +173,7 @@
 		    flex-direction: column;
 		    justify-content: space-between;
 		    align-items: center;
-		    height: 0.34em;       /* Výška rozostupu medzi hornou a dolnou bodkou */
+		    height: 0.47em;       /* 2/3 výšky číslic (cap-height je ~0.71em) */
 		    width: 0.09em;        /* Minimálna šírka samotného stĺpca bodiek */
 		    margin: 0 0.01em;     /* Takmer nulový bočný okraj */
 		    flex-shrink: 0;
