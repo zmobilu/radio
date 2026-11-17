@@ -157,8 +157,7 @@
 		    line-height: 0.8; 
 		    letter-spacing: -4px; 
 		    display: flex; 
-		    align-items: center; /* zmenené z baseline, aby bola dvojbodka presne v strede výšky číslic */
-		    font-variant-numeric: tabular-nums;
+		    align-items: center;
 		    transform: scaleY(1.05); 
 		    transform-origin: center; 
 		    cursor: pointer; 
@@ -168,27 +167,26 @@
 		.red-digit { color: #eb0028 !important; } 
 		.blue-digit { color: #307CEB !important; }
 		
-		/* Statická okrúhla dvojbodka prispôsobená pre letter-spacing: -4px */
+		/* Ultra-kompaktná statická dvojbodka bez vytláčania minút */
 		.time-colon {
 		    display: inline-flex;
 		    flex-direction: column;
 		    justify-content: space-between;
 		    align-items: center;
-		    height: 0.36em;       /* Vzdialenosť medzi hornou a dolnou bodkou */
-		    width: 0.16em;        /* Kompaktnejšia šírka, aby sedela s tesným letter-spacingom */
-		    margin: 0 0.04em 0 0.06em;
+		    height: 0.34em;       /* Výška rozostupu medzi hornou a dolnou bodkou */
+		    width: 0.09em;        /* Minimálna šírka samotného stĺpca bodiek */
+		    margin: 0 0.01em;     /* Takmer nulový bočný okraj */
 		    flex-shrink: 0;
 		}
 		
 		.time-colon i {
 		    display: block;
-		    width: 0.06em;        /* Priemer jednej bodky */
-		    height: 0.06em;
+		    width: 0.055em;       /* Priemer jednej bodky */
+		    height: 0.055em;
 		    background-color: #ffffff;
 		    border-radius: 50%;
 		}
 		
-		/* V nočnom režime prevezme žltú/zvolenú farbu hodín */
 		body.full-night-mode .time-colon i {
 		    background-color: var(--night-color) !important;
 		}
