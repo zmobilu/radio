@@ -777,7 +777,7 @@
 				const id = slotFavoritesMain[i];
 				const item = DATABASE.find(d => d.id === id);
 				if (item && id !== null) {
-					let innerContent = item.img ? `<img src="${item.img}" style="max-width:75%; max-height:70%; object-fit:contain;">` : `<i class="${item.icon}" style="font-size:60px;"></i>`;
+					let innerContent = item.img ? `<img src="${item.img}" style="max-width:90%; max-height:90%; object-fit:contain;">` : `<i class="${item.icon}" style="font-size:60px;"></i>`;
 					
 					if(item.id === 'spotify') {
 						container.innerHTML += `<button onclick="showSpotify()" class="btn spotify" style="${item.style}" data-type="spotify">${innerContent}</button>`;
