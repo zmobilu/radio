@@ -208,6 +208,10 @@
 
         .btn { display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; 
               border: none; background: #151515; color: white; border-radius: 18px; cursor: pointer; font-size: 14px; }
+		 .btn img {
+		    transform: scale(1.25); /* 1.25 = 125 % veľkosti, uprav podľa potreby napr. na 1.15 alebo 1.35 */
+		    transition: transform 0.2s ease;
+		}
         .vypni { background-color: #333; grid-column: span 2; }
         .vypni i { color: #eb0028; font-size: 65px; }
         .playing { border: 2px solid #ff9f0a !important; }
@@ -669,7 +673,7 @@
 		const DATABASE = [
 			// Verejnoprávne (STVR)
 			{ id: "slovensko", name: "Slovensko", url: "https://icecast.stv.livebox.sk/slovensko_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png", style: "background:#00547E;", category: "Verejnoprávne" },
-			{ id: "fm", name: "Rádio_FM", url: "https://icecast.stv.livebox.sk/fm_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioFM.png", style: "background:#CC001C;", category: "Verejnoprávne" },
+			{ id: "fm", name: "Rádio_FM", url: "https://icecast.stv.livebox.sk/fm_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioFM.png", style: "background:#CC001C;", scale: 1.3, category: "Verejnoprávne" },
 			{ id: "regina", name: "Regina", url: "https://icecast.stv.livebox.sk/regina-ba_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioReginaZ.png", style: "background:#6ECC99;", category: "Verejnoprávne" },
 			{ id: "devin", name: "Devín", url: "https://icecast.stv.livebox.sk/devin_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioDevin.png", style: "background:#D6B55B;", category: "Verejnoprávne" },
 			{ id: "junior", name: "Junior", url: "https://icecast.stv.livebox.sk/junior_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioJunior.png", style: "background:#7B97D6;", category: "Verejnoprávne" },
@@ -778,7 +782,10 @@
 				const id = slotFavoritesMain[i];
 				const item = DATABASE.find(d => d.id === id);
 				if (item && id !== null) {
-					let innerContent = item.img ? `<img src="${item.img}" style="max-width:90%; max-height:90%; object-fit:contain;">` : `<i class="${item.icon}" style="font-size:60px;"></i>`;
+					const imgScale = item.scale ? `transform: scale(${item.scale});` : '';
+					let innerContent = item.img 
+					    ? `<img src="${item.img}" style="max-width:90%; max-height:90%; object-fit:contain; ${imgScale}">` 
+					    : `<i class="${item.icon}" style="font-size:60px;"></i>`;
 					
 					if(item.id === 'spotify') {
 						container.innerHTML += `<button onclick="showSpotify()" class="btn spotify" style="${item.style}" data-type="spotify">${innerContent}</button>`;
