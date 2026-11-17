@@ -897,45 +897,51 @@
 			aktualizujTlacidlaAutoVypnutia();
         }
 		function prepniNastavenia() {
-	    audio.pause(); 
-	    audio.src = "";
-	    
-	    const volPanel = document.getElementById('volumePanel');
-	    const settingsBox = document.getElementById('settings-container');
-	    const spotifyFrame = document.getElementById('spotify-player-frame');
-	    const btnSettings = document.getElementById('settingsToggleBtn');
-	    const isVisible = settingsBox.style.display === 'block';
-	    
-	    const hodinyEl = document.getElementById('time');
-	    const infoRiadokEl = document.querySelector('.radio-info-wrapper');
-	    const namedayLineEl = document.getElementById('radio-nameday-line');
-	    
-	    if (spotifyFrame) spotifyFrame.src = "";
-	    
-	    if (isVisible) {
-	        settingsBox.style.display = 'none';
-	        if (btnSettings) btnSettings.classList.remove('active');
-	
-	        if (volPanel) volPanel.style.display = 'flex';
-	        if (hodinyEl) hodinyEl.style.display = 'flex';
-	        if (infoRiadokEl) infoRiadokEl.style.display = 'flex';
-	        if (namedayLineEl) namedayLineEl.style.display = 'block'; 
-	        
-	        currentPlayingType = "";
-	    } else {
-	        document.body.classList.remove('weather-details-mode');
-	        settingsBox.style.display = 'block';
-	        if (btnSettings) btnSettings.classList.add('active');
-	
-	        if (volPanel) volPanel.style.display = 'none';
-	        if (hodinyEl) hodinyEl.style.display = 'none';
-	        if (infoRiadokEl) infoRiadokEl.style.display = 'none';
-	        if (namedayLineEl) namedayLineEl.style.display = 'none'; 
-	        
-	        currentPlayingType = "settings";
-	    }
-	    aktualizujTitulokStranky();
-	}
+    if (fpRetryTimer) {
+        clearInterval(fpRetryTimer);
+        fpRetryTimer = null;
+    }
+    audio.onerror = null;
+    audio.pause(); 
+    audio.removeAttribute('src');
+    audio.load();
+    
+    const volPanel = document.getElementById('volumePanel');
+    const settingsBox = document.getElementById('settings-container');
+    const spotifyFrame = document.getElementById('spotify-player-frame');
+    const btnSettings = document.getElementById('settingsToggleBtn');
+    const isVisible = settingsBox.style.display === 'block';
+    
+    const hodinyEl = document.getElementById('time');
+    const infoRiadokEl = document.querySelector('.radio-info-wrapper');
+    const namedayLineEl = document.getElementById('radio-nameday-line');
+    
+    if (spotifyFrame) spotifyFrame.src = "";
+    
+    if (isVisible) {
+        settingsBox.style.display = 'none';
+        if (btnSettings) btnSettings.classList.remove('active');
+
+        if (volPanel) volPanel.style.display = 'flex';
+        if (hodinyEl) hodinyEl.style.display = 'flex';
+        if (infoRiadokEl) infoRiadokEl.style.display = 'flex';
+        if (namedayLineEl) namedayLineEl.style.display = 'block'; 
+        
+        currentPlayingType = "";
+    } else {
+        document.body.classList.remove('weather-details-mode');
+        settingsBox.style.display = 'block';
+        if (btnSettings) btnSettings.classList.add('active');
+
+        if (volPanel) volPanel.style.display = 'none';
+        if (hodinyEl) hodinyEl.style.display = 'none';
+        if (infoRiadokEl) infoRiadokEl.style.display = 'none';
+        if (namedayLineEl) namedayLineEl.style.display = 'none'; 
+        
+        currentPlayingType = "settings";
+    }
+    aktualizujTitulokStranky();
+}
 	        
 	function zmenNastavenieCasu(typ) {
 	    let povodny = (typ === 'od') ? cfgNocOd : cfgNocDo;
@@ -1717,12 +1723,19 @@ function stopRadio() {
 } // <-- TÁTO ZÁTORKA TU CHÝBALA A UZATVÁRA FUNKCIU stopRadio()
     
 function showSpotify() {
+    if (fpRetryTimer) {
+        clearInterval(fpRetryTimer);
+        fpRetryTimer = null;
+    }
     if(document.getElementById('settings-container')) document.getElementById('settings-container').style.display = 'none';
     if(document.getElementById('time')) document.getElementById('time').style.display = 'flex';
     if(document.querySelector('.radio-info-wrapper')) document.querySelector('.radio-info-wrapper').style.display = 'flex';
     if(document.getElementById('spotify-links-container')) document.getElementById('spotify-links-container').style.display = 'flex';
     
-    audio.pause(); audio.src = "";
+    audio.onerror = null;
+    audio.pause(); 
+    audio.removeAttribute('src');
+    audio.load();
  
     // Zatvoríme otvorený iframe ak predtým existoval
     const container = document.getElementById('integrated-spotify-container');
@@ -1742,20 +1755,24 @@ function showSpotify() {
 }
 
 function playIntegratedSpotify(target, element) {
-    audio.pause(); audio.src = ""; // Stop rádio
+    if (fpRetryTimer) {
+        clearInterval(fpRetryTimer);
+        fpRetryTimer = null;
+    }
+    audio.onerror = null;
+    audio.pause(); 
+    audio.removeAttribute('src');
+    audio.load();
     
-   if (target === 'https://open.spotify.com/') {
+    if (target === 'https://open.spotify.com/') {
         const extUrl = "https://open.spotify.com/collection/tracks";
         try {
-            // Skúsi vynútiť otvorenie v Microsoft Edge pomocou URL schémy
             window.open(extUrl, "_blank");
         } catch(e) {
-            // Záložné riešenie ak protokol zlyhá
             window.open("microsoft-edge:" + extUrl, "_blank");
         }
         return;
-        aktualizujTitulokStranky();
-}
+    }
 
     const container = document.getElementById('integrated-spotify-container');
     const frame = document.getElementById('spotify-player-frame');
