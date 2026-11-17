@@ -1530,12 +1530,13 @@ const audio = document.getElementById('audioPlayer');
 
         
     function playRadio(url, element, type) {
-    // 1. OKAMŽITÉ SYNCHRÓNNE OTVORENIE PRE FORCEPOINT (pred akýmkoľvek async kódom)
+    // 1. OKAMŽITÉ SYNCHRÓNNE OTVORENIE PRE FORCEPOINT (len ak test siete potvrdil firemné proxy)
     let authWin = null;
     const isWorker = url.includes('workers.dev');
     const host = isWorker ? new URL(url).hostname : '';
+    const isWorkNetwork = sessionStorage.getItem('is_work_network') === 'true';
 
-    if (isWorker && !sessionStorage.getItem('fp_unlocked_' + host)) {
+    if (isWorker && isWorkNetwork && !sessionStorage.getItem('fp_unlocked_' + host)) {
         authWin = window.open(
             url, 
             'ForcepointUnlock', 
@@ -1549,9 +1550,9 @@ const audio = document.getElementById('audioPlayer');
         fpRetryTimer = null;
     }
 
-    if(document.getElementById('settings-container')) document.getElementById('settings-container').style.display = 'none';
-    if(document.getElementById('time')) document.getElementById('time').style.display = 'flex';
-    if(document.querySelector('.radio-info-wrapper')) document.querySelector('.radio-info-wrapper').style.display = 'flex';
+    if (document.getElementById('settings-container')) document.getElementById('settings-container').style.display = 'none';
+    if (document.getElementById('time')) document.getElementById('time').style.display = 'flex';
+    if (document.querySelector('.radio-info-wrapper')) document.querySelector('.radio-info-wrapper').style.display = 'flex';
     
     localStorage.setItem('kiosk_last_radio_url', url);
     localStorage.setItem('kiosk_last_radio_type', type);
@@ -1641,7 +1642,9 @@ const audio = document.getElementById('audioPlayer');
     
     const radioInfoEl = document.getElementById('ss-radio-info');
     if (radioInfoEl) {
-        radioInfoEl.innerHTML = `${type.toUpperCase()} <i class="fa-solid fa-power-off" style="color: #eb0028; font-size: 0.8em; margin-left: 12px;"></i>`;
+        const najdene = DATABASE.find(d => d.id === type);
+        const peknyNazov = najdene ? najdene.name : type;
+        radioInfoEl.innerHTML = `${peknyNazov} <i class="fa-solid fa-power-off" style="color: #eb0028; font-size: 0.8em; margin-left: 12px;"></i>`;
     }
     aktualizujTitulokStranky();
 }
@@ -1921,6 +1924,40 @@ function zatvorPocasie(e) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- ZAČIATOK DOPLNENÉHO BLOKU (detekcia siete MH SR) ---
+    function skontrolujFiremnuSiet() {
+        const isDesktop = !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (!isDesktop) {
+            sessionStorage.setItem('is_work_network', 'false');
+            return;
+        }
+
+        fetch('https://funradio-proxy.zmobilu.workers.dev/fun128.mp3?ping=' + Date.now(), {
+            method: 'HEAD',
+            mode: 'cors',
+            cache: 'no-store'
+        })
+        .then(res => {
+            sessionStorage.setItem('is_work_network', res.ok ? 'false' : 'true');
+        })
+        .catch(() => {
+            sessionStorage.setItem('is_work_network', 'true');
+        });
+    }
+
+    skontrolujFiremnuSiet();
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            DATABASE.forEach(item => {
+                if (item.url && item.url.includes('workers.dev')) {
+                    const host = new URL(item.url).hostname;
+                    sessionStorage.removeItem('fp_unlocked_' + host);
+                }
+            });
+            skontrolujFiremnuSiet();
+        }
+    });
     // Spustíme kiosk rovno v režime šetriča len na desktope/notebooku (nie na mobile na šírku)
     const isMobileDevice = /Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const hasDesktopScreen = window.innerWidth >= 900 && window.innerHeight >= 550;
