@@ -1618,24 +1618,22 @@ function prepniDenGrafu(e, dayIndex) {
 		`;
 	}
 	
-	// Cyklicky prepína len rádiá z 6-tlačidlového panela (preskočí prázdne sloty a Spotify)
+	// Cyklicky prepína medzi všetkými streamami z DATABASE (vynechá Spotify)
 	function prepniRadioVSetrici(smer) {
-		const platneRadia = slotFavoritesMain.filter(id => id && id !== 'spotify');
-		if (platneRadia.length === 0) return;
+		const vsetkyStreamy = DATABASE.filter(item => item.url && item.id !== 'spotify');
+		if (vsetkyStreamy.length === 0) return;
 	
 		const aktualneId = (currentPlayingType && currentPlayingType !== "" && currentPlayingType !== "settings")
 			? currentPlayingType
 			: localStorage.getItem('kiosk_last_radio_type');
 	
-		let idx = platneRadia.indexOf(aktualneId);
-		idx = (idx === -1) ? 0 : (idx + smer + platneRadia.length) % platneRadia.length;
+		let idx = vsetkyStreamy.findIndex(item => item.id === aktualneId);
+		idx = (idx === -1) ? 0 : (idx + smer + vsetkyStreamy.length) % vsetkyStreamy.length;
 	
-		const noveId = platneRadia[idx];
-		const item = DATABASE.find(d => d.id === noveId);
-		if (item && item.url) {
-			playRadio(item.url, null, item.id);
-		}
-	}    
+		const noveRadio = vsetkyStreamy[idx];
+		playRadio(noveRadio.url, null, noveRadio.id);
+	}  
+		
     function playRadio(url, element, type) {
     // 1. OKAMŽITÉ SYNCHRÓNNE OTVORENIE PRE FORCEPOINT (len ak test siete potvrdil firemné proxy)
     let authWin = null;
