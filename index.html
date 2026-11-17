@@ -455,8 +455,8 @@
     <audio id="audioPlayer" preload="none" playsinline></audio>
 	    <!-- Ľavý panel (mriežka 6 rádií a tlačidlo STOP) -->
 	    <div class="buttons-section" id="leftButtonsContainer">
-	        <button onpointerdown="stopRadio()" class="btn vypni" style="padding: 20px 0; min-height: 90px; width: 100%;"><i class="fa-solid fa-power-off"></i></button>
-	    </div>
+    <button onclick="stopRadio()" class="btn vypni" style="padding: 20px 0; min-height: 90px; width: 100%;"><i class="fa-solid fa-power-off"></i></button>
+		</div>
 	    
 	    <div class="clock-section">
 	        <!-- Tlačidlo nastavení vpravo hore -->
@@ -772,7 +772,7 @@
 			const container = document.getElementById('leftButtonsContainer');
 			if(!container) return;
 			
-			container.innerHTML = `<button onpointerdown="stopRadio()" class="btn vypni" style="padding: 20px 0; min-height: 90px; width: 100%; grid-column: span 2;"><i class="fa-solid fa-power-off"></i></button>`;
+			container.innerHTML = `<button onclick="stopRadio()" class="btn vypni" style="padding: 20px 0; min-height: 90px; width: 100%; grid-column: span 2;"><i class="fa-solid fa-power-off"></i></button>`;
 	
 			for (let i = 0; i < 6; i++) {
 				const id = slotFavoritesMain[i];
@@ -1672,11 +1672,10 @@ function stopRadio() {
         if (container) container.style.display = 'none';
         if (frame) frame.src = "";
         
-        aktualizujSubPanely("none");
+       	aktualizujSubPanely("none");
         resetIdleTimer(false);
         
-        const radioInfoEl = document.getElementById('ss-radio-info');
-        if (radioInfoEl) radioInfoEl.innerHTML = `<small style="font-size: 0.85em; opacity: 0.65; text-transform: none;">zapni</small> <i class="fa-solid fa-power-off" style="color: #555; font-size: 0.8em; margin-left: 10px;"></i>`;   
+        zobrazPosledneRadioVSetrici();
         aktualizujTitulokStranky();
     }
      // PRIDANÉ: Ak nič nehrá, ale sme v nastaveniach -> zatvor ich a pusť rádio
@@ -1714,7 +1713,21 @@ function stopRadio() {
         }
     }
 } // <-- TÁTO ZÁTORKA TU CHÝBALA A UZATVÁRA FUNKCIU stopRadio()
-    
+
+function zobrazPosledneRadioVSetrici() {
+    const radioInfoEl = document.getElementById('ss-radio-info');
+    if (!radioInfoEl) return;
+
+    const savedRadioType = localStorage.getItem('kiosk_last_radio_type');
+    if (savedRadioType) {
+        const najdene = DATABASE.find(d => d.id === savedRadioType);
+        const nazov = najdene ? najdene.name : savedRadioType;
+        radioInfoEl.innerHTML = `<span style="opacity: 0.65;">${nazov}</span> <i class="fa-solid fa-power-off" style="color: #555; font-size: 0.8em; margin-left: 12px;"></i>`;
+    } else {
+        radioInfoEl.innerHTML = `<small style="font-size: 0.85em; opacity: 0.65; text-transform: none;">zapni</small> <i class="fa-solid fa-power-off" style="color: #555; font-size: 0.8em; margin-left: 10px;"></i>`;
+    }
+}
+		
 function showSpotify() {
     if (fpRetryTimer) {
         clearInterval(fpRetryTimer);
@@ -1901,8 +1914,11 @@ function zatvorPocasie(e) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Na notebookoch a monitoroch spustíme kiosk rovno v režime šetriča (počasie + hodiny)
-    if (window.innerWidth >= 768) {
+    // Spustíme kiosk rovno v režime šetriča len na desktope/notebooku (nie na mobile na šírku)
+    const isMobileDevice = /Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const hasDesktopScreen = window.innerWidth >= 900 && window.innerHeight >= 550;
+
+    if (!isMobileDevice && hasDesktopScreen) {
         document.body.classList.add('screensaver-mode');
     }
 
@@ -1949,11 +1965,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedRadioUrl && savedRadioType) {
         lastRadioUrl = savedRadioUrl;
         lastRadioType = savedRadioType;
-        
-        // Nastavíme text "zapni" na šetriči obrazovky
-        const radioInfoEl = document.getElementById('ss-radio-info');
-        if (radioInfoEl) radioInfoEl.innerHTML = `<small style="font-size: 0.85em; opacity: 0.65; text-transform: none;">zapni</small> <i class="fa-solid fa-power-off" style="color: #555; font-size: 0.8em; margin-left: 10px;"></i>`;
     }
+    zobrazPosledneRadioVSetrici();
 });
 
 async function hladajMesto() {
