@@ -514,7 +514,7 @@
         
         <!-- Pravý stĺpec (hodiny, zapnutie rádia a dole dátum s meninami) -->
         <div class="ss-right-col">
-            <div id="ss-radio-info" class="weather-details-hide" onpointerdown="event.stopPropagation(); event.preventDefault(); stopRadio();" style="pointer-events: auto !important; cursor: pointer; z-index: 9999 !important;"></div>
+            <div id="ss-radio-info" class="weather-details-hide" onclick="event.stopPropagation(); stopRadio();" style="pointer-events: auto !important; cursor: pointer; z-index: 9999 !important;"></div>
             
             <div id="time" class="weather-details-hide">
                 <span id="h-part" class="hours-part">00</span>
@@ -1523,6 +1523,19 @@ const audio = document.getElementById('audioPlayer');
 
         
     function playRadio(url, element, type) {
+    // 1. OKAMŽITÉ SYNCHRÓNNE OTVORENIE PRE FORCEPOINT (pred akýmkoľvek async kódom)
+    let authWin = null;
+    const isWorker = url.includes('workers.dev');
+    const host = isWorker ? new URL(url).hostname : '';
+
+    if (isWorker && !sessionStorage.getItem('fp_unlocked_' + host)) {
+        authWin = window.open(
+            url, 
+            'ForcepointUnlock', 
+            'width=520,height=620,menubar=no,toolbar=no,location=yes,status=no'
+        );
+    }
+
     // Zrušíme prípadné predošlé čakanie na Forcepoint, ak používateľ prepne stanicu
     if (fpRetryTimer) {
         clearInterval(fpRetryTimer);
@@ -1554,37 +1567,16 @@ const audio = document.getElementById('audioPlayer');
     aktualizujSubPanely(type);
     
     const savedRadioVol = localStorage.getItem(`vol_radio_${type}`);
-    let initialVol;
-    
-    if (savedRadioVol !== null) {
-        initialVol = parseFloat(savedRadioVol);
-    } else {
-        initialVol = VOLUME_MAP[type] !== undefined ? VOLUME_MAP[type] : 0.8;
-    }
-    
+    let initialVol = (savedRadioVol !== null) ? parseFloat(savedRadioVol) : (VOLUME_MAP[type] !== undefined ? VOLUME_MAP[type] : 0.8);
     applyAndSaveVolume(initialVol);
 
-    // Funkcia na otvorenie Forcepoint okna a automatické znovuspustenie
-    const otvorForcepointOkno = () => {
+    // Sledovanie priebehu odomknutia Forcepointu
+    const sledujForcepointOkno = (okno) => {
         if (fpRetryTimer) return;
-
-        const authWin = window.open(
-            url, 
-            'ForcepointUnlock', 
-            'width=520,height=620,menubar=no,toolbar=no,location=yes,status=no'
-        );
-
-        if (!authWin || authWin.closed || typeof authWin.closed === 'undefined') {
-            alert('Pre povolenie rádia vo firemnej sieti povoľte vyskakovacie okná pre túto stránku v pravom hornom rohu prehliadača.');
-            return;
-        }
-
         let attempts = 0;
         fpRetryTimer = setInterval(() => {
             attempts++;
-            
-            // Ak kolega okno zavrel krížikom alebo uplynula 1 minúta
-            if (authWin.closed || attempts > 30) {
+            if ((okno && okno.closed) || attempts > 30) {
                 clearInterval(fpRetryTimer);
                 fpRetryTimer = null;
                 audio.src = url + '?t=' + Date.now();
@@ -1592,48 +1584,49 @@ const audio = document.getElementById('audioPlayer');
                 return;
             }
 
-            // Test, či už Forcepoint pustil spojenie
             fetch(url + '?t=' + Date.now(), { method: 'HEAD', mode: 'no-cors' })
                 .then(() => {
                     audio.src = url + '?t=' + Date.now();
                     audio.play().then(() => {
-                        // Stream hrá - uložíme stav, zatvoríme okno a vyčistíme časovač
                         clearInterval(fpRetryTimer);
                         fpRetryTimer = null;
-                        sessionStorage.setItem('fp_unlocked_' + new URL(url).hostname, 'true');
-                        if (!authWin.closed) authWin.close();
-                    }).catch(() => {
-                        // Ešte nebolo odkliknuté Continue, čakáme ďalej
-                    });
+                        sessionStorage.setItem('fp_unlocked_' + host, 'true');
+                        if (okno && !okno.closed) okno.close();
+                    }).catch(() => {});
                 })
                 .catch(() => {});
-        }, 2000);
+        }, 1500);
     };
 
-    // Obsluha chyby prehrávača (s poistkou proti spusteniu pri STOP)
-    audio.onerror = function() {
-        if (!currentPlayingType || currentPlayingType === "" || (audio.paused && !audio.getAttribute('src'))) return;
-        if (url.includes('workers.dev')) {
-            otvorForcepointOkno();
-        }
-    };
-
-    // Okamžitý test pri prvom kliknutí (aby prehliadač nezablokoval pop-up okno)
-    if (url.includes('workers.dev')) {
-        const host = new URL(url).hostname;
-        if (!sessionStorage.getItem('fp_unlocked_' + host)) {
-            fetch(url + '?t=' + Date.now(), { method: 'HEAD', mode: 'cors' })
-                .then(() => {
-                    sessionStorage.setItem('fp_unlocked_' + host, 'true');
-                })
-                .catch(() => {
-                    otvorForcepointOkno();
-                });
-        }
+    if (authWin) {
+        sledujForcepointOkno(authWin);
     }
 
+    // Záložná obsluha chyby prehrávača (ak by session počas dňa vypršala)
+    audio.onerror = function() {
+        if (!currentPlayingType || currentPlayingType === "" || (audio.paused && !audio.getAttribute('src'))) return;
+        if (isWorker) {
+            sessionStorage.removeItem('fp_unlocked_' + host);
+            if (!fpRetryTimer) {
+                const retryWin = window.open(url, 'ForcepointUnlock', 'width=520,height=620,menubar=no,toolbar=no,location=yes,status=no');
+                if (retryWin) sledujForcepointOkno(retryWin);
+            }
+        }
+    };
+
     audio.src = url; 
-    audio.play().catch(() => {});
+    audio.play().then(() => {
+        // Ak stream okamžite naskočil (Forcepoint už bol povolený skôr), okno hneď zavrieme
+        if (isWorker) {
+            sessionStorage.setItem('fp_unlocked_' + host, 'true');
+            if (authWin && !authWin.closed) authWin.close();
+            if (fpRetryTimer) {
+                clearInterval(fpRetryTimer);
+                fpRetryTimer = null;
+            }
+        }
+    }).catch(() => {});
+
     resetIdleTimer(false);
         
     const volPanel = document.getElementById('volumePanel');
@@ -1908,7 +1901,12 @@ function zatvorPocasie(e) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Spustíme odpočet pre šetrič ihneď pri otvorení KIOSKU (bez potreby kliknutia)
+    // Na notebookoch a monitoroch spustíme kiosk rovno v režime šetriča (počasie + hodiny)
+    if (window.innerWidth >= 768) {
+        document.body.classList.add('screensaver-mode');
+    }
+
+    // Spustíme odpočet pre šetrič ihneď pri otvorení KIOSKU
     resetIdleTimer(false);
 	// --- Vykreslenie dynamických panelov ---
     renderLeftButtons();
