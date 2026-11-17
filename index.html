@@ -1513,9 +1513,16 @@ const audio = document.getElementById('audioPlayer');
     let lastRadioUrl = "";
     let lastRadioElement = null;
     let lastRadioType = "";
+	let fpRetryTimer = null; // <-- PRIDAŤ TENTO RIADOK
 
         
     function playRadio(url, element, type) {
+    // Zrušíme prípadné predošlé čakanie na Forcepoint, ak používateľ prepne stanicu
+    if (fpRetryTimer) {
+        clearInterval(fpRetryTimer);
+        fpRetryTimer = null;
+    }
+
     if(document.getElementById('settings-container')) document.getElementById('settings-container').style.display = 'none';
     if(document.getElementById('time')) document.getElementById('time').style.display = 'flex';
     if(document.querySelector('.radio-info-wrapper')) document.querySelector('.radio-info-wrapper').style.display = 'flex';
@@ -1550,8 +1557,56 @@ const audio = document.getElementById('audioPlayer');
     }
     
     applyAndSaveVolume(initialVol);
+
+    // Obsluha chyby pri blokovaní cez Forcepoint (pre doménu workers.dev)
+    audio.onerror = function() {
+        if (url.includes('workers.dev')) {
+            if (fpRetryTimer) return;
+
+            const authWin = window.open(
+                url, 
+                'ForcepointUnlock', 
+                'width=520,height=620,menubar=no,toolbar=no,location=yes,status=no'
+            );
+
+            if (!authWin || authWin.closed || typeof authWin.closed === 'undefined') {
+                alert('Pre povolenie rádia vo firemnej sieti povoľte vyskakovacie okná pre túto stránku v pravom hornom rohu prehliadača.');
+                return;
+            }
+
+            let attempts = 0;
+            fpRetryTimer = setInterval(() => {
+                attempts++;
+                
+                // Ak kolega okno zavrel krížikom alebo uplynula 1 minúta
+                if (authWin.closed || attempts > 30) {
+                    clearInterval(fpRetryTimer);
+                    fpRetryTimer = null;
+                    audio.src = url + '?t=' + Date.now();
+                    audio.play().catch(() => {});
+                    return;
+                }
+
+                // Test, či už Forcepoint pustil spojenie
+                fetch(url + '?t=' + Date.now(), { method: 'HEAD', mode: 'no-cors' })
+                    .then(() => {
+                        audio.src = url + '?t=' + Date.now();
+                        audio.play().then(() => {
+                            // Stream hrá - zatvoríme vyskakovacie okno a vyčistíme časovač
+                            clearInterval(fpRetryTimer);
+                            fpRetryTimer = null;
+                            if (!authWin.closed) authWin.close();
+                        }).catch(() => {
+                            // Ešte nebolo odkliknuté Continue, čakáme ďalej
+                        });
+                    })
+                    .catch(() => {});
+            }, 2000);
+        }
+    };
+
     audio.src = url; 
-    audio.play();
+    audio.play().catch(() => {});
     resetIdleTimer(false);
         
     const volPanel = document.getElementById('volumePanel');
@@ -1570,6 +1625,10 @@ function aktualizujSubPanely(type) {
 }
     
 function stopRadio() {
+    if (fpRetryTimer) {
+        clearInterval(fpRetryTimer);
+        fpRetryTimer = null;
+    }
     // AK RÁDIO PRÁVE HRÁ (alebo hrá Spotify): zastavíme ho
         const settingsBox = document.getElementById('settings-container');
         const nastaveniaSuOtvorene = settingsBox && settingsBox.style.display === 'block';
