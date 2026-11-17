@@ -676,7 +676,7 @@
 			{ id: "litera", name: "Litera", url: "https://icecast.stv.livebox.sk/litera_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioLitera.png", style: "background:#50CCC6;", category: "Verejnoprávne" },
 
 			// Fun Kontajner
-			{ id: "fun", name: "Fun Radio", url: "https://funradio-proxy.zmobilu.workers.dev/fun192.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
+			{ id: "fun", name: "Fun Radio", url: "https://funradio-proxy.zmobilu.workers.dev/fun128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
 			{ id: "funchill", name: "Fun Chill", url: "https://funradio-proxy.zmobilu.workers.dev/chill128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunChill.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
 			{ id: "fun8090", name: "Fun 80-90", url: "https://funradio-proxy.zmobilu.workers.dev/80-90-128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun8090.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
 			{ id: "funczsk", name: "Fun CZ-SK", url: "https://funradio-proxy.zmobilu.workers.dev/cs128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunCZSK.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
@@ -1560,6 +1560,9 @@ const audio = document.getElementById('audioPlayer');
 
     // Obsluha chyby pri blokovaní cez Forcepoint (pre doménu workers.dev)
     audio.onerror = function() {
+        // Poistka proti spusteniu pri zastavení rádia alebo prázdnom zdroji
+        if (!currentPlayingType || currentPlayingType === "" || (audio.paused && !audio.getAttribute('src'))) return;
+
         if (url.includes('workers.dev')) {
             if (fpRetryTimer) return;
 
@@ -1634,8 +1637,10 @@ function stopRadio() {
         const nastaveniaSuOtvorene = settingsBox && settingsBox.style.display === 'block';
         // AK RÁDIO PRÁVE HRÁ (alebo hrá Spotify): zastavíme ho
     if (currentPlayingType !== "" && currentPlayingType !== "settings") {
+        audio.onerror = null; // <-- PRIDAŤ: Zabráni otvoreniu okna Forcepoint pri vypnutí
         audio.pause(); 
-        audio.src = "";
+        audio.removeAttribute('src'); // Čistejšie než audio.src = "" (nevyvoláva chybu)
+        audio.load();
         currentPlayingType = "";
 		
         // PRIDAŤ: Skrytie panelu hlasitosti pri zastavení rádia
