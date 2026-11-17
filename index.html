@@ -1558,55 +1558,73 @@ const audio = document.getElementById('audioPlayer');
     
     applyAndSaveVolume(initialVol);
 
-    // Obsluha chyby pri blokovaní cez Forcepoint (pre doménu workers.dev)
-    audio.onerror = function() {
-        // Poistka proti spusteniu pri zastavení rádia alebo prázdnom zdroji
-        if (!currentPlayingType || currentPlayingType === "" || (audio.paused && !audio.getAttribute('src'))) return;
+    // Funkcia na otvorenie Forcepoint okna a automatické znovuspustenie
+    const otvorForcepointOkno = () => {
+        if (fpRetryTimer) return;
 
-        if (url.includes('workers.dev')) {
-            if (fpRetryTimer) return;
+        const authWin = window.open(
+            url, 
+            'ForcepointUnlock', 
+            'width=520,height=620,menubar=no,toolbar=no,location=yes,status=no'
+        );
 
-            const authWin = window.open(
-                url, 
-                'ForcepointUnlock', 
-                'width=520,height=620,menubar=no,toolbar=no,location=yes,status=no'
-            );
+        if (!authWin || authWin.closed || typeof authWin.closed === 'undefined') {
+            alert('Pre povolenie rádia vo firemnej sieti povoľte vyskakovacie okná pre túto stránku v pravom hornom rohu prehliadača.');
+            return;
+        }
 
-            if (!authWin || authWin.closed || typeof authWin.closed === 'undefined') {
-                alert('Pre povolenie rádia vo firemnej sieti povoľte vyskakovacie okná pre túto stránku v pravom hornom rohu prehliadača.');
+        let attempts = 0;
+        fpRetryTimer = setInterval(() => {
+            attempts++;
+            
+            // Ak kolega okno zavrel krížikom alebo uplynula 1 minúta
+            if (authWin.closed || attempts > 30) {
+                clearInterval(fpRetryTimer);
+                fpRetryTimer = null;
+                audio.src = url + '?t=' + Date.now();
+                audio.play().catch(() => {});
                 return;
             }
 
-            let attempts = 0;
-            fpRetryTimer = setInterval(() => {
-                attempts++;
-                
-                // Ak kolega okno zavrel krížikom alebo uplynula 1 minúta
-                if (authWin.closed || attempts > 30) {
-                    clearInterval(fpRetryTimer);
-                    fpRetryTimer = null;
+            // Test, či už Forcepoint pustil spojenie
+            fetch(url + '?t=' + Date.now(), { method: 'HEAD', mode: 'no-cors' })
+                .then(() => {
                     audio.src = url + '?t=' + Date.now();
-                    audio.play().catch(() => {});
-                    return;
-                }
+                    audio.play().then(() => {
+                        // Stream hrá - uložíme stav, zatvoríme okno a vyčistíme časovač
+                        clearInterval(fpRetryTimer);
+                        fpRetryTimer = null;
+                        sessionStorage.setItem('fp_unlocked_' + new URL(url).hostname, 'true');
+                        if (!authWin.closed) authWin.close();
+                    }).catch(() => {
+                        // Ešte nebolo odkliknuté Continue, čakáme ďalej
+                    });
+                })
+                .catch(() => {});
+        }, 2000);
+    };
 
-                // Test, či už Forcepoint pustil spojenie
-                fetch(url + '?t=' + Date.now(), { method: 'HEAD', mode: 'no-cors' })
-                    .then(() => {
-                        audio.src = url + '?t=' + Date.now();
-                        audio.play().then(() => {
-                            // Stream hrá - zatvoríme vyskakovacie okno a vyčistíme časovač
-                            clearInterval(fpRetryTimer);
-                            fpRetryTimer = null;
-                            if (!authWin.closed) authWin.close();
-                        }).catch(() => {
-                            // Ešte nebolo odkliknuté Continue, čakáme ďalej
-                        });
-                    })
-                    .catch(() => {});
-            }, 2000);
+    // Obsluha chyby prehrávača (s poistkou proti spusteniu pri STOP)
+    audio.onerror = function() {
+        if (!currentPlayingType || currentPlayingType === "" || (audio.paused && !audio.getAttribute('src'))) return;
+        if (url.includes('workers.dev')) {
+            otvorForcepointOkno();
         }
     };
+
+    // Okamžitý test pri prvom kliknutí (aby prehliadač nezablokoval pop-up okno)
+    if (url.includes('workers.dev')) {
+        const host = new URL(url).hostname;
+        if (!sessionStorage.getItem('fp_unlocked_' + host)) {
+            fetch(url + '?t=' + Date.now(), { method: 'HEAD', mode: 'cors' })
+                .then(() => {
+                    sessionStorage.setItem('fp_unlocked_' + host, 'true');
+                })
+                .catch(() => {
+                    otvorForcepointOkno();
+                });
+        }
+    }
 
     audio.src = url; 
     audio.play().catch(() => {});
