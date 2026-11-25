@@ -955,7 +955,10 @@
 					} else {
 						container.innerHTML += `<button onclick="playRadio('${item.url}', this, '${item.id}')" class="btn${labelClass}" style="${item.style}" data-type="${item.id}">${innerContent}</button>`;
 					}
+				} else {
+					container.innerHTML += `<button class="btn empty" style="background:#111; border: 1px dashed #444;" onclick="prepniNastavenia()"><i class="fa-solid fa-plus" style="color:#444; font-size: 30px;"></i></button>`;
 				}
+			}
 			
 			if(currentPlayingType) {
 				const activeBtn = container.querySelector(`[data-type="${currentPlayingType}"]`);
