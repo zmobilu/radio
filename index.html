@@ -770,6 +770,17 @@
 			{ id: "fun8090", name: "Fun 80-90", url: "https://funradio-proxy.zmobilu.workers.dev/80-90-128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun8090.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
 			{ id: "funczsk", name: "Fun CZ-SK", url: "https://funradio-proxy.zmobilu.workers.dev/cs128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunCZSK.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
 			{ id: "milenialky", name: "Milenialky", url: "https://funradio-proxy.zmobilu.workers.dev/milenialky128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun2000.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
+
+			// Rock Non-Stop (bez vstupov)
+			{ id: "rockit", name: "Rockit Radio", url: "https://rockitradio.ice.infomaniak.ch/rockitradio-high.mp3", icon: "fa-solid fa-bolt", color: "#ff453a", style: "background:#111; color:#ff453a;", category: "Rock Non-Stop" },
+			{ id: "spoon-rock", name: "Spoon Rock", url: "https://spoonradio.ice.infomaniak.ch/spoonradio-high.mp3", icon: "fa-solid fa-guitar", color: "#ff9f0a", style: "background:#111; color:#ff9f0a;", category: "Rock Non-Stop" },
+			{ id: "energy-rock", name: "Energy Rock", url: "https://energyrock.ice.infomaniak.ch/energyrock-high.mp3", icon: "fa-solid fa-fire", color: "#e06c75", style: "background:#111; color:#e06c75;", category: "Rock Non-Stop" },
+			{ id: "ouifm-inde", name: "OÜI Rock Indé", url: "https://ouifm2.ice.infomaniak.ch/ouifm2.mp3", icon: "fa-solid fa-compact-disc", color: "#61afef", style: "background:#111; color:#61afef;", category: "Rock Non-Stop" },
+			{ id: "virgin-rock", name: "Virgin Rock", url: "https://virginrocklive.ice.infomaniak.ch/virgin-radio-rock-live.mp3", icon: "fa-solid fa-radio", color: "#c678dd", style: "background:#111; color:#c678dd;", category: "Rock Non-Stop" },
+			{ id: "1fm-rockclassics", name: "Rock Classics", url: "https://strm112.1.fm/rockclassics_mobile_mp3", icon: "fa-solid fa-record-vinyl", color: "#D6B55B", style: "background:#111; color:#D6B55B;", category: "Rock Non-Stop" },
+			{ id: "1fm-highvoltage", name: "High Voltage", url: "https://strm112.1.fm/highvoltage_mobile_mp3", icon: "fa-solid fa-skull", color: "#98c379", style: "background:#111; color:#98c379;", category: "Rock Non-Stop" },
+			{ id: "ra-grunge", name: "Grunge Rock", url: "https://stream.rockantenne.de/grunge/stream/mp3", icon: "fa-solid fa-volume-high", color: "#56b6c2", style: "background:#111; color:#56b6c2;", category: "Rock Non-Stop" },
+			{ id: "star-hardrock", name: "Hard Rock", url: "https://stream.starfm.de/hardrock/mp3-192/", icon: "fa-solid fa-drum", color: "#e5c07b", style: "background:#111; color:#e5c07b;", category: "Rock Non-Stop" },
 			
 			// Komerčné
 			{ id: "jazz", name: "Rádio Jazz", url: "https://radio-jazz-proxy.zmobilu.workers.dev", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioJazz.png", style: "background:#FFFFFF;", category: "Komerčné" },
@@ -796,12 +807,13 @@
 			{ id: "1fm-bossa", name: "Bossa Nova", url: "https://strm112.1.fm/bossanova_mobile_mp3", icon: "fa-solid fa-guitar", color: "#98c379", style: "background:#111; color:#98c379;", category: "Jazz & Lounge" },
 			{ id: "1fm-lounge", name: "Chill Lounge", url: "https://strm112.1.fm/chilloutlounge_mobile_mp3", icon: "fa-solid fa-couch", color: "#c678dd", style: "background:#111; color:#c678dd;", category: "Jazz & Lounge" },
 			{ id: "groove-jazz", name: "Cafe Groove", url: "https://jazz-wr08.ice.infomaniak.ch/jazz-wr08-128.mp3", icon: "fa-solid fa-headphones", color: "#56b6c2", style: "background:#111; color:#56b6c2;", category: "Jazz & Lounge" },
-			{ id: "swiss-jazz", name: "Swiss Jazz", url: "https://stream.srg-ssr.ch/srgssr/rsj/mp3/128", icon: "fa-solid fa-mug-hot", color: "#ff9f0a", style: "background:#111; color:#ff9f0a;", category: "Jazz & Lounge" },
-			{ id: "soma-lounge", name: "Cafe Lounge", url: "https://ice1.somafm.com/illstreet-128-mp3", icon: "fa-solid fa-headphones", color: "#56b6c2", style: "background:#111; color:#56b6c2;", category: "Jazz & Lounge" },
+			
 		];
 	
-		let slotFavoritesMain = JSON.parse(localStorage.getItem('kiosk_slots_main')) || ["slovensko", "fun", "rock", "blanik", "S-techno", "spotify"];
-		// Staré: let cfgRadioOffTime = localStorage.getItem('cfg_radio_off_time') || "16:30";
+		let slotFavoritesMain = JSON.parse(localStorage.getItem('kiosk_slots_main')) || ["slovensko", "fun", "rock", "blanik", "expres", "jazz"];
+		const platneIds = new Set(DATABASE.map(r => r.id));
+        slotFavoritesMain = slotFavoritesMain.filter(id => platneIds.has(id));
+       	localStorage.setItem('kiosk_slots_main', JSON.stringify(slotFavoritesMain));
 		let cfgRadioOffTime1 = localStorage.getItem('cfg_radio_off_time_1') || "09:00";
 		let cfgRadioOffTime2 = localStorage.getItem('cfg_radio_off_time_2') || "17:00";
 		let cfgRadioOffEnabled1 = localStorage.getItem('cfg_radio_off_enabled_1') === 'true';
