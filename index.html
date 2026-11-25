@@ -249,6 +249,34 @@
         .vypni { background-color: #333; grid-column: span 2; }
         .vypni i { color: #eb0028; font-size: 65px; }
         .playing { border: 2px solid #ff9f0a !important; }
+		 
+		/* Názvy pod ikonkami v ľavom paneli (len pre tlačidlá bez obrázkového loga) */
+        .btn.btn-icon-labeled {
+            padding: 6px 4px;
+            gap: 5px;
+            box-sizing: border-box;
+        }
+        .btn.btn-icon-labeled i {
+            font-size: clamp(20px, min(3.4vw, 5.2vh), 44px);
+            line-height: 1;
+        }
+        .btn-label {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-align: center;
+            font-size: clamp(9px, 1.05vw, 13px);
+            font-weight: 600;
+            line-height: 1.15;
+            text-transform: uppercase;
+            color: #ccc;
+            width: 100%;
+            word-break: break-word;
+        }
+        .btn.playing .btn-label {
+            color: #ff9f0a;
+        }
 
         .btn-nav { background-color: #222; color: #ff9f0a; font-weight: bold; }
         .btn-nav i { font-size: 30px; margin-bottom: 5px; color: #ff9f0a; }
@@ -917,19 +945,17 @@
 				const item = DATABASE.find(d => d.id === id);
 				if (item && id !== null) {
 					const imgScale = item.scale ? `transform: scale(${item.scale});` : '';
+					const labelClass = item.img ? '' : ' btn-icon-labeled';
 					let innerContent = item.img 
 					    ? `<img src="${item.img}" style="max-width:90%; max-height:90%; object-fit:contain; ${imgScale}">` 
-					    : `<i class="${item.icon}" style="font-size:60px;"></i>`;
+					    : `<i class="${item.icon || 'fa-solid fa-radio'}" style="color:${item.color || '#fff'};"></i><span class="btn-label">${item.name}</span>`;
 					
 					if(item.id === 'spotify') {
-						container.innerHTML += `<button onclick="showSpotify()" class="btn spotify" style="${item.style}" data-type="spotify">${innerContent}</button>`;
+						container.innerHTML += `<button onclick="showSpotify()" class="btn spotify${labelClass}" style="${item.style}" data-type="spotify">${innerContent}</button>`;
 					} else {
-						container.innerHTML += `<button onclick="playRadio('${item.url}', this, '${item.id}')" class="btn" style="${item.style}" data-type="${item.id}">${innerContent}</button>`;
+						container.innerHTML += `<button onclick="playRadio('${item.url}', this, '${item.id}')" class="btn${labelClass}" style="${item.style}" data-type="${item.id}">${innerContent}</button>`;
 					}
-				} else {
-					container.innerHTML += `<button class="btn empty" style="background:#111; border: 1px dashed #444;" onclick="prepniNastavenia()"><i class="fa-solid fa-plus" style="color:#444; font-size: 30px;"></i></button>`;
 				}
-			}
 			
 			if(currentPlayingType) {
 				const activeBtn = container.querySelector(`[data-type="${currentPlayingType}"]`);
