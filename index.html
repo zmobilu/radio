@@ -811,8 +811,10 @@
 	
 		let slotFavoritesMain = JSON.parse(localStorage.getItem('kiosk_slots_main')) || ["slovensko", "fun", "rock", "blanik", "expres", "jazz"];
 		const platneIds = new Set(DATABASE.map(r => r.id));
-        slotFavoritesMain = slotFavoritesMain.filter(id => platneIds.has(id));
-       	localStorage.setItem('kiosk_slots_main', JSON.stringify(slotFavoritesMain));
+		slotFavoritesMain = slotFavoritesMain.map(id => (id && platneIds.has(id)) ? id : null);
+		while (slotFavoritesMain.length < 6) slotFavoritesMain.push(null);
+		slotFavoritesMain = slotFavoritesMain.slice(0, 6);
+		localStorage.setItem('kiosk_slots_main', JSON.stringify(slotFavoritesMain));
 		let cfgRadioOffTime1 = localStorage.getItem('cfg_radio_off_time_1') || "09:00";
 		let cfgRadioOffTime2 = localStorage.getItem('cfg_radio_off_time_2') || "17:00";
 		let cfgRadioOffEnabled1 = localStorage.getItem('cfg_radio_off_enabled_1') === 'true';
