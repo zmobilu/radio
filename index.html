@@ -756,7 +756,7 @@
 			        </div>
 			    </div>
 			
-			    <h2 style="color: #ff9f0a; margin-top: 15px; font-weight: 400; font-size: 1.8vw; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 8px;">Výber 7 rádií do panelu</h2>
+			    	<h2 id="nadpisVyberRadii" style="color: #ff9f0a; margin-top: 15px; font-weight: 400; font-size: 1.8vw; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 8px; scroll-margin-top: 8px;">Výber 7 rádií do panelu</h2>
 			    <div id="settingsGridView" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; padding: 5px 0;"></div>
 			</div>
 
@@ -978,7 +978,7 @@
 						container.innerHTML += `<button onclick="playRadio('${item.url}', this, '${item.id}')" class="btn${labelClass}" style="${item.style}" data-type="${item.id}">${innerContent}</button>`;
 					}
 				} else {
-					container.innerHTML += `<button class="btn empty" style="background:#111; border: 1px dashed #444;" onclick="prepniNastavenia()"><i class="fa-solid fa-plus" style="color:#444; font-size: 30px;"></i></button>`;
+					container.innerHTML += `<button class="btn empty" style="background:#111; border: 1px dashed #444;" onclick="prepniNastavenia(true)"><i class="fa-solid fa-plus" style="color:#444; font-size: 30px;"></i></button>`;
 				}
 			}
 			
@@ -1088,7 +1088,7 @@
             });
 			aktualizujTlacidlaAutoVypnutia();
         }
-		function prepniNastavenia() {
+		function prepniNastavenia(skrolujNaRadia = false) { // <--- PRIDANÝ PARAMETER
             const volPanel = document.getElementById('volumePanel');
             const settingsBox = document.getElementById('settings-container');
             const spotifyBox = document.getElementById('integrated-spotify-container');
@@ -1100,7 +1100,7 @@
             const infoRiadokEl = document.querySelector('.radio-info-wrapper');
             const namedayLineEl = document.getElementById('radio-nameday-line');
             
-            if (isVisible) {
+            if (isVisible && !skrolujNaRadia) { // <--- UPRAVENÉ (ak je už otvorené a klikneš na +, nezavrie sa, len odroluje)
                 settingsBox.style.display = 'none';
                 if (btnSettings) btnSettings.classList.remove('active');
 
@@ -1123,6 +1123,16 @@
                 if (infoRiadokEl) infoRiadokEl.style.display = 'none';
                 if (namedayLineEl) namedayLineEl.style.display = 'none';
                 if (spotifyBox) spotifyBox.style.display = 'none';
+
+                // <--- PRIDANÉ ODROLOVANIE:
+                setTimeout(() => {
+                    const ciel = document.getElementById('nadpisVyberRadii');
+                    if (skrolujNaRadia && ciel) {
+                        ciel.scrollIntoView({ behavior: 'auto', block: 'start' });
+                    } else {
+                        settingsBox.scrollTop = 0;
+                    }
+                }, 30);
             }
             aktualizujTitulokStranky();
         }
