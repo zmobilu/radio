@@ -2492,7 +2492,46 @@ inicializujPlochuNastaveni();
 		        skontrolujNochnuAktualizaciu();
 		    }
 		});
+
+		// --- AUTOMATICKÉ UPOZORNENIE NA NOVÉ RÁDIÁ (bez ručnej údržby) ---
+		document.addEventListener('DOMContentLoaded', () => {
+		    const aktualnyPocet = DATABASE.length;
+		    const ulozenyPocet = localStorage.getItem('kiosk_db_count');
+		    const rozdiel = ulozenyPocet === null ? 'NOVÉ' : (aktualnyPocet - parseInt(ulozenyPocet, 10));
 		
+		    if (rozdiel === 'NOVÉ' || rozdiel > 0) {
+		        const btn = document.getElementById('settingsToggleBtn');
+		        if (btn) {
+		            btn.style.borderColor = '#ff9f0a';
+		            btn.style.color = '#ff9f0a';
+		            const odznak = document.createElement('span');
+		            odznak.id = 'db-new-badge';
+		            odznak.textContent = rozdiel === 'NOVÉ' ? 'NOVÉ' : `+${rozdiel}`;
+		            odznak.style.cssText = 'position:absolute; bottom:-6px; background:#eb0028; color:#fff; font-size:9px; font-weight:800; padding:1px 5px; border-radius:6px; line-height:1.1;';
+		            btn.appendChild(odznak);
+		        }
+		
+		        const zrusUpozornenie = () => {
+		            localStorage.setItem('kiosk_db_count', aktualnyPocet);
+		            const odznak = document.getElementById('db-new-badge');
+		            if (odznak) odznak.remove();
+		            if (btn) { btn.style.borderColor = ''; btn.style.color = ''; }
+		            document.querySelectorAll('.btn.empty').forEach(b => {
+		                b.style.borderColor = '#444';
+		                const ikona = b.querySelector('i');
+		                if (ikona) ikona.style.color = '#444';
+		            });
+		        };
+		
+		        if (btn) btn.addEventListener('click', zrusUpozornenie, { once: true });
+		        document.querySelectorAll('.btn.empty').forEach(b => {
+		            b.style.borderColor = '#ff9f0a';
+		            const ikona = b.querySelector('i');
+		            if (ikona) ikona.style.color = '#ff9f0a';
+		            b.addEventListener('click', zrusUpozornenie, { once: true });
+		        });
+		    }
+		});
 </script>
 </body>
 </html>
