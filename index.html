@@ -235,7 +235,16 @@
 
         .sub-btn.playing { border: 2px solid #ff9f0a !important; }
         
-        .buttons-section { width: 30%; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 0.6fr 1fr 1fr 1fr; gap: 8px; padding: 10px; background: #050505; box-sizing: border-box;}
+        .buttons-section { 
+            width: 30%; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            grid-template-rows: repeat(4, 1fr); 
+            gap: 8px; 
+            padding: 10px; 
+            background: #050505; 
+            box-sizing: border-box;
+        }
         
         .page-group { display: contents; }
         .page-group.hidden { display: none !important; }
@@ -246,8 +255,8 @@
 		    transform: scale(1.25); /* 1.25 = 125 % veľkosti, uprav podľa potreby napr. na 1.15 alebo 1.35 */
 		    transition: transform 0.2s ease;
 		}
-        .vypni { background-color: #333; grid-column: span 2; }
-        .vypni i { color: #eb0028; font-size: 65px; }
+        .vypni { background-color: #333; }
+        .vypni i { color: #eb0028; font-size: clamp(32px, 4.5vw, 56px); }
         .playing { border: 2px solid #ff9f0a !important; }
 		 
 		/* Názvy pod ikonkami v ľavom paneli (len pre tlačidlá bez obrázkového loga) */
@@ -747,7 +756,7 @@
 			        </div>
 			    </div>
 			
-			    <h2 style="color: #ff9f0a; margin-top: 15px; font-weight: 400; font-size: 1.8vw; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 8px;">Výber 6 rádií do panelu</h2>
+			    <h2 style="color: #ff9f0a; margin-top: 15px; font-weight: 400; font-size: 1.8vw; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 8px;">Výber 7 rádií do panelu</h2>
 			    <div id="settingsGridView" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; padding: 5px 0;"></div>
 			</div>
 
@@ -777,8 +786,8 @@
         const VOLUME_MAP = { 
             'slovensko': 0.3, 'fm': 0.5, 'devin': 0.5, 'litera': 0.5, 'junior': 0.5, 'regina': 0.5,
             'fun': 1.0, 'funchill': 0.5, 'funczsk': 0.5, 'fun8090': 0.5, 'milenialky': 0.5,
-            'expres': 1.0, 'europa2': 1.0, 'melody': 1.0, 'vlna': 1.0,
-            'blanik': 0.5, 'rock': 0.5, 'rockrepublika': 0.5, 'beat': 0.5, 'casrock': 0.5, 
+            'expres': 1.0, 'europa2': 1.0, 'melody': 1.0, 'vlna': 1.0, 'bbc-world': 0.5, 'npr-news': 0.5, 'rfi-english': 0.5, 'dlf-news': 0.5, 'srf4-news': 0.5,
+            'blanik': 0.5, 'rock': 0.5, 'rockrepublika': 0.5, 'beat': 0.5, 'casrock': 0.5, 'cro-radiozurnal': 0.5, 'cro-plus': 0.5, 'cro-dvojka': 0.5,
             'S-techno': 1.0, 'schranz': 1.0, 'melodic': 1.0, 'h-techno': 1.0, 'Drumcode': 1.0,
             'topolcany': 0.5 // PRIDANÉ SEM
         };
@@ -828,7 +837,7 @@
 			{ id: "npr-news", name: "NPR News", url: "https://npr-ice.streamguys1.com/live.mp3", icon: "fa-solid fa-landmark", color: "#61afef", style: "background:#111; color:#61afef;", category: "Zahraničné správy" },
 			{ id: "rfi-english", name: "RFI English", url: "https://rfienanglais64k.ice.infomaniak.ch/rfienanglais-64.mp3", icon: "fa-solid fa-earth-europe", color: "#ff9f0a", style: "background:#111; color:#ff9f0a;", category: "Zahraničné správy" },
 			{ id: "dlf-news", name: "Deutschlandfunk", url: "https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3", icon: "fa-solid fa-newspaper", color: "#D6B55B", style: "background:#111; color:#D6B55B;", category: "Zahraničné správy" },
-			{ id: "orf-oe1", name: "ORF Ö1", url: "https://orf-live.ors-shoutcast.at/oe1-q2a", icon: "fa-solid fa-radio", color: "#98c379", style: "background:#111; color:#98c379;", category: "Zahraničné správy" },
+			{ id: "srf4-news", name: "SRF 4 News", url: "https://stream.srg-ssr.ch/m/drs4news/mp3_128", icon: "fa-solid fa-radio", color: "#98c379", style: "background:#111; color:#98c379;", category: "Zahraničné správy" },
 			
 			// Radio Rock a dalsie  Non-Stop
 			{ id: "rock", name: "Radio ROCK", url: "https://stream.bauermedia.sk/rock-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png", style: "background:#000000;", category: "Rock Non-Stop" },
@@ -874,12 +883,16 @@
 			
 		];
 	
-		let slotFavoritesMain = JSON.parse(localStorage.getItem('kiosk_slots_main')) || ["slovensko", "fun", "rock", "blanik", "expres", "jazz"];
+		let slotFavoritesMain = JSON.parse(localStorage.getItem('kiosk_slots_main')) || [null, "slovensko", "fun", "rock", "blanik", "expres", "jazz"];
+		if (slotFavoritesMain.length === 6) {
+			slotFavoritesMain.unshift(null);
+		}
 		const platneIds = new Set(DATABASE.map(r => r.id));
 		slotFavoritesMain = slotFavoritesMain.map(id => (id && platneIds.has(id)) ? id : null);
-		while (slotFavoritesMain.length < 6) slotFavoritesMain.push(null);
-		slotFavoritesMain = slotFavoritesMain.slice(0, 6);
+		while (slotFavoritesMain.length < 7) slotFavoritesMain.push(null);
+		slotFavoritesMain = slotFavoritesMain.slice(0, 7);
 		localStorage.setItem('kiosk_slots_main', JSON.stringify(slotFavoritesMain));
+		
 		let cfgRadioOffTime1 = localStorage.getItem('cfg_radio_off_time_1') || "09:00";
 		let cfgRadioOffTime2 = localStorage.getItem('cfg_radio_off_time_2') || "17:00";
 		let cfgRadioOffEnabled1 = localStorage.getItem('cfg_radio_off_enabled_1') === 'true';
@@ -947,9 +960,9 @@
 			const container = document.getElementById('leftButtonsContainer');
 			if(!container) return;
 			
-			container.innerHTML = `<button onclick="stopRadio()" class="btn vypni" style="padding: 20px 0; min-height: 90px; width: 100%; grid-column: span 2;"><i class="fa-solid fa-power-off"></i></button>`;
+			container.innerHTML = `<button onclick="stopRadio()" class="btn vypni" style="width: 100%;"><i class="fa-solid fa-power-off"></i></button>`;
 	
-			for (let i = 0; i < 6; i++) {
+			for (let i = 0; i < 7; i++) {
 				const id = slotFavoritesMain[i];
 				const item = DATABASE.find(d => d.id === id);
 				if (item && id !== null) {
@@ -1013,10 +1026,10 @@
 						slotFavoritesMain[existingIndex] = null;
 					} else {
 						let freeSlotIndex = slotFavoritesMain.findIndex(slot => !slot);
-						if (freeSlotIndex !== -1 && freeSlotIndex < 6) {
+						if (freeSlotIndex !== -1 && freeSlotIndex < 7) {
 							slotFavoritesMain[freeSlotIndex] = item.id;
 						} else {
-							alert("Všetkých 6 pozícií je plných. Najprv kliknutím uvoľnite niektoré miesto.");
+							alert("Všetkých 7 pozícií je plných. Najprv kliknutím uvoľnite niektoré miesto.");
 							return;
 						}
 					}
@@ -1943,9 +1956,8 @@ function stopRadio() {
         }
         // ÚPLNÁ ZÁLOHA: Ak je kiosk spustený prvýkrát a pamäť je úplne prázdna
        else {
-            const prveTlacitko = document.querySelector('.buttons-section .btn:not(.vypni):not(.spotify)');
+            const prveTlacitko = document.querySelector('.buttons-section .btn:not(.vypni):not(.spotify):not(.empty)');
             if (prveTlacitko) {
-                // Simuluje kliknutie na prvé rádio v poradí (Slovensko)
                 prveTlacitko.click();
             }
         }
