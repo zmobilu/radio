@@ -1755,49 +1755,97 @@
             document.removeEventListener('click', enableNoSleep);
         }, false);
 
-        const DATABASE = [
-            { id: "slovensko", name: "Slovensko", url: "https://icecast.stv.livebox.sk/slovensko_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png", style: "background:#00547E;", category: "Verejnoprávne" },
-            { id: "fm", name: "Rádio_FM", url: "https://icecast.stv.livebox.sk/fm_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioFM.png", style: "background:#111;", category: "Verejnoprávne" },
-            { id: "regina", name: "Regina", url: "https://icecast.stv.livebox.sk/regina-ba_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioReginaZ.png", style: "background:#111;", category: "Verejnoprávne" },
-            { id: "devin", name: "Devín", url: "https://icecast.stv.livebox.sk/devin_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioDevin.png", style: "background:#111;", category: "Verejnoprávne" },
-            { id: "junior", name: "Junior", url: "https://icecast.stv.livebox.sk/junior_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioJunior.png", style: "background:#111;", category: "Verejnoprávne" },
-            { id: "litera", name: "Litera", url: "https://icecast.stv.livebox.sk/litera_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioLitera.png", style: "background:#111;", category: "Verejnoprávne" },
-            
-            { id: "fun", name: "Fun Radio", url: "https://funradio-proxy.zmobilu.workers.dev/fun192.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png", style: "background:#fff;", category: "Fun Kontajner" },
-            { id: "funchill", name: "Fun Chill", url: "https://funradio-proxy.zmobilu.workers.dev/chill128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunChill.png", style: "background:#111;", category: "Fun Kontajner" },
-            { id: "fun8090", name: "Fun 80-90", url: "https://funradio-proxy.zmobilu.workers.dev/80-90-128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun8090.png", style: "background:#111;", category: "Fun Kontajner" },
-            { id: "funczsk", name: "Fun CZ-SK", url: "https://funradio-proxy.zmobilu.workers.dev/cs128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunCZSK.png", style: "background:#111;", category: "Fun Kontajner" },
-            { id: "milenialky", name: "Milenialky", url: "https://funradio-proxy.zmobilu.workers.dev/milenialky128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun2000.png", style: "background:#111;", category: "Fun Kontajner" },
-           
-            { id: "rock", name: "Radio rock", url: "https://stream.bauermedia.sk/rock-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png", style: "background:#000000;", category: "Rockové" },
-			{ id: "rockzone", name: "RockZONE", url: "https://proxy-rockzone.zmobilu.workers.dev", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRockZone.png", style: "background:#000000;", category: "Rockové" },
-			
-            { id: "blanik", name: "Blaník", url: "https://ice.abradio.cz/blanikcz128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png", style: "background:#005ea6;", category: "Komerčné" },
-            { id: "expres", name: "Expres", url: "https://stream.bauermedia.sk/expres-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoExpress.png", style: "background:#111;", category: "Komerčné" },
-            { id: "europa2", name: "Europa 2", url: "https://stream.bauermedia.sk/europa2-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoEuropa2.png", style: "background:#111;", category: "Komerčné" },
-            { id: "melody", name: "Melody", url: "https://stream.bauermedia.sk/melody-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoMelody.png", style: "background:#111;", category: "Komerčné" },
-            { id: "vlna", name: "Rádio Vlna", url: "https://stream.radiovlna.sk/vlna-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoVlna.png", style: "background:#111;", category: "Komerčné" },
-			
-            { id: "jazz", name: "Rádio Jazz", url: "https://radio-jazz-proxy.zmobilu.workers.dev", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioJazz.png", style: "background:#111;", category: "Ostatné" },
-			{ id: "impuls", name: "Rádio Impuls", url: "https://proxy-impuls.zmobilu.workers.dev", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoImpuls.png", style: "background:#111;", category: "Ostatné" },
-			
-            { id: "S-techno", name: "Techno", url: "https://stream.sunshine-live.de/techno/mp3-192/", icon: "fa-solid fa-bolt", color: "#307CEB", style: "background:#111;", category: "Techno scéna" },
-            { id: "schranz", name: "Schranz", url: "https://stream.sunshine-live.de/schranz/mp3-192/", icon: "fa-solid fa-triangle-exclamation", color: "#fff", style: "background:#111;", category: "Techno scéna" },
-            { id: "melodic", name: "Melodic Beats", url: "https://stream.sunshine-live.de/melodic_beats/mp3-192/", icon: "fa-solid fa-wave-square", color: "#fff", style: "background:#111;", category: "Techno scéna" },
-            { id: "h-techno", name: "Hard Techno", url: "https://stream.sunshine-live.de/hardtechno/mp3-192", icon: "fa-solid fa-circle-radiation", color: "#fff", style: "background:#111;", category: "Techno scéna" },
-            { id: "Drumcode", name: "Drumcode", url: "https://stream.sunshine-live.de/drumbass/mp3-192", icon: "fa-solid fa-volume-high", color: "#fff", style: "background:#111;", category: "Techno scéna" },
-            
-            { id: "spotify", name: "Spotify", url: "https://open.spotify.com", icon: "fa-brands fa-spotify", color: "#1DB954", style: "background:#111;", category: "Externé Aplikácie" },
-            { id: "applemusic", name: "Apple Music", url: "https://music.apple.com", icon: "fa-solid fa-music", color: "#FA243C", style: "background:#111;", category: "Externé Aplikácie" },
-            { id: "youtube", name: "YT Music", url: "https://music.youtube.com", icon: "fa-brands fa-youtube", color: "#FF0000", style: "background:#111;", category: "Externé Aplikácie" },
-            { id: "tidal", name: "Tidal", url: "https://tidal.com", icon: "fa-solid fa-wave-square", color: "#00FFFF", style: "background:#111;", category: "Externé Aplikácie" },
-            { id: "soundcloud", name: "SoundCloud", url: "https://soundcloud.com", icon: "fa-brands fa-soundcloud", color: "#FF5500", style: "background:#111;", category: "Externé Aplikácie" },
+        // --- DATABÁZA ZOSKUPENÁ PODĽA KATEGÓRIÍ ---
+		const DATABASE = [
+			// Verejnoprávne (STVR)
+			{ id: "slovensko", name: "Slovensko", url: "https://icecast.stv.livebox.sk/slovensko_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoSRo.png", style: "background:#00547E;", category: "Verejnoprávne" },
+			{ id: "fm", name: "Rádio_FM", url: "https://icecast.stv.livebox.sk/fm_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioFM.png", style: "background:#CC001C;", scale: 1.3, category: "Verejnoprávne" },
+			{ id: "regina", name: "Regina", url: "https://icecast.stv.livebox.sk/regina-ba_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioReginaZ.png", style: "background:#6ECC99;", category: "Verejnoprávne" },
+			{ id: "devin", name: "Devín", url: "https://icecast.stv.livebox.sk/devin_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioDevin.png", style: "background:#D6B55B;", category: "Verejnoprávne" },
+			{ id: "junior", name: "Junior", url: "https://icecast.stv.livebox.sk/junior_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioJunior.png", style: "background:#7B97D6;", category: "Verejnoprávne" },
+			{ id: "litera", name: "Litera", url: "https://icecast.stv.livebox.sk/litera_128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioLitera.png", style: "background:#50CCC6;", category: "Verejnoprávne" },
 
-			{ id: "sp1", name: "Ach TucTuc", embedUrl: "https://open.spotify.com/embed/playlist/1mv2iWdWfEfffZfa8kOBFs?utm_source=generator", icon: "fa-brands fa-spotify", color: "#1DB954", style: "background:#111;", category: "Súkromne playlisty" }, 
-			{ id: "sp2", name: "Ah Rock", embedUrl: "https://open.spotify.com/embed/playlist/2xLrXn0HleL3pJvnRWnRcJ?utm_source=generator", icon: "fa-brands fa-spotify", color: "#1DB954", style: "background:#111;", category: "Súkromne playlisty" },
-			{ id: "sp3", name: "Spotify-proxy", embedUrl: "https://spotify-proxy.zmobilu.workers.dev", icon: "fa-brands fa-spotify", color: "#1DB954", style: "background:#111;", category: "Súkromne playlisty" },
+			// Fun Kontajner
+			{ id: "fun", name: "Fun Radio", url: "https://funradio-proxy.zmobilu.workers.dev/fun128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunRadio.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
+			{ id: "funchill", name: "Fun Chill", url: "https://funradio-proxy.zmobilu.workers.dev/chill128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunChill.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
+			{ id: "fun8090", name: "Fun 80-90", url: "https://funradio-proxy.zmobilu.workers.dev/80-90-128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun8090.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
+			{ id: "funczsk", name: "Fun CZ-SK", url: "https://funradio-proxy.zmobilu.workers.dev/cs128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFunCZSK.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
+			{ id: "milenialky", name: "Milenialky", url: "https://funradio-proxy.zmobilu.workers.dev/milenialky128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoFun2000.png", style: "background:#FFFFFF;", category: "Fun Kontajner" },
+
+			// Pop Klasika 80s / 90s
+			{ id: "vintage-pop", name: "VintagePop", url: "https://vintageradio.ice.infomaniak.ch/vintageradio-high.mp3", icon: "fa-solid fa-compact-disc", color: "#ff9f0a", style: "background:#111; color:#ff9f0a;", category: "Pop Klasika 80s/90s" },
+			{ id: "energy-80s", name: "Energy80sPop", url: "https://streams.80s80s.de/web/mp3-192/streams.80s80s.de/", icon: "fa-solid fa-star", color: "#ff453a", style: "background:#111; color:#ff453a;", category: "Pop Klasika 80s/90s" },
+			{ id: "energy-90s", name: "Energy90sPop", url: "https://streams.90s90s.de/main/mp3-192/streams.90s90s.de/", icon: "fa-solid fa-bolt", color: "#c678dd", style: "background:#111; color:#c678dd;", category: "Pop Klasika 80s/90s" },
+			{ id: "100-80s", name: "80s Hits", url: "https://100radio-80.ice.infomaniak.ch/100radio-80-128.mp3", icon: "fa-solid fa-record-vinyl", color: "#61afef", style: "background:#111; color:#61afef;", category: "Pop Klasika 80s/90s" },
+			{ id: "100-90s", name: "90s Hits", url: "https://100radio-90.ice.infomaniak.ch/100radio-90-128.mp3", icon: "fa-solid fa-music", color: "#98c379", style: "background:#111; color:#98c379;", category: "Pop Klasika 80s/90s" },
+			{ id: "1fm-euro80s", name: "Euro 80/90", url: "https://strm112.1.fm/80s_90s_mobile_mp3", icon: "fa-solid fa-radio", color: "#D6B55B", style: "background:#111; color:#D6B55B;", category: "Pop Klasika 80s/90s" },
+			{ id: "1fm-love", name: "Love Classic", url: "https://strm112.1.fm/loveclassics_mobile_mp3", icon: "fa-solid fa-heart", color: "#e06c75", style: "background:#111; color:#e06c75;", category: "Pop Klasika 80s/90s" },
 			
-        ];
+			// Komerčné
+			{ id: "expres", name: "Expres", url: "https://stream.bauermedia.sk/expres-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoExpress.png", style: "background:#000000;", category: "Komerčné" },
+			{ id: "europa2", name: "Europa 2", url: "https://stream.bauermedia.sk/europa2-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoEuropa2.png", style: "background:#0764AA;", category: "Komerčné" },
+			{ id: "melody", name: "Melody", url: "https://stream.bauermedia.sk/melody-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoMelody.png", style: "background:#EBE5CA;", category: "Komerčné" },
+			{ id: "vlna", name: "Rádio Vlna", url: "https://stream.radiovlna.sk/vlna-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoVlna.png", style: "background:#FFFFFF;", category: "Komerčné" },
+
+			// České a rozhlas
+			{ id: "cro-radiozurnal", name: "ČRo Radiožurnál", url: "https://rozhlas.stream/radiozurnal_mp3_128.mp3", icon: "fa-solid fa-newspaper", color: "#eb0028", style: "background:#111; color:#eb0028;", category: "České" },
+			{ id: "cro-plus", name: "ČRo Plus", url: "https://rozhlas.stream/plus_mp3_128.mp3", icon: "fa-solid fa-microphone-lines", color: "#ff9f0a", style: "background:#111; color:#ff9f0a;", category: "České" },
+			{ id: "cro-dvojka", name: "ČRo Dvojka", url: "https://rozhlas.stream/dvojka_mp3_128.mp3", icon: "fa-solid fa-radio", color: "#61afef", style: "background:#111; color:#61afef;", category: "České" },
+			{ id: "blanik", name: "Blaník", url: "https://ice.abradio.cz/blanikcz128.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoBlanik.png", style: "background:#D53531;", category: "České" },
+			{ id: "radio-samson", name: "Rádio Samson", url: "https://icecast8.play.cz/samsonfm128.mp3", icon: "fa-solid fa-campground", color: "#98c379", style: "background:#111; color:#98c379;", category: "České" },
+			{ id: "country-cz", name: "Country Radio", url: "https://stream.rcs.revma.com/h7rwanvb938uv", icon: "fa-solid fa-guitar", color: "#D6B55B", style: "background:#111; color:#D6B55B;", category: "České" },
+			{ id: "impuls", name: "Rádio Impuls", url: "https://proxy-impuls.zmobilu.workers.dev", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoImpuls.png", style: "background:#FED807;", category: "České" },
+
+			// Zahraničné správy (Verejnoprávne)
+			{ id: "bbc-world", name: "BBC World", url: "https://stream.live.vc.bbcmedia.co.uk/bbc_world_service", icon: "fa-solid fa-globe", color: "#eb0028", style: "background:#111; color:#eb0028;", category: "Zahraničné správy" },
+			{ id: "npr-news", name: "NPR News", url: "https://npr-ice.streamguys1.com/live.mp3", icon: "fa-solid fa-landmark", color: "#61afef", style: "background:#111; color:#61afef;", category: "Zahraničné správy" },
+			{ id: "rfi-english", name: "RFI English", url: "https://rfienanglais64k.ice.infomaniak.ch/rfienanglais-64.mp3", icon: "fa-solid fa-earth-europe", color: "#ff9f0a", style: "background:#111; color:#ff9f0a;", category: "Zahraničné správy" },
+			{ id: "dlf-news", name: "Deutschlandfunk", url: "https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3", icon: "fa-solid fa-newspaper", color: "#D6B55B", style: "background:#111; color:#D6B55B;", category: "Zahraničné správy" },
+			{ id: "srf4-news", name: "SRF 4 News", url: "https://stream.srg-ssr.ch/m/drs4news/mp3_128", icon: "fa-solid fa-radio", color: "#98c379", style: "background:#111; color:#98c379;", category: "Zahraničné správy" },
+			
+			// Radio Rock a dalsie  Non-Stop
+			{ id: "rock", name: "Radio ROCK", url: "https://stream.bauermedia.sk/rock-hi.mp3", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoAntenaROCK.png", style: "background:#000000;", category: "Rock Non-Stop" },
+			{ id: "ouifm-inde", name: "OÜI Rock", url: "https://ouifm2.ice.infomaniak.ch/ouifm2.mp3", icon: "fa-solid fa-compact-disc", color: "#61afef", style: "background:#111; color:#61afef;", category: "Rock Non-Stop" },
+			{ id: "spoon-rock", name: "Spoon Rock", url: "https://spoonradio.ice.infomaniak.ch/spoonradio-high.mp3", icon: "fa-solid fa-guitar", color: "#ff9f0a", style: "background:#111; color:#ff9f0a;", category: "Rock Non-Stop" },
+			{ id: "virgin-rock", name: "Virgin Rock", url: "https://virginrocklive.ice.infomaniak.ch/virgin-radio-rock-live.mp3", icon: "fa-solid fa-radio", color: "#c678dd", style: "background:#111; color:#c678dd;", category: "Rock Non-Stop" },
+			{ id: "1fm-rockclassics", name: "Rock Classic", url: "https://strm112.1.fm/rockclassics_mobile_mp3", icon: "fa-solid fa-record-vinyl", color: "#D6B55B", style: "background:#111; color:#D6B55B;", category: "Rock Non-Stop" },
+			{ id: "1fm-highvoltage", name: "High Voltage", url: "https://strm112.1.fm/highvoltage_mobile_mp3", icon: "fa-solid fa-skull", color: "#98c379", style: "background:#111; color:#98c379;", category: "Rock Non-Stop" },
+			{ id: "star-hardrock", name: "Hard Rock", url: "https://stream.starfm.de/hardrock/mp3-192/", icon: "fa-solid fa-drum", color: "#e5c07b", style: "background:#111; color:#e5c07b;", category: "Rock Non-Stop" },
+			{ id: "ra-grunge", name: "Grunge Rock", url: "https://stream.rockantenne.de/grunge/stream/mp3", icon: "fa-solid fa-volume-high", color: "#56b6c2", style: "background:#111; color:#56b6c2;", category: "Rock Non-Stop" },
+
+			// Jazz & Lounge
+			{ id: "jazz", name: "Rádio Jazz", url: "https://radio-jazz-proxy.zmobilu.workers.dev", img: "https://raw.githubusercontent.com/zmobilu/assets/main/LogoRadioJazz.png", style: "background:#FFFFFF;", category: "Jazz & Lounge" },
+			{ id: "classic-jazz", name: "Classic Jazz", url: "https://jazz-wr01.ice.infomaniak.ch/jazz-wr01-128.mp3", icon: "fa-solid fa-mug-hot", color: "#ff9f0a", style: "background:#111; color:#ff9f0a;", category: "Jazz & Lounge" },
+			{ id: "tsf-jazz", name: "TSF Jazz", url: "https://tsfjazz.ice.infomaniak.ch/tsfjazz-high.mp3", icon: "fa-solid fa-music", color: "#D6B55B", style: "background:#111; color:#D6B55B;", category: "Jazz & Lounge" },
+			{ id: "fr-jazz", name: "Jazz&Soul", url: "https://jazzradio.ice.infomaniak.ch/jazzradio-high.mp3", icon: "fa-solid fa-record-vinyl", color: "#e06c75", style: "background:#111; color:#e06c75;", category: "Jazz & Lounge" },
+			{ id: "1fm-smooth", name: "Smooth Jazz", url: "https://strm112.1.fm/smoothjazz_mobile_mp3", icon: "fa-solid fa-martini-glass", color: "#61afef", style: "background:#111; color:#61afef;", category: "Jazz & Lounge" },
+			{ id: "1fm-blues", name: "Soft Blues", url: "https://strm112.1.fm/blues_mobile_mp3", icon: "fa-solid fa-whiskey-glass", color: "#748ffc", style: "background:#111; color:#748ffc;", category: "Jazz & Lounge" },
+			{ id: "1fm-bossa", name: "Bossa Nova", url: "https://strm112.1.fm/bossanova_mobile_mp3", icon: "fa-solid fa-guitar", color: "#98c379", style: "background:#111; color:#98c379;", category: "Jazz & Lounge" },
+			{ id: "1fm-lounge", name: "Chill Lounge", url: "https://strm112.1.fm/chilloutlounge_mobile_mp3", icon: "fa-solid fa-couch", color: "#c678dd", style: "background:#111; color:#c678dd;", category: "Jazz & Lounge" },
+			{ id: "groove-jazz", name: "Cafe Groove", url: "https://jazz-wr08.ice.infomaniak.ch/jazz-wr08-128.mp3", icon: "fa-solid fa-headphones", color: "#56b6c2", style: "background:#111; color:#56b6c2;", category: "Jazz & Lounge" },
+
+			// Hip-Hop & Rap
+			{ id: "bigfm-oldschool", name: "Oldschool", url: "https://streams.bigfm.de/bigfm-oldschool-128-mp3", icon: "fa-solid fa-microphone-lines", color: "#ff9f0a", style: "background:#111; color:#ff9f0a;", category: "Hip-Hop & Rap" },
+			{ id: "bigfm-usrap", name: "US Rap", url: "https://streams.bigfm.de/bigfm-usrap-128-mp3", icon: "fa-solid fa-compact-disc", color: "#eb0028", style: "background:#111; color:#eb0028;", category: "Hip-Hop & Rap" },
+			{ id: "gen-90s", name: "90s Hip-Hop", url: "https://generations-90.ice.infomaniak.ch/generations-90.mp3", icon: "fa-solid fa-record-vinyl", color: "#D6B55B", style: "background:#111; color:#D6B55B;", category: "Hip-Hop & Rap" },
+			{ id: "gen-rapus", name: "Générat.US", url: "https://generationfm-rap.ice.infomaniak.ch/generationfm-rap-high.mp3", icon: "fa-solid fa-headphones", color: "#61afef", style: "background:#111; color:#61afef;", category: "Hip-Hop & Rap" },
+			{ id: "1fm-jamz", name: "1.FM Jamz", url: "https://strm112.1.fm/jamz_mobile_mp3", icon: "fa-solid fa-fire", color: "#c678dd", style: "background:#111; color:#c678dd;", category: "Hip-Hop & Rap" },
+			{ id: "1fm-90srnb", name: "90s Urban", url: "https://strm112.1.fm/90srnb_mobile_mp3", icon: "fa-solid fa-music", color: "#98c379", style: "background:#111; color:#98c379;", category: "Hip-Hop & Rap" },
+
+			// Severský & Keltský Folk
+			{ id: "celtcast", name: "Celt Viking", url: "https://caster04.streampakket.com/proxy/8982/CeltCast/;type=mp3", icon: "fa-solid fa-shield-halved", color: "#D6B55B", style: "background:#111; color:#D6B55B;", category: "Severský & Keltský Folk" },
+			{ id: "nrk-folk", name: "NRK Folk", url: "https://lyd.nrk.no/nrk_radio_folkemusikk_mp3_h", icon: "fa-solid fa-mountain", color: "#61afef", style: "background:#111; color:#61afef;", category: "Severský & Keltský Folk" },
+			{ id: "nord-bretagne", name: "Bretagne Folk", url: "https://radionordbretagne.ice.infomaniak.ch/radionordbretagne.mp3", icon: "fa-solid fa-compass", color: "#56b6c2", style: "background:#111; color:#56b6c2;", category: "Severský & Keltský Folk" },
+			{ id: "laut-celtic", name: "Celtic Sounds", url: "https://stream.laut.fm/celtic-sounds", icon: "fa-solid fa-guitar", color: "#D6B55B", style: "background:#111; color:#D6B55B;", category: "Severský & Keltský Folk" },
+
+			// Elektronická scéna
+			{ id: "S-techno", name: "Techno", url: "https://stream.sunshine-live.de/techno/mp3-192/", icon: "fa-solid fa-bolt", color: "#307CEB", style: "background:#111; color:#307CEB;", category: "Elektronická scéna" },
+			{ id: "schranz", name: "Schranz", url: "https://stream.sunshine-live.de/schranz/mp3-192/", icon: "fa-solid fa-triangle-exclamation", color: "#fff", style: "background:#111;", category: "Elektronická scéna" },
+			{ id: "melodic", name: "Melod Beats", url: "https://stream.sunshine-live.de/MelodicB/mp3-192/", icon: "fa-solid fa-wave-square", color: "#fff", style: "background:#111;", category: "Elektronická scéna" },
+			{ id: "h-techno", name: "H Techno", url: "https://stream.sunshine-live.de/Hardtechno/mp3-192/", icon: "fa-solid fa-circle-radiation", color: "#fff", style: "background:#111;", category: "Elektronická scéna" },
+			{ id: "Drumcode", name: "DrumBass", url: "https://stream.sunshine-live.de/dnb/mp3-192/", icon: "fa-solid fa-volume-high", color: "#fff", style: "background:#111;", category: "Elektronická scéna" },
+			
+		];
 
         const RODINA = ['Dominik', 'Janka', 'Patrik', 'Martin', 'Andrea', 'Roman', 'Emília', 'Ján', 'Mária', 'Juraj', 'Tatiana', 'Rastislav', 'Viktor', 'Adela', 'Linda', 'Michal', 'Ondrej', 'Jana', 'Viliam', 'Nataša', 'Kristína', 'Tibor', 'Ema'];
         const KOLEGOVIA = ['Ivana', 'Mária', 'Iveta', 'Nina', 'Adriana', 'Jaroslava', 'Eva', 'Jana', 'Jozef', 'Marcel', 'Karol', 'Anna', 'Petra', 'Dominika'];
