@@ -2539,9 +2539,30 @@
             }, 30000);
         }
 
-        function renderSidebarFavorites() {
+        function vycistiNeplatneSloty() {
+		    let zmenene = false;
+		    for (let i = 0; i < 8; i++) {
+		        const id = slotFavorites[i];
+		        if (!id || !DATABASE.some(d => d.id === id)) {
+		            if (slotFavorites[i] !== null) {
+		                slotFavorites[i] = null;
+		                zmenene = true;
+		            }
+		        }
+		    }
+		    if (slotFavorites.length !== 8) {
+		        slotFavorites.length = 8;
+		        zmenene = true;
+		    }
+		    if (zmenene) {
+		        localStorage.setItem('kiosk_slots_v3', JSON.stringify(slotFavorites));
+		    }
+		}
+		
+		function renderSidebarFavorites() {
+		    vycistiNeplatneSloty();
 		    const container = document.getElementById('favSidebarContainer');
-		    if(!container) return;
+		    if (!container) return;
 		    container.innerHTML = "";
 		
 		    for (let i = 0; i < 8; i++) {
@@ -2552,7 +2573,6 @@
 		        if (item && id !== null) {
 		            card.className = "fav-card";
 		            
-		            // JEDNODUCHÁ KONTROLA: Rámik svieti len vtedy, ak má rádio aktívny status
 		            if (currentPlayingType === item.id) {
 		                card.classList.add("playing");
 		            }
@@ -2566,6 +2586,7 @@
 		            }
 		        } else {
 		            card.className = "fav-card empty";
+		            card.onclick = () => otvorNastaveniaPreSlot();
 		            card.innerHTML = `<i class="fa-solid fa-plus"></i>`;
 		        }
 		        container.appendChild(card);
@@ -2626,19 +2647,15 @@
         }
 
         function handleChannelSelectionToggle(id) {
+		    vycistiNeplatneSloty();
 		    const existingIndex = slotFavorites.indexOf(id);
 		    
 		    // 1. Ak už rádio v obľúbených je, kliknutím ho odstránime (nahradíme null)
 		    if (existingIndex !== -1) {
 		        slotFavorites[existingIndex] = null;
 		    } else {
-		        // 2. Hľadáme index prvého voľného miesta (kde je null, undefined alebo "")
-		        let freeSlotIndex = slotFavorites.findIndex(slot => !slot);
-		        
-		        // Ak je pole kratšie ako 8, môžeme pridať nový slot
-		        if (freeSlotIndex === -1 && slotFavorites.length < 8) {
-		            freeSlotIndex = slotFavorites.length;
-		        }
+		        // 2. Hľadáme prvý voľný slot (null alebo ID neexistujúce v DATABASE)
+		        let freeSlotIndex = slotFavorites.findIndex(slot => !slot || !DATABASE.some(d => d.id === slot));
 		
 		        if (freeSlotIndex !== -1 && freeSlotIndex < 8) {
 		            slotFavorites[freeSlotIndex] = id;
@@ -2646,11 +2663,6 @@
 		            alert("Všetkých 8 pozícií je plných. Najprv kliknutím uvoľnite niektoré miesto.");
 		            return;
 		        }
-		    }
-		    
-		    // Garantujeme, že pole má vždy presne 8 položiek
-		    while (slotFavorites.length < 8) {
-		        slotFavorites.push(null);
 		    }
 		
 		    localStorage.setItem('kiosk_slots_v3', JSON.stringify(slotFavorites));
