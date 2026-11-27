@@ -726,20 +726,73 @@
                     transform: scaleY(1.90) translateY(-8vh) !important;
                 }
 
-                /* Iba v NOČNOM režime držíme prehrávač dole */
+                .night-btn {
+                    touch-action: manipulation; /* Okamžitá reakcia bez 300ms oneskorenia a zoomu pri rýchlom klikaní */
+                }
+                .night-btn-all {
+                    opacity: 0.72;
+                }
+                .night-player-station {
+                    max-width: 92vw;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                /* NOČNÝ REŽIM na výšku */
                 body.full-night-mode .night-player-container {
                     position: absolute !important;
                     bottom: 18vh !important;
                     width: 100% !important;
                 }
+                body.full-night-mode .night-player-controls {
+                    width: 100% !important;
+                    gap: 4.5vw !important;
+                }
+                body.full-night-mode .night-btn {
+                    font-size: 7.5vw !important;
+                    padding: 10px 8px !important;
+                }
+                body.full-night-mode .night-btn.btn-playpause {
+                    font-size: 10vw !important;
+                }
 
-                /* V DENNOM režime pri schovanom paneli ho presunieme do prirodzeného toku pod dátum */
+                /* DENNÝ REŽIM na výšku (so spodnou mriežkou 8 rádií) */
+                body:not(.full-night-mode) .night-player-container {
+                    width: 100% !important;
+                    margin-top: 0.3vh !important;
+                    margin-bottom: 0.3vh !important;
+                }
+                body:not(.full-night-mode) .night-player-station {
+                    font-size: 4.2vw !important;
+                    margin-bottom: 0.3vh !important;
+                }
+                body:not(.full-night-mode) .night-player-controls {
+                    width: 100% !important;
+                    gap: 3.5vw !important;
+                }
+                body:not(.full-night-mode) .night-btn {
+                    font-size: 6.2vw !important;
+                    padding: 4px 8px !important;
+                }
+                body:not(.full-night-mode) .night-btn.btn-playpause {
+                    font-size: 8.2vw !important;
+                }
+
+                /* DENNÝ REŽIM pri skrytom spodnom paneli (väčšie tlačidlá) */
                 body:not(.full-night-mode).sidebar-hidden .night-player-container {
                     position: relative !important;
                     bottom: auto !important;
                     width: 100% !important;
                     margin-top: 1vh !important;
                     margin-bottom: 1vh !important;
+                }
+                body:not(.full-night-mode).sidebar-hidden .night-btn {
+                    font-size: 7.5vw !important;
+                    padding: 8px 10px !important;
+                }
+                body:not(.full-night-mode).sidebar-hidden .night-btn.btn-playpause {
+                    font-size: 9.5vw !important;
                 }
             }
            
@@ -1473,9 +1526,11 @@
 				        <i class="fa-solid fa-radio"></i> <span id="nightStationName">OFFLINE</span>
 				    </div>
 				    <div class="night-player-controls">
-				        <button class="night-btn" onclick="spustiDalsieRadio('vzad'); event.stopPropagation();"><i class="fa-solid fa-backward-step"></i></button>
+				        <button class="night-btn night-btn-all" onclick="spustiDalsieRadio('vzad', 'all'); event.stopPropagation();" title="Predchádzajúca zo všetkých"><i class="fa-solid fa-angles-left"></i></button>
+				        <button class="night-btn" onclick="spustiDalsieRadio('vzad', 'fav'); event.stopPropagation();" title="Predchádzajúca obľúbená"><i class="fa-solid fa-backward-step"></i></button>
 				        <button class="night-btn btn-playpause" onclick="toggleNightPlayPause(); event.stopPropagation();" id="nightPlayPauseBtn"><i class="fa-solid fa-circle-play"></i></button>
-				        <button class="night-btn" onclick="spustiDalsieRadio('vpred'); event.stopPropagation();"><i class="fa-solid fa-forward-step"></i></button>
+				        <button class="night-btn" onclick="spustiDalsieRadio('vpred', 'fav'); event.stopPropagation();" title="Ďalšia obľúbená"><i class="fa-solid fa-forward-step"></i></button>
+				        <button class="night-btn night-btn-all" onclick="spustiDalsieRadio('vpred', 'all'); event.stopPropagation();" title="Ďalšia zo všetkých"><i class="fa-solid fa-angles-right"></i></button>
 				    </div>
 				</div>
                 
@@ -2840,53 +2895,59 @@
             }
         }
         
-        function spustiDalsieRadio(smer) {
-            if (!currentPlayingType || currentPlayingType === "") return;
-            let currentIndex = slotFavorites.indexOf(currentPlayingType);
-            if (currentIndex === -1) return;
+        let radioPlayTimeout = null;
 
-            let novyIndex = currentIndex;
-            let najdeneRadio = null;
+        function spustiDalsieRadio(smer, rezim = 'fav') {
+            const jePlatneRadio = (item) => item && item.url && !item.isExternal &&
+                !item.url.includes('googleusercontent.com') &&
+                !item.url.includes('music.apple.com') &&
+                !item.url.includes('music.youtube.com') &&
+                !item.url.includes('tidal.com') &&
+                !item.url.includes('soundcloud.com') &&
+                !item.url.includes('open.spotify.com');
 
-            for (let i = 0; i < 8; i++) {
-                novyIndex = (smer === 'vpred') ? (novyIndex + 1) % 8 : (novyIndex - 1 + 8) % 8;
-                const idKandidata = slotFavorites[novyIndex];
-                if (!idKandidata) continue;
+            const zoznam = (rezim === 'all')
+                ? DATABASE.filter(jePlatneRadio)
+                : slotFavorites
+                    .map(id => DATABASE.find(d => d.id === id))
+                    .filter(jePlatneRadio);
 
-                const item = DATABASE.find(d => d.id === idKandidata);
-                if (item && item.url && !item.url.includes('googleusercontent.com') && !item.url.includes('music.apple.com') && !item.url.includes('music.youtube.com') && !item.url.includes('tidal.com') && !item.url.includes('soundcloud.com')) {
-                    najdeneRadio = item;
-                    break;
-                }
-            }
+            if (!zoznam.length) return;
 
+            const aktualneId = currentPlayingType || localStorage.getItem('kiosk_last_radio_type');
+            const currentIndex = zoznam.findIndex(item => item.id === aktualneId);
+
+            const novyIndex = (currentIndex === -1)
+                ? (smer === 'vpred' ? 0 : zoznam.length - 1)
+                : (smer === 'vpred' ? (currentIndex + 1) % zoznam.length : (currentIndex - 1 + zoznam.length) % zoznam.length);
+
+            const najdeneRadio = zoznam[novyIndex];
             if (najdeneRadio) {
+                manualnePozastavene = false;
                 playRadio(najdeneRadio.url, najdeneRadio.id);
             }
         }
         
         function playRadio(url, id) {
+		    clearTimeout(radioPlayTimeout);
 		    audio.src = url;
 		    audio.load();
-		    // Zoberieme priamu URL adresu rádia a spustíme analýzu streamu
-		    sledujStreamMetadat(url);
 		    currentPlayingType = id;
 		    localStorage.setItem('kiosk_last_radio_url', url);
 		    localStorage.setItem('kiosk_last_radio_type', id);
-		    // Načítanie individuálnej uloženej hlasitosti pre stanicu
+
+		    renderSidebarFavorites();
+		    aktualizujNochnyPrehravacVizual();
+
 		    const savedRadioVol = localStorage.getItem(`vol_radio_${id}`);
-		    let initialVol;
-		    
-		    if (savedRadioVol !== null) {
-		        initialVol = parseFloat(savedRadioVol);
-		    } else {
-		        initialVol = VOLUME_MAP[id] !== undefined ? VOLUME_MAP[id] : 0.8;
-		    }
+		    let initialVol = (savedRadioVol !== null)
+		        ? parseFloat(savedRadioVol)
+		        : (VOLUME_MAP[id] !== undefined ? VOLUME_MAP[id] : 0.8);
 		    
 		    applyAndSaveVolume(initialVol);
+		    sledujStreamMetadat(url);
 		
-		    // Pridaný pauza 800 ms pre načítanie bufferu zo siete
-		    setTimeout(() => {
+		    radioPlayTimeout = setTimeout(() => {
 		        audio.play()
 		        .then(() => {
 		            if (typeof noSleep !== 'undefined') {
@@ -2898,7 +2959,7 @@
 		            aktualizujNochnyPrehravacVizual();
 		        })
 		        .catch((e) => console.log("Stream offline", e));
-		    }, 800);
+		    }, 300);
 		}
 
         function triggerExternalApp(url, id) {
@@ -3158,7 +3219,8 @@
 			});
 			
 			audio.addEventListener('pause', () => {
-			    document.getElementById("player-now-playing").innerText = "";
+			    const nowPlayingEl = document.getElementById("player-now-playing");
+    			if (nowPlayingEl) nowPlayingEl.innerText = "";
 			    if ('mediaSession' in navigator) {
 			        navigator.mediaSession.playbackState = "paused";
 			    }
@@ -3212,6 +3274,7 @@
         
         async function sledujStreamMetadat(streamUrl) {
             const textElement = document.getElementById("player-now-playing");
+   			if (textElement) textElement.innerText = "";
             
             // 1. Okamžitý reset - pri každom prepnutí okamžite vyčistíme obrazovku
             textElement.innerText = ""; 
